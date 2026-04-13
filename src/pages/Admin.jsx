@@ -1,9 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
+import { getSupabase } from '../services/supabaseClient'
+import {
+  isLikelySupabaseBucketUrl,
+  isSupabaseStorageConfigured,
+  uploadPublicSiteImage,
+} from '../services/supabaseStorageUpload'
 
 const AUTH_KEY = 'cs_admin_auth'
 
@@ -90,6 +96,181 @@ async function fileToArticleImageSrc(file) {
     }
   }
   return undefined
+}
+
+function adminSrcIsRemovable(src) {
+  const s = String(src || '').trim()
+  if (!s) return false
+  if (s.startsWith('data:')) return true
+  return isLikelySupabaseBucketUrl(s)
+}
+
+const AdminMediaContext = createContext(null)
+
+function useAdminMedia() {
+  const ctx = useContext(AdminMediaContext)
+  if (!ctx) {
+    throw new Error('useAdminMedia doit être utilisé dans AdminMediaGate.')
+  }
+  return ctx
+}
+
+function AdminMediaGate({ children, setMsg }) {
+  const storageOn = isSupabaseStorageConfigured()
+  const [session, setSession] = useState(null)
+  const [authReady, setAuthReady] = useState(!storageOn)
+  const [authBusy, setAuthBusy] = useState(false)
+  const [sbEmail, setSbEmail] = useState('')
+  const [sbPassword, setSbPassword] = useState('')
+  const [sbErr, setSbErr] = useState('')
+
+  useEffect(() => {
+    if (!storageOn) return undefined
+    const sb = getSupabase()
+    if (!sb) {
+      setAuthReady(true)
+      return undefined
+    }
+    let cancelled = false
+    sb.auth.getSession().then(({ data: { session: s } }) => {
+      if (!cancelled) {
+        setSession(s ?? null)
+        setAuthReady(true)
+      }
+    })
+    const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {
+      setSession(s ?? null)
+    })
+    return () => {
+      cancelled = true
+      sub.subscription.unsubscribe()
+    }
+  }, [storageOn])
+
+  const signInSupabase = async (e) => {
+    e.preventDefault()
+    setSbErr('')
+    const sb = getSupabase()
+    if (!sb) {
+      setSbErr('Client Supabase indisponible.')
+      return
+    }
+    setAuthBusy(true)
+    const { error } = await sb.auth.signInWithPassword({
+      email: sbEmail.trim(),
+      password: sbPassword,
+    })
+    setAuthBusy(false)
+    if (error) {
+      setSbErr(error.message || 'Connexion impossible.')
+      return
+    }
+    setSbPassword('')
+    setMsg('Compte Supabase connecté — vos prochains envois de photos iront dans le stockage cloud.')
+  }
+
+  const signOutSupabase = async () => {
+    const sb = getSupabase()
+    setSbErr('')
+    if (sb) await sb.auth.signOut()
+    setMsg('Déconnecté du stockage Supabase.')
+  }
+
+  const fileToSrc = useCallback(
+    async (file, { variant, folder }) => {
+      if (!file || !file.type.startsWith('image/')) return undefined
+      const sb = getSupabase()
+      if (storageOn && sb && session && folder) {
+        try {
+          const url = await uploadPublicSiteImage(sb, file, folder)
+          setMsg('')
+          return url
+        } catch (err) {
+          const msg = err?.message || String(err)
+          setMsg(`Envoi Supabase : ${msg}. Réessai en image intégrée (navigateur)…`)
+        }
+      } else if (storageOn && sb && !session) {
+        setMsg('Connectez-vous à Supabase (bloc « Photos sur le cloud ») pour envoyer les fichiers sur le serveur.')
+      }
+      if (variant === 'article') return fileToArticleImageSrc(file)
+      return fileToGallerySrc(file)
+    },
+    [storageOn, session, setMsg],
+  )
+
+  const value = useMemo(
+    () => ({
+      storageOn,
+      session,
+      authReady,
+      fileToSrc,
+    }),
+    [storageOn, session, authReady, fileToSrc],
+  )
+
+  return (
+    <AdminMediaContext.Provider value={value}>
+      {storageOn && authReady ? (
+        <div
+          className="mb-6 rounded-xl border p-4 space-y-3"
+          style={{ borderColor: 'rgba(139,75,106,0.35)', background: 'rgba(255,248,251,0.85)' }}
+        >
+          <h2 className="text-base font-semibold" style={{ color: 'var(--violet)' }}>
+            Photos sur le cloud (Supabase Storage)
+          </h2>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+            Un compte <strong>Supabase Auth</strong> (différent du mot de passe admin du site) permet d’uploader les images
+            depuis cette page. Créez un utilisateur dans le tableau Supabase : Authentication → Users. Le bucket doit être
+            public en lecture ; les policies Storage autorisent l’écriture aux utilisateurs authentifiés (voir commentaires dans{' '}
+            <code className="text-[10px]">src/services/supabaseStorageUpload.js</code>).
+          </p>
+          {session?.user ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs">
+                Connecté : <strong>{session.user.email}</strong>
+              </span>
+              <button type="button" className="btn-outline text-xs py-2 px-3" onClick={signOutSupabase}>
+                Déconnexion Supabase
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={signInSupabase} className="flex flex-col sm:flex-row flex-wrap gap-2 items-end">
+              <label className="block flex-1 min-w-[10rem]">
+                <span className="text-[11px]">Email Supabase</span>
+                <input
+                  type="email"
+                  autoComplete="username"
+                  className="form-field mt-1"
+                  value={sbEmail}
+                  onChange={(e) => setSbEmail(e.target.value)}
+                  placeholder="admin@votredomaine.fr"
+                />
+              </label>
+              <label className="block flex-1 min-w-[10rem]">
+                <span className="text-[11px]">Mot de passe</span>
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  className="form-field mt-1"
+                  value={sbPassword}
+                  onChange={(e) => setSbPassword(e.target.value)}
+                />
+              </label>
+              <button type="submit" className="btn-primary text-xs py-2 px-4 mb-0.5" disabled={authBusy}>
+                {authBusy ? 'Connexion…' : 'Connexion'}
+              </button>
+            </form>
+          )}
+          {sbErr ? (
+            <p className="text-xs" style={{ color: 'var(--mauve)' }}>
+              {sbErr}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      {children}
+    </AdminMediaContext.Provider>
+  )
 }
 
 function computeFullName(first, last) {
@@ -329,8 +510,22 @@ export default function Admin() {
     return (
       <div className="admin-page font-sans pt-6 px-4 pb-20 max-w-lg mx-auto">
         <h1 className="text-2xl mb-4" style={{ color: 'var(--violet)' }}>Admin</h1>
-        <p className="text-sm" style={{ color: 'var(--text-mid)' }}>
-          Ajoutez <code className="text-xs">VITE_ADMIN_PASSWORD=votre_mot_de_passe</code> dans le fichier <code>.env</code> à la racine du projet, puis redémarrez le serveur de dev.
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+          {import.meta.env.PROD ? (
+            <>
+              Le site est en <strong>production</strong> : le mot de passe admin vient des variables d’environnement au moment du build.
+              <br />
+              <br />
+              Sur <strong>Vercel</strong> : projet → <strong>Settings</strong> → <strong>Environment Variables</strong> → ajoutez{' '}
+              <code className="text-xs bg-mauve-light/20 px-1 rounded">VITE_ADMIN_PASSWORD</code> (valeur = votre mot de passe), cochez{' '}
+              <strong>Production</strong>, enregistrez, puis <strong>Deployments</strong> → menu <strong>⋯</strong> du dernier déploiement →{' '}
+              <strong>Redeploy</strong>.
+            </>
+          ) : (
+            <>
+              Ajoutez <code className="text-xs">VITE_ADMIN_PASSWORD=votre_mot_de_passe</code> dans le fichier <code>.env</code> à la racine du projet, puis redémarrez le serveur de dev.
+            </>
+          )}
         </p>
         <Link to="/" className="btn-outline inline-block mt-6 text-xs">← Retour</Link>
       </div>
@@ -362,6 +557,7 @@ export default function Admin() {
   const h = c.home
 
   return (
+    <AdminMediaGate setMsg={setMsg}>
     <div className="admin-page font-sans pt-24 pb-20 px-4 max-w-4xl mx-auto text-sm" style={{ color: 'var(--text-mid)' }}>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--violet)' }}>Administration du site</h1>
@@ -514,6 +710,7 @@ export default function Admin() {
           pageArticles={c.pageArticles}
           save={save}
           setMsg={setMsg}
+          contentDriver={contentDriver}
         />
       )}
 
@@ -624,10 +821,12 @@ export default function Admin() {
         </div>
       )}
     </div>
+    </AdminMediaGate>
   )
 }
 
 function HeroBackgroundEditor({ initial, onDraftChange }) {
+  const { fileToSrc } = useAdminMedia()
   const [src, setSrc] = useState(initial?.backgroundSrc || '')
   const [photoKey, setPhotoKey] = useState(initial?.backgroundPhotoKey || '')
 
@@ -640,8 +839,8 @@ function HeroBackgroundEditor({ initial, onDraftChange }) {
     const file = fileList?.[0]
     if (!file) return
     try {
-      const dataUrl = await fileToGallerySrc(file)
-      if (dataUrl) setSrc(dataUrl)
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/hero' })
+      if (url) setSrc(url)
     } catch {
       /* ignore */
     }
@@ -691,9 +890,9 @@ function HeroBackgroundEditor({ initial, onDraftChange }) {
               }}
             />
           </label>
-          {src?.startsWith('data:') && (
+          {adminSrcIsRemovable(src) && (
             <button type="button" className="btn-outline text-[11px] py-2 px-3" onClick={() => setSrc('')}>
-              Retirer l’image intégrée
+              Retirer la photo
             </button>
           )}
         </span>
@@ -721,9 +920,9 @@ function HeroBackgroundEditor({ initial, onDraftChange }) {
           />
         )}
         <p className="text-[11px] leading-snug max-w-md" style={{ color: 'var(--text-mid)' }}>
-          Aperçu du bandeau d’accueil. Sans image : dégradé comme sur le site. Les très grandes images peuvent remplir le
-          stockage du navigateur : préférez un fichier dans <code className="text-[10px]">public/</code> et un chemin en
-          src.
+          Aperçu du bandeau d’accueil. Sans image : dégradé comme sur le site. Connecté à Supabase Storage : les envois
+          vont dans le cloud (URL en <code className="text-[10px]">src</code>). Sinon, les images peuvent être intégrées
+          (navigateur) ou des chemins <code className="text-[10px]">public/</code>.
         </p>
       </div>
     </fieldset>
@@ -731,6 +930,7 @@ function HeroBackgroundEditor({ initial, onDraftChange }) {
 }
 
 function HomeCoupsEditor({ initial, onDraftChange }) {
+  const { fileToSrc } = useAdminMedia()
   const [pretitle, setPretitle] = useState(initial?.pretitle || '')
   const [title, setTitle] = useState(initial?.title || '')
   const [intro, setIntro] = useState(initial?.intro || '')
@@ -753,8 +953,8 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
     const file = fileList?.[0]
     if (!file) return
     try {
-      const dataUrl = await fileToGallerySrc(file)
-      if (dataUrl) setField(idx, 'src', dataUrl)
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/coups' })
+      if (url) setField(idx, 'src', url)
     } catch {
       /* ignore */
     }
@@ -863,9 +1063,9 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
                     }}
                   />
                 </label>
-                {it.src?.startsWith('data:') && (
+                {adminSrcIsRemovable(it.src) && (
                   <button type="button" className="btn-outline text-[11px] py-2 px-3" onClick={() => setField(idx, 'src', '')}>
-                    Retirer l’image intégrée
+                    Retirer la photo
                   </button>
                 )}
               </span>
@@ -897,6 +1097,7 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
 }
 
 function HomePrestationsEditor({ initial, onDraftChange }) {
+  const { fileToSrc } = useAdminMedia()
   const [pretitle, setPretitle] = useState(initial?.pretitle || '')
   const [title, setTitle] = useState(initial?.title || '')
   const [categories, setCategories] = useState(() =>
@@ -919,8 +1120,8 @@ function HomePrestationsEditor({ initial, onDraftChange }) {
     const file = fileList?.[0]
     if (!file) return
     try {
-      const dataUrl = await fileToGallerySrc(file)
-      if (dataUrl) setField(idx, 'src', dataUrl)
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/prestations' })
+      if (url) setField(idx, 'src', url)
     } catch {
       /* ignore */
     }
@@ -981,9 +1182,9 @@ function HomePrestationsEditor({ initial, onDraftChange }) {
                     }}
                   />
                 </label>
-                {cat.src?.startsWith('data:') && (
+                {adminSrcIsRemovable(cat.src) && (
                   <button type="button" className="btn-outline text-[11px] py-2 px-3" onClick={() => setField(i, 'src', '')}>
-                    Retirer l’image intégrée
+                    Retirer la photo
                   </button>
                 )}
               </span>
@@ -1034,7 +1235,8 @@ function emptyArticleItem() {
   }
 }
 
-function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg }) {
+function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, contentDriver }) {
+  const { fileToSrc } = useAdminMedia()
   const current = pageArticles?.[pageKey] || { sectionTitle: '', intro: '', items: [] }
   const [saveFeedback, setSaveFeedback] = useState(null)
   const [localTitle, setLocalTitle] = useState(current.sectionTitle || '')
@@ -1071,13 +1273,13 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg })
     const file = fileList?.[0]
     if (!file) return
     try {
-      const dataUrl = await fileToArticleImageSrc(file)
-      if (dataUrl) {
-        setField(idx, 'src', dataUrl)
+      const url = await fileToSrc(file, { variant: 'article', folder: 'articles' })
+      if (url) {
+        setField(idx, 'src', url)
         setMsg('')
       } else {
         setMsg(
-          'Image trop lourde même après réduction. Enregistrez le fichier dans le dossier public/ du site (ex. public/boutique/photo.jpg) et indiquez /boutique/photo.jpg dans le champ src.',
+          'Image trop lourde même après réduction. Connectez-vous à Supabase pour l’envoyer dans le cloud, ou placez le fichier dans public/ (ex. /boutique/photo.jpg dans src).',
         )
       }
     } catch {
@@ -1105,14 +1307,20 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg })
     })
     if (ok) {
       setMsg('Articles enregistrés pour cette page.')
-      setSaveFeedback({ ok: true, text: 'Enregistré dans ce navigateur (localStorage).' })
+      setSaveFeedback({
+        ok: true,
+        text:
+          contentDriver === 'supabase'
+            ? 'Enregistré (Supabase + copie locale). Les images en URL cloud allègent le JSON.'
+            : 'Enregistré dans ce navigateur (localStorage).',
+      })
     } else {
       setMsg(
-        'Impossible d’enregistrer : stockage plein. Réduisez les images intégrées ou utilisez des fichiers dans public/.',
+        'Impossible d’enregistrer : stockage plein. Préférez des photos Supabase (URL) ou des fichiers dans public/.',
       )
       setSaveFeedback({
         ok: false,
-        text: 'Échec : espace navigateur insuffisant ou sauvegarde bloquée. Utilisez des images dans public/ (chemins /…) plutôt que des photos intégrées.',
+        text: 'Échec : espace navigateur insuffisant. Utilisez Supabase Storage ou des chemins /… vers public/.',
       })
     }
   }
@@ -1125,11 +1333,22 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg })
       >
         <p className="font-semibold" style={{ color: 'var(--violet)' }}>Voir les photos à jour sur le site public</p>
         <p>
-          L’enregistrement ci-dessous va dans <strong>ce navigateur</strong> (localStorage). Vous les voyez tout de suite ici en visitant le site sur <strong>le même ordinateur / navigateur</strong>.
+          {contentDriver === 'supabase' ? (
+            <>
+              Avec <strong>Supabase</strong>, le texte et les liens d’images se synchronisent pour les visiteurs. Les photos
+              hébergées sur Storage restent des URL légères dans le catalogue.
+            </>
+          ) : (
+            <>
+              L’enregistrement ci-dessous va dans <strong>ce navigateur</strong> (localStorage). Vous les voyez tout de suite
+              ici en visitant le site sur <strong>le même ordinateur / navigateur</strong>.
+            </>
+          )}
         </p>
         <p>
-          Pour <strong>la mise en ligne</strong> (autres appareils, clients) : en haut de l’admin, cliquez <strong>Exporter JSON</strong>, remplacez le fichier{' '}
-          <code className="text-[11px] bg-white/80 px-1 rounded">public/site-content.json</code> par ce fichier, puis reconstruisez et redéployez le site.
+          Pour <strong>la mise en ligne</strong> sans driver Supabase : <strong>Exporter JSON</strong>, remplacez{' '}
+          <code className="text-[11px] bg-white/80 px-1 rounded">public/site-content.json</code>, puis redéployez. Avec{' '}
+          <code className="text-[10px]">VITE_CONTENT_DRIVER=supabase</code>, l’export reste utile pour sauvegarde.
         </p>
       </div>
       <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
@@ -1246,8 +1465,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg })
               <div className="sm:col-span-2 space-y-2">
                 <span className="block text-sm">Image depuis l’ordinateur</span>
                 <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-                  Les photos sont fortement réduites pour tenir dans le stockage du navigateur. Si l’enregistrement échoue encore, placez les fichiers dans{' '}
-                  <code className="text-[10px]">public/</code> et mettez le chemin <code className="text-[10px]">/dossier/fichier.jpg</code> dans src.
+                  Connecté à Supabase : envoi direct vers le cloud (recommandé pour la boutique). Sinon, réduction pour le
+                  navigateur ; en dernier recours, fichiers dans <code className="text-[10px]">public/</code> et chemin{' '}
+                  <code className="text-[10px]">/dossier/fichier.jpg</code> dans src.
                 </p>
                 <label className="btn-outline text-xs py-2 px-4 cursor-pointer inline-block">
                   Parcourir…
@@ -1261,9 +1481,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg })
                     }}
                   />
                 </label>
-                {it.src?.startsWith('data:') && (
+                {adminSrcIsRemovable(it.src) && (
                   <button type="button" className="btn-outline text-[11px] py-2 px-3 ml-2" onClick={() => setField(idx, 'src', '')}>
-                    Retirer l’image intégrée
+                    Retirer la photo
                   </button>
                 )}
                 <label className="block">
