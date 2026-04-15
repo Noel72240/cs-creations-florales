@@ -120,6 +120,7 @@ function AdminMediaGate({ children, setMsg }) {
   const [session, setSession] = useState(null)
   const [authReady, setAuthReady] = useState(!storageOn)
   const [authBusy, setAuthBusy] = useState(false)
+  const [authMode, setAuthMode] = useState('password') // 'password' | 'magic'
   const [sbEmail, setSbEmail] = useState('')
   const [sbPassword, setSbPassword] = useState('')
   const [sbErr, setSbErr] = useState('')
@@ -147,6 +148,16 @@ function AdminMediaGate({ children, setMsg }) {
     }
   }, [storageOn])
 
+  const magicLinkRedirectTo = useMemo(() => {
+    // Utilise l'URL actuelle (dev ou prod) et renvoie sur /admin.
+    // Important: doit être autorisé dans Supabase (Auth -> URL Configuration -> Redirect URLs).
+    try {
+      return new URL('/admin', window.location.href).toString()
+    } catch {
+      return undefined
+    }
+  }, [])
+
   const signInSupabase = async (e) => {
     e.preventDefault()
     setSbErr('')
@@ -156,17 +167,28 @@ function AdminMediaGate({ children, setMsg }) {
       return
     }
     setAuthBusy(true)
-    const { error } = await sb.auth.signInWithPassword({
-      email: sbEmail.trim(),
-      password: sbPassword,
-    })
+    const email = sbEmail.trim()
+    const { error } =
+      authMode === 'magic'
+        ? await sb.auth.signInWithOtp({
+            email,
+            options: magicLinkRedirectTo ? { emailRedirectTo: magicLinkRedirectTo } : undefined,
+          })
+        : await sb.auth.signInWithPassword({
+            email,
+            password: sbPassword,
+          })
     setAuthBusy(false)
     if (error) {
       setSbErr(error.message || 'Connexion impossible.')
       return
     }
-    setSbPassword('')
-    setMsg('Compte Supabase connecté — vos prochains envois de photos iront dans le stockage cloud.')
+    if (authMode === 'magic') {
+      setMsg("Email envoyé (lien magique). Ouvrez-le pour finaliser la connexion, puis revenez sur cette page.")
+    } else {
+      setSbPassword('')
+      setMsg('Compte Supabase connecté — vos prochains envois de photos iront dans le stockage cloud.')
+    }
   }
 
   const signOutSupabase = async () => {
@@ -235,6 +257,21 @@ function AdminMediaGate({ children, setMsg }) {
             </div>
           ) : (
             <form onSubmit={signInSupabase} className="flex flex-col sm:flex-row flex-wrap gap-2 items-end">
+              <label className="block w-full">
+                <span className="text-[11px]">Mode de connexion</span>
+                <select
+                  className="form-field mt-1"
+                  value={authMode}
+                  onChange={(e) => {
+                    setAuthMode(e.target.value)
+                    setSbErr('')
+                    setMsg('')
+                  }}
+                >
+                  <option value="password">Email + mot de passe</option>
+                  <option value="magic">Lien magique par email</option>
+                </select>
+              </label>
               <label className="block flex-1 min-w-[10rem]">
                 <span className="text-[11px]">Email Supabase</span>
                 <input
@@ -246,18 +283,20 @@ function AdminMediaGate({ children, setMsg }) {
                   placeholder="admin@votredomaine.fr"
                 />
               </label>
-              <label className="block flex-1 min-w-[10rem]">
-                <span className="text-[11px]">Mot de passe</span>
-                <input
-                  type="password"
-                  autoComplete="current-password"
-                  className="form-field mt-1"
-                  value={sbPassword}
-                  onChange={(e) => setSbPassword(e.target.value)}
-                />
-              </label>
+              {authMode === 'password' ? (
+                <label className="block flex-1 min-w-[10rem]">
+                  <span className="text-[11px]">Mot de passe</span>
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    className="form-field mt-1"
+                    value={sbPassword}
+                    onChange={(e) => setSbPassword(e.target.value)}
+                  />
+                </label>
+              ) : null}
               <button type="submit" className="btn-primary text-xs py-2 px-4 mb-0.5" disabled={authBusy}>
-                {authBusy ? 'Connexion…' : 'Connexion'}
+                {authBusy ? 'En cours…' : authMode === 'magic' ? 'Envoyer le lien' : 'Connexion'}
               </button>
             </form>
           )}
