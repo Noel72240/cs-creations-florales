@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { useCart } from '../context/CartContext'
-import { useCustomerAuth } from '../context/CustomerAuthContext'
 
 function PromoBannerRich({ text, code }) {
   const c = (code || '').trim()
@@ -45,7 +44,6 @@ const menuItems = [
 
 export default function Navbar() {
   const { itemCount } = useCart()
-  const { isAuthenticated } = useCustomerAuth()
   const { content } = useSiteConfig()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -83,8 +81,6 @@ export default function Navbar() {
     if (path === '/') return location.pathname === '/'
     return location.pathname === path || location.pathname.startsWith(`${path}/`)
   }
-
-  const isCompteActive = location.pathname.startsWith('/compte')
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40)
@@ -216,16 +212,6 @@ export default function Navbar() {
           </nav>
 
             <Link
-              to={isAuthenticated ? '/compte' : '/compte/connexion'}
-              className={`hidden sm:inline-flex shrink-0 items-center px-3 py-2 rounded-xl text-[0.8125rem] font-refined font-medium transition-colors ${
-                isCompteActive ? 'bg-mauve-pale ring-1 ring-mauve-light/50' : 'hover:bg-mauve-pale/80'
-              }`}
-              style={{ color: 'var(--violet)' }}
-            >
-              {isAuthenticated ? 'Mon compte' : 'Connexion'}
-            </Link>
-
-            <Link
               to="/panier"
               className={`relative shrink-0 p-2.5 rounded-xl transition-colors ${
                 location.pathname === '/panier'
@@ -299,13 +285,6 @@ export default function Navbar() {
               </div>
             ))}
             <div className="pt-3 border-t border-mauve-light/30 space-y-2">
-              <Link
-                to={isAuthenticated ? '/compte' : '/compte/connexion'}
-                className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                {isAuthenticated ? 'Mon compte' : 'Connexion / créer un compte'}
-              </Link>
               <Link
                 to="/panier"
                 className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"

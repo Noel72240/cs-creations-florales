@@ -22,9 +22,6 @@ import CGV from './pages/CGV'
 import Paiement from './pages/Paiement'
 import Panier from './pages/Panier'
 import Admin from './pages/Admin'
-import Inscription from './pages/compte/Inscription'
-import Connexion from './pages/compte/Connexion'
-import MonCompte from './pages/compte/MonCompte'
 import ScrollReveal from './components/ScrollReveal'
 import ScrollToTop from './components/ScrollToTop'
 
@@ -49,9 +46,6 @@ function App() {
           <Route path="/creations-saisonnieres/fete-des-meres" element={<FeteDesMeres />} />
           <Route path="/personnalisation" element={<Personnalisation />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/compte/inscription" element={<Inscription />} />
-          <Route path="/compte/connexion" element={<Connexion />} />
-          <Route path="/compte" element={<MonCompte />} />
           <Route path="/panier" element={<Panier />} />
           <Route path="/paiement" element={<Paiement />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
