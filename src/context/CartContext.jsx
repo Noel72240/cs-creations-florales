@@ -13,6 +13,7 @@ function normalizeItem(raw) {
   let qty = parseInt(raw?.quantity, 10)
   if (!Number.isFinite(qty) || qty < 1) qty = 1
   if (qty > 99) qty = 99
+  const selectedColor = raw?.selectedColor ? String(raw.selectedColor).slice(0, 32) : ''
   return {
     id,
     title,
@@ -20,6 +21,7 @@ function normalizeItem(raw) {
     quantity: qty,
     imageUrl: raw?.imageUrl ? String(raw.imageUrl).slice(0, 500) : undefined,
     path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
+    selectedColor,
   }
 }
 
@@ -47,7 +49,8 @@ function persist(items) {
 export function buildCartPrefillMessage(items) {
   if (!items?.length) return ''
   const lines = items.map(
-    (i) => `• ${i.title} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`,
+    (i) =>
+      `• ${i.title}${i.selectedColor ? ` (couleur ${i.selectedColor})` : ''} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`,
   )
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0)
   return [

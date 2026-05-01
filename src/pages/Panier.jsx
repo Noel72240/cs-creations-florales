@@ -61,6 +61,17 @@ export default function Panier() {
                       ) : (
                         <p className="font-heading text-lg" style={{ color: 'var(--violet)' }}>{line.title}</p>
                       )}
+                      {line.selectedColor ? (
+                        <p className="font-body text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
+                          Couleur :{' '}
+                          <span
+                            className="inline-block align-middle h-3.5 w-3.5 rounded-full border border-mauve-light/40 mr-1"
+                            style={{ background: line.selectedColor }}
+                            aria-hidden="true"
+                          />
+                          <span className="font-mono">{line.selectedColor}</span>
+                        </p>
+                      ) : null}
                       <p className="font-body text-sm mt-1" style={{ color: 'var(--text-mid)' }}>
                         {formatEuro(line.price)} <span className="opacity-75">/ unité</span>
                       </p>

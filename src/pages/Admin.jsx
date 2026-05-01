@@ -1271,6 +1271,9 @@ function emptyArticleItem() {
     price: 0,
     photoKey: 'weddingBouquet',
     src: '',
+    photoKey2: '',
+    src2: '',
+    colors: ['', '', ''],
   }
 }
 
@@ -1281,7 +1284,15 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
   const [localTitle, setLocalTitle] = useState(current.sectionTitle || '')
   const [localIntro, setLocalIntro] = useState(current.intro || '')
   const [localItems, setLocalItems] = useState(() =>
-    (current.items || []).slice(0, MAX_PAGE_ARTICLES).map((it) => ({ ...it, price: Number(it.price) || 0 })),
+    (current.items || [])
+      .slice(0, MAX_PAGE_ARTICLES)
+      .map((it) => ({
+        ...it,
+        price: Number(it.price) || 0,
+        photoKey2: it.photoKey2 || '',
+        src2: it.src2 || '',
+        colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+      })),
   )
 
   useEffect(() => {
@@ -1292,7 +1303,17 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     const next = pageArticles?.[pageKey] || { sectionTitle: '', intro: '', items: [] }
     setLocalTitle(next.sectionTitle || '')
     setLocalIntro(next.intro || '')
-    setLocalItems((next.items || []).slice(0, MAX_PAGE_ARTICLES).map((it) => ({ ...it, price: Number(it.price) || 0 })))
+    setLocalItems(
+      (next.items || [])
+        .slice(0, MAX_PAGE_ARTICLES)
+        .map((it) => ({
+          ...it,
+          price: Number(it.price) || 0,
+          photoKey2: it.photoKey2 || '',
+          src2: it.src2 || '',
+          colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+        })),
+    )
   }, [pageKey, pageArticles])
 
   const setField = (idx, key, value) => {
@@ -1326,6 +1347,24 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     }
   }
 
+  const pickImage2 = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'article', folder: 'articles' })
+      if (url) {
+        setField(idx, 'src2', url)
+        setMsg('')
+      } else {
+        setMsg(
+          'Image (photo 2) trop lourde même après réduction. Connectez-vous à Supabase pour l’envoyer dans le cloud, ou placez le fichier dans public/ (ex. /boutique/photo.jpg dans src).',
+        )
+      }
+    } catch {
+      setMsg('Impossible de lire cette image.')
+    }
+  }
+
   const savePage = () => {
     const items = localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
@@ -1334,6 +1373,11 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       price: Math.max(0, Math.round((Number(it.price) || 0) * 100) / 100),
       photoKey: String(it.photoKey || 'weddingBouquet').trim() || 'weddingBouquet',
       src: String(it.src || '').trim(),
+      photoKey2: String(it.photoKey2 || '').trim(),
+      src2: String(it.src2 || '').trim(),
+      colors: Array.isArray(it.colors)
+        ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
+        : ['', '', ''],
     }))
     const ok = save({
       pageArticles: {
@@ -1502,7 +1546,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                 </select>
               </label>
               <div className="sm:col-span-2 space-y-2">
-                <span className="block text-sm">Image depuis l’ordinateur</span>
+                <span className="block text-sm">Image principale (photo 1)</span>
                 <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
                   Connecté à Supabase : envoi direct vers le cloud (recommandé pour la boutique). Sinon, réduction pour le
                   navigateur ; en dernier recours, fichiers dans <code className="text-[10px]">public/</code> et chemin{' '}
@@ -1538,6 +1582,120 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                   <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
                     Aperçu : « src » si renseigné, sinon la clé Unsplash.
                   </p>
+                </div>
+              </div>
+
+              <label className="block">
+                Clé photo 2 (Unsplash, optionnel)
+                <select
+                  className="form-field mt-1"
+                  value={it.photoKey2 || ''}
+                  onChange={(e) => setField(idx, 'photoKey2', e.target.value)}
+                >
+                  <option value="">— aucune —</option>
+                  {PHOTO_KEY_OPTIONS.map((k) => (
+                    <option key={k} value={k}>
+                      {k}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="sm:col-span-2 space-y-2">
+                <span className="block text-sm">Image secondaire (photo 2)</span>
+                <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+                  Affichée en miniature : clic = remplace la photo principale sur la fiche article.
+                </p>
+                <label className="btn-outline text-xs py-2 px-4 cursor-pointer inline-block">
+                  Parcourir…
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => {
+                      pickImage2(idx, e.target.files)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                {adminSrcIsRemovable(it.src2) && (
+                  <button type="button" className="btn-outline text-[11px] py-2 px-3 ml-2" onClick={() => setField(idx, 'src2', '')}>
+                    Retirer la photo 2
+                  </button>
+                )}
+                <label className="block">
+                  src2 (optionnel — URL ou /chemin/public)
+                  <input
+                    className="form-field mt-1"
+                    value={it.src2 || ''}
+                    onChange={(e) => setField(idx, 'src2', e.target.value)}
+                    placeholder="vide = clé photo 2 (ou aucune photo 2)"
+                  />
+                </label>
+                {(it.src2?.trim() || it.photoKey2?.trim()) ? (
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={it.src2?.trim() ? resolvePhotoSrc(it.src2) : resolvePhotoSrc(it.photoKey2)}
+                      alt=""
+                      className="h-20 w-28 rounded-lg object-cover border border-mauve-light/30 shrink-0 bg-mauve-light/10"
+                    />
+                    <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+                      Aperçu : « src2 » si renseigné, sinon la clé photo 2.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[11px]" style={{ color: 'var(--text-mid)' }}>
+                    Aucune photo 2 renseignée.
+                  </p>
+                )}
+              </div>
+
+              <div className="sm:col-span-2">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--violet)' }}>
+                  Couleurs (3 ronds)
+                </p>
+                <p className="text-[11px] leading-snug mb-2" style={{ color: 'var(--text-mid)' }}>
+                  Choisissez jusqu’à 3 couleurs (hex). Si une couleur est vide, le rond n’apparaît pas sur le site.
+                </p>
+                <div className="flex flex-wrap gap-3 items-end">
+                  {[0, 1, 2].map((i) => (
+                    <label key={i} className="block">
+                      <span className="block text-[11px] mb-1">Couleur {i + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={(it.colors?.[i] || '#ffffff').trim() || '#ffffff'}
+                          onChange={(e) => {
+                            const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
+                            next[i] = e.target.value
+                            setField(idx, 'colors', next)
+                          }}
+                          className="h-9 w-12 rounded border border-mauve-light/40 bg-white"
+                        />
+                        <input
+                          className="form-field font-mono text-xs w-28"
+                          value={(it.colors?.[i] || '').trim()}
+                          onChange={(e) => {
+                            const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
+                            next[i] = e.target.value
+                            setField(idx, 'colors', next)
+                          }}
+                          placeholder="#RRGGBB"
+                        />
+                        <button
+                          type="button"
+                          className="btn-outline text-[11px] py-2 px-3"
+                          onClick={() => {
+                            const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
+                            next[i] = ''
+                            setField(idx, 'colors', next)
+                          }}
+                        >
+                          Vider
+                        </button>
+                      </div>
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
