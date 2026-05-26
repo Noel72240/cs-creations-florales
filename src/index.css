@@ -4,6 +4,8 @@
 
 :root {
   --font-script: 'Great Vibes', cursive;
+  --font-brand: 'Cookie', cursive;
+  --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */
   --lavande: #F0D2DD;  /* accent clair (blush) */
@@ -169,7 +171,26 @@
 }
 
 .hero-square-frame--plain[data-animate='hero-frame'] {
-  animation: none;
+  animation: heroBrandFloat 5.5s ease-in-out infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@keyframes heroBrandFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  35% {
+    transform: translateY(-10px) rotate(0.25deg);
+  }
+  70% {
+    transform: translateY(-5px) rotate(-0.2deg);
+  }
+}
+
+.hero-square-frame--plain[data-animate='hero-frame']:hover {
+  animation-play-state: paused;
 }
 
 /* Sous-titre au-dessus du titre hero : manuscrite (Great Vibes) */
@@ -290,13 +311,22 @@
   text-align: center;
 }
 
-/* Titres marque (hero) : manuscrite brush élégante (Great Vibes) */
-.hero-brand-title {
-  font-family: var(--font-script);
+/* Nom de marque C&S — Cookie */
+.font-brand {
+  font-family: var(--font-brand);
   font-weight: 400;
   font-style: normal;
-  letter-spacing: 0.04em;
-  line-height: 1.25;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Titre principal hero : Cookie */
+.hero-brand-title {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.75), 0 2px 14px rgba(139, 75, 106, 0.12);
@@ -647,7 +677,8 @@
   .hero-square-frame .hero-frame-borderlight,
   .hero-square-frame .hero-frame-mist::before,
   .hero-square-frame .hero-frame-mist::after,
-  [data-animate="hero-frame"] {
+  [data-animate="hero-frame"],
+  .hero-brand-float {
     animation: none !important;
   }
 }
@@ -746,6 +777,26 @@ main.site-main {
   background: none;
   vertical-align: baseline;
   white-space: nowrap;
+}
+
+/* Bandeau maintenance (prioritaire sur la promo) */
+.site-maintenance-banner {
+  background: linear-gradient(90deg, #b45309 0%, #d97706 45%, #b45309 100%);
+  color: #fffbeb;
+  border-bottom: 2px solid rgba(120, 53, 15, 0.45);
+  box-shadow: 0 2px 8px rgba(120, 53, 15, 0.2);
+  font-family: var(--font-script);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.site-maintenance-banner__title {
+  letter-spacing: 0.04em;
+}
+
+.site-maintenance-banner__message {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 /* En-têtes de page */
@@ -912,6 +963,31 @@ h1, h2, h3, h4 {
   vertical-align: -0.12em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+.text-refined .qui-inline-brand,
+.page-legal-doc .font-brand,
+.footer-bottom-bar .font-brand {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.22em;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  color: var(--mauve);
+  padding: 0 0.04em;
+  display: inline-block;
+  vertical-align: -0.1em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.site-footer .font-brand {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
 .text-refined--sm {
@@ -1463,6 +1539,64 @@ button.nav-link.nav-link-header {
   letter-spacing: 0.04em;
   line-height: 1.75;
   color: var(--violet);
+}
+
+/* ─── Notes étoiles (avis Google) ─── */
+.star-rating__star {
+  color: rgba(192, 122, 151, 0.28);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.star-rating__star--on {
+  color: #e8a317;
+  text-shadow: 0 1px 2px rgba(139, 75, 106, 0.15);
+}
+
+.star-rating--sm .star-rating__star {
+  font-size: 0.95rem;
+}
+
+.star-rating--lg .star-rating__star {
+  font-size: 1.45rem;
+}
+
+.star-rating-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.star-rating-input__btn {
+  background: none;
+  border: none;
+  padding: 0.1rem 0.2rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: rgba(192, 122, 151, 0.35);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-rating-input__btn:hover,
+.star-rating-input__btn--on {
+  color: #e8a317;
+  transform: scale(1.08);
+}
+
+.star-rating-input__btn:focus-visible {
+  outline: 2px solid var(--mauve);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.google-review-card {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.google-review-card:hover {
+  box-shadow: 0 12px 32px -12px rgba(139, 75, 106, 0.18);
 }
 
 /* ─── Petal decoration ─── */

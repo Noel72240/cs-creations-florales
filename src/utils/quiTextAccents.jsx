@@ -8,7 +8,7 @@ export const DEFAULT_BRAND_PHRASES = [
 ]
 
 /**
- * Prénom + nom de marque en manuscrite (.qui-inline-script), le reste suit le corps de texte.
+ * Prénom en manuscrite (Great Vibes), nom de marque en Cookie (.qui-inline-brand).
  */
 export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = []) {
   const str = String(text ?? '')
@@ -19,6 +19,12 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
 
   const wrapScript = (content, k) => (
     <span key={k} className="qui-inline-script">
+      {content}
+    </span>
+  )
+
+  const wrapBrand = (content, k) => (
+    <span key={k} className="qui-inline-brand font-brand">
       {content}
     </span>
   )
@@ -43,7 +49,7 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
 
   str.split(brandRe).forEach((chunk) => {
     if (brands.includes(chunk)) {
-      nodes.push(wrapScript(chunk, key++))
+      nodes.push(wrapBrand(chunk, key++))
       return
     }
     if (fn) {

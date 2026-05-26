@@ -23,9 +23,9 @@ const SEASONS = [
     color: '#c94f4f',
   },
   {
-    title: 'Fête des Mères',
+    title: 'Fête des Mères/Père',
     path: '/creations-saisonnieres/fete-des-meres',
-    desc: 'Des bouquets et créations florales tendres et délicats pour honorer les mamans avec amour.',
+    desc: 'Des bouquets et créations florales tendres et délicats pour honorer mamans et papas avec amour.',
     img: w600(P.bouquetSoft),
     icon: '💝',
     color: '#d4759b',

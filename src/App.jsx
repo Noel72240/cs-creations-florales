@@ -16,10 +16,12 @@ import Noel from './pages/saisonniers/Noel'
 import FeteDesMeres from './pages/saisonniers/FeteDesMeres'
 import Personnalisation from './pages/Personnalisation'
 import Contact from './pages/Contact'
+import AvisGoogle from './pages/AvisGoogle'
 import MentionsLegales from './pages/MentionsLegales'
 import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite'
 import CGV from './pages/CGV'
 import Paiement from './pages/Paiement'
+import PaiementSucces from './pages/PaiementSucces'
 import Panier from './pages/Panier'
 import Admin from './pages/Admin'
 import ScrollReveal from './components/ScrollReveal'
@@ -46,8 +48,10 @@ function App() {
           <Route path="/creations-saisonnieres/fete-des-meres" element={<FeteDesMeres />} />
           <Route path="/personnalisation" element={<Personnalisation />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/avis-google" element={<AvisGoogle />} />
           <Route path="/panier" element={<Panier />} />
           <Route path="/paiement" element={<Paiement />} />
+          <Route path="/paiement/succes" element={<PaiementSucces />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
           <Route path="/cgv" element={<CGV />} />

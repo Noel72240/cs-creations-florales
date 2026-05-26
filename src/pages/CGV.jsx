@@ -1,3 +1,4 @@
+import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
 import { useSiteConfig } from '../context/SiteContentContext'
 
@@ -16,7 +17,10 @@ export default function CGV() {
           <div>
             <h2>1. Identification du vendeur</h2>
             <p>
-              <strong style={{ color: 'var(--text-dark)' }}>{SITE.ownerFullName} — {SITE.businessName}</strong><br />
+              <strong style={{ color: 'var(--text-dark)' }}>
+                {SITE.ownerFullName} — <BrandName>{SITE.businessName}</BrandName>
+              </strong>
+              <br />
               {SITE.postalCode} {SITE.city}, {SITE.region} — {SITE.email}<br />
               SIREN / SIRET : [À compléter]
             </p>
@@ -25,7 +29,9 @@ export default function CGV() {
           <div>
             <h2>2. Objet</h2>
             <p>
-              Les présentes Conditions Générales de Vente (CGV) régissent les relations entre C&S Créations Florales et Personnalisation et ses clients dans le cadre de la vente de compositions florales, créations décoratives et prestations de personnalisation.
+              Les présentes Conditions Générales de Vente (CGV) régissent les relations entre{' '}
+              <BrandName>{SITE.businessName}</BrandName> et ses clients dans le cadre de la vente de
+              compositions florales, créations décoratives et prestations de personnalisation.
             </p>
           </div>
 

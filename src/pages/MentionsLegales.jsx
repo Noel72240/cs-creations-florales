@@ -1,3 +1,4 @@
+import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
 import { useSiteConfig } from '../context/SiteContentContext'
 
@@ -19,7 +20,9 @@ export default function MentionsLegales() {
               <h2>1. Éditeur du site</h2>
               <p>Le présent site est édité par l’entreprise artisanale :</p>
               <ul className="mt-3 space-y-1 pl-4 list-disc" style={{ color: 'var(--text-dark)' }}>
-                <li><strong>Raison sociale :</strong> {SITE.businessName}</li>
+                <li>
+                  <strong>Raison sociale :</strong> <BrandName>{SITE.businessName}</BrandName>
+                </li>
                 <li><strong>Responsable de publication :</strong> {SITE.ownerFullName}</li>
                 <li><strong>Adresse :</strong> {SITE.postalCode} {SITE.city}, {SITE.region}, France</li>
                 <li><strong>Email :</strong> <a href={`mailto:${SITE.email}`} style={{ color: 'var(--mauve)' }}>{SITE.email}</a></li>
@@ -53,7 +56,7 @@ export default function MentionsLegales() {
             <div>
               <h2>4. Propriété intellectuelle</h2>
               <p>
-                L'ensemble du contenu de ce site (textes, images, logos, compositions, photographies) est la propriété exclusive de {SITE.ownerFullName} — {SITE.businessName}, sauf mention contraire. Toute reproduction, représentation, modification ou exploitation, totale ou partielle, de ce contenu est interdite sans autorisation préalable écrite.
+                L'ensemble du contenu de ce site (textes, images, logos, compositions, photographies) est la propriété exclusive de {SITE.ownerFullName} — <BrandName>{SITE.businessName}</BrandName>, sauf mention contraire. Toute reproduction, représentation, modification ou exploitation, totale ou partielle, de ce contenu est interdite sans autorisation préalable écrite.
               </p>
             </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
 import SocialIconLinks from '../components/SocialIconLinks'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -172,7 +173,11 @@ export default function Contact() {
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input type="checkbox" name="rgpd" checked={form.rgpd} onChange={handleChange} className="mt-0.5 accent-mauve shrink-0" required />
                       <span>
-                        J'accepte que mes données personnelles (nom, prénom, email, téléphone, message) soient collectées par <strong style={{ color: 'var(--violet)' }}>{site.ownerFullName} — {site.businessName}</strong> dans le seul but de traiter ma demande de contact ou de devis. Ces données ne seront pas transmises à des tiers et seront conservées pendant 3 ans maximum. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression en écrivant à <a href={`mailto:${site.email}`} style={{ color: 'var(--mauve)' }}>{site.email}</a>. *
+                        J'accepte que mes données personnelles (nom, prénom, email, téléphone, message) soient collectées par{' '}
+                        <strong style={{ color: 'var(--violet)' }}>
+                          {site.ownerFullName} — <BrandName>{site.businessName}</BrandName>
+                        </strong>{' '}
+                        dans le seul but de traiter ma demande de contact ou de devis. Ces données ne seront pas transmises à des tiers et seront conservées pendant 3 ans maximum. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression en écrivant à <a href={`mailto:${site.email}`} style={{ color: 'var(--mauve)' }}>{site.email}</a>. *
                       </span>
                     </label>
                   </div>

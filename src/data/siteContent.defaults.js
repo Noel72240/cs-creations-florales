@@ -3,11 +3,12 @@
  * Fusionné avec localStorage + optionnellement /public/site-content.json
  */
 import { SITE as SITE_BASE, WEB_DEV as WEB_DEV_BASE } from '../config/site'
+import { PAGE_ARTICLE_CATALOG } from './articleCatalog'
 
-export const SITE_CONTENT_VERSION = 3
+export const SITE_CONTENT_VERSION = 7
 
 /** Nombre max d’articles boutique par page rubrique (admin + grille vitrine). */
-export const MAX_PAGE_ARTICLES = 12
+export const MAX_PAGE_ARTICLES = 50
 
 export const SITE_CONTENT_DEFAULTS = {
   version: SITE_CONTENT_VERSION,
@@ -17,6 +18,14 @@ export const SITE_CONTENT_DEFAULTS = {
   site: { ...SITE_BASE },
   webDev: { ...WEB_DEV_BASE },
 
+  /** Bandeau maintenance + blocage des paiements en ligne */
+  maintenance: {
+    enabled: false,
+    title: 'Site en cours de maintenance',
+    message:
+      'Notre site est momentanément en maintenance. Les paiements en ligne sont suspendus — vous pouvez nous contacter pour toute commande ou devis.',
+  },
+
   navbar: {
     /** Bannière toute en haut (style annonce, police script) */
     promoBanner: {
@@ -25,6 +34,10 @@ export const SITE_CONTENT_DEFAULTS = {
       fontScale: 1.08,
       /** Surligné en style « code » si présent dans le texte */
       code: 'Bienvenuecscreationflorale10',
+      percentOff: 10,
+      minSubtotal: 35,
+      firstOrderOnly: true,
+      label: '10 % sur votre 1ère commande',
       text:
         'Pour votre 1ère commande : 10% sur le site avec un minimum d’achat de 35€ avec le code Bienvenuecscreationflorale10',
     },
@@ -47,6 +60,31 @@ export const SITE_CONTENT_DEFAULTS = {
   contact: {
     addressLine: '72220 Écommoy, Sarthe',
     availability: 'Lun–Sam · 9h–18h',
+  },
+
+  googleReviews: {
+    pageTitle: 'Avis Google',
+    pageSubtitle: 'Ce que nos clients disent',
+    intro:
+      'Merci pour votre confiance. Voici quelques témoignages partagés sur Google — n’hésitez pas à laisser le vôtre après votre commande.',
+    googleUrl: '',
+    ctaLabel: 'Voir nos avis sur Google',
+    items: [
+      {
+        id: 'demo-1',
+        authorName: 'Sophie L.',
+        rating: 5,
+        text: 'Un bouquet magnifique pour notre mariage, délicat et exactement comme je l’avais imaginé. Merci Charlène pour votre écoute et votre talent.',
+        publishedAt: 'janvier 2025',
+      },
+      {
+        id: 'demo-2',
+        authorName: 'Marc & Julie',
+        rating: 5,
+        text: 'Composition funéraire très touchante, réalisée avec beaucoup de soin. Nous recommandons sans hésiter.',
+        publishedAt: 'décembre 2024',
+      },
+    ],
   },
 
   home: {
@@ -142,7 +180,7 @@ export const SITE_CONTENT_DEFAULTS = {
         },
         {
           title: 'Créations saisonnières',
-          desc: 'Pâques, Noël, Fête des Mères — des créations adaptées à chaque saison et tradition.',
+          desc: 'Pâques, Noël, Fête des Mères/Père — des créations adaptées à chaque saison et tradition.',
           icon: '🌿',
           path: '/creations-saisonnieres',
           photoKey: 'tulips',
@@ -173,277 +211,97 @@ export const SITE_CONTENT_DEFAULTS = {
   pageArticles: {
     evenementsFloraux: {
       sectionTitle: 'Nos créations événementielles',
-      intro: 'Exemples de compositions avec tarifs indicatifs — ajustables sur devis selon vos fleurs et la saison.',
+      intro:
+        'Aperçu de nos réalisations — consultez chaque rubrique (mariage, anniversaire, baptême) pour voir toutes les créations.',
       items: [
         {
-          id: 'evt-bouquet-mariee',
-          title: 'Bouquet de mariée',
-          description: 'Bouquet rond ou retombant, rubans et finitions au choix. Fleurs artificielles ou stabilisées.',
+          id: 'evt-mariage-plateau',
+          title: 'Plateau alliances miroir',
+          description: 'Plateau personnalisé pour l’échange des alliances, roses blanches et coffret cœur.',
           price: 85,
           photoKey: 'weddingBouquet',
-          src: '',
+          src: '/images/articles/mariage/004.png',
         },
         {
-          id: 'evt-centre-table',
-          title: 'Centre de table',
-          description: 'Composition basse pour tables d’honneur ou invités, harmonisée avec votre thème.',
-          price: 45,
-          photoKey: 'weddingTableFlorals',
-          src: '',
+          id: 'evt-anniversaire-verre',
+          title: 'Verre anniversaire 18 ans',
+          description: 'Verre gravé doré pour fêter une majorité ou un anniversaire mémorable.',
+          price: 30,
+          photoKey: 'dahlias',
+          src: '/images/articles/anniversaire/001.png',
         },
         {
-          id: 'evt-arche-fleurie',
-          title: 'Décoration d’entrée',
-          description: 'Arrangement floral pour encadrer l’entrée ou la salle (format à définir ensemble).',
-          price: 120,
-          photoKey: 'peonies',
-          src: '',
-        },
-        {
-          id: 'evt-couronne',
-          title: 'Couronne ou couronne de tête',
-          description: 'Couronne fleurie légère pour cérémonie ou séance photo.',
-          price: 55,
-          photoKey: 'wildflowers',
-          src: '',
-        },
-        {
-          id: 'evt-bouquet-cadeau',
-          title: 'Bouquet cadeau invités',
-          description: 'Petits bouquets ou boutonnières coordonnés pour vos proches (lot sur devis).',
-          price: 38,
-          photoKey: 'bouquetSoft',
-          src: '',
-        },
-      ],
-    },
-    creationsFlorales: {
-      sectionTitle: 'Nos créations florales',
-      intro: 'Idées de pièces décoratives — dimensions et fleurs personnalisables.',
-      items: [
-        {
-          id: 'cf-vase-signature',
-          title: 'Composition en vase',
-          description: 'Arrangement pour salon ou salle à manger, vase inclus.',
-          price: 52,
-          photoKey: 'vaseInterior',
-          src: '',
-        },
-        {
-          id: 'cf-bouquet-frais',
-          title: 'Bouquet long',
-          description: 'Bouquet élancé, tons doux ou contrastés selon saison.',
-          price: 42,
-          photoKey: 'bouquetSoft',
-          src: '',
-        },
-        {
-          id: 'cf-tableau-floral',
-          title: 'Cadre floral',
-          description: 'Décoration murale ou à poser, fleurs stabilisées.',
-          price: 68,
-          photoKey: 'flatlayBlooms',
-          src: '',
-        },
-        {
-          id: 'cf-suspension',
-          title: 'Couronne de porte',
-          description: 'Couronne ou demi-couronne pour intérieur ou porche abrité.',
-          price: 48,
-          photoKey: 'flowerWall',
-          src: '',
-        },
-        {
-          id: 'cf-coffret',
-          title: 'Coffret fleuri',
-          description: 'Fleurs présentées dans un coffret, idéal cadeau.',
-          price: 58,
-          photoKey: 'bouquetGift',
-          src: '',
-        },
-      ],
-    },
-    creationsFuneraires: {
-      sectionTitle: 'Compositions & tarifs indicatifs',
-      intro: 'Créations réalisées avec respect — ajustements possibles selon cérémonie et fleurs souhaitées.',
-      items: [
-        {
-          id: 'fun-gerbe',
-          title: 'Gerbe classique',
-          description: 'Gerbe allongée, tons au choix (blanc, pastels, couleurs douces).',
+          id: 'evt-anniversaire-chiffre',
+          title: 'Chiffre floral anniversaire',
+          description: 'Chiffre en roses roses et blanches sur socle — idéal pour 30, 40 ou 50 ans.',
           price: 75,
-          photoKey: 'wildflowers',
-          src: '',
-        },
-        {
-          id: 'fun-couronne',
-          title: 'Couronne funéraire',
-          description: 'Couronne ronde ou cœur, message ruban en option.',
-          price: 95,
-          photoKey: 'rosesPink',
-          src: '',
-        },
-        {
-          id: 'fun-bouquet',
-          title: 'Bouquet de deuil',
-          description: 'Bouquet porté ou pour déposer, format moyen.',
-          price: 48,
-          photoKey: 'bouquetSoft',
-          src: '',
-        },
-        {
-          id: 'fun-cercueil',
-          title: 'Raquette ou coussin',
-          description: 'Composition plate pour cercueil, dimensions standards.',
-          price: 110,
-          photoKey: 'weddingBouquet',
-          src: '',
-        },
-        {
-          id: 'fun-tombe',
-          title: 'Plante ou coupe de tombe',
-          description: 'Composition résistante pour sépulture, entretien facilité.',
-          price: 35,
           photoKey: 'peonies',
-          src: '',
+          src: '/images/articles/anniversaire/003.png',
+        },
+        {
+          id: 'evt-bapteme-plaque',
+          title: 'Plaque baptême fleurie',
+          description: 'Plaque commémorative roses bleues et blanches, ange et colombe.',
+          price: 68,
+          photoKey: 'bouquetSoft',
+          src: '/images/articles/bapteme-communion/004.png',
+        },
+        {
+          id: 'evt-bapteme-gobelet',
+          title: 'Gobelet baptême personnalisé',
+          description: 'Gobelet givré avec prénom, âge et date — souvenir pour vos invités.',
+          price: 32,
+          photoKey: 'wildflowers',
+          src: '/images/articles/bapteme-communion/002.png',
         },
       ],
     },
+    ...PAGE_ARTICLE_CATALOG,
     creationsSaisonnieres: {
       sectionTitle: 'Créations de saison',
-      intro: 'Sélection d’exemples tout au long de l’année — Pâques, fêtes, fête des mères…',
+      intro:
+        'Pâques, fête des mères et fêtes de fin d’année — découvrez nos créations dans chaque rubrique dédiée.',
       items: [
         {
-          id: 'sai-printemps',
-          title: 'Composition printanière',
-          description: 'Tulipes, jonquilles, tons frais et lumineux.',
-          price: 44,
-          photoKey: 'tulips',
-          src: '',
-        },
-        {
-          id: 'sai-ete',
-          title: 'Bouquet estival',
-          description: 'Mélange champêtre, pivoines ou dahlias selon arrivage.',
-          price: 46,
-          photoKey: 'dahlias',
-          src: '',
-        },
-        {
-          id: 'sai-automne',
-          title: 'Ambiance automnale',
-          description: 'Tons orangés, baies et feuillages décoratifs.',
-          price: 49,
-          photoKey: 'wildflowers',
-          src: '',
-        },
-        {
-          id: 'sai-hiver',
-          title: 'Couronne ou centre hivernal',
-          description: 'Pour tables de fêtes ou porte d’entrée.',
-          price: 55,
-          photoKey: 'rosesPink',
-          src: '',
-        },
-        {
-          id: 'sai-fete-meres',
-          title: 'Coffret fête des mères',
-          description: 'Fleurs + petite attention dans un coffret.',
-          price: 52,
-          photoKey: 'bouquetSoft',
-          src: '',
-        },
-      ],
-    },
-    personnalisation: {
-      sectionTitle: 'Exemples de personnalisations',
-      intro: 'Objets et créations uniques — texte, couleurs et motifs adaptés à votre projet.',
-      items: [
-        {
-          id: 'pers-coffret',
-          title: 'Coffret prénom & date',
-          description: 'Coffret décoré, calligraphie ou lettrage au choix.',
-          price: 42,
-          photoKey: 'bouquetGift',
-          src: '',
-        },
-        {
-          id: 'pers-cadre',
-          title: 'Cadre fleuri',
-          description: 'Cadre orné de fleurs stabilisées, format au choix.',
-          price: 55,
-          photoKey: 'vaseInterior',
-          src: '',
-        },
-        {
-          id: 'pers-accessoire',
-          title: 'Accessoire fleuri',
-          description: 'Barrette, broche ou peigne pour événement.',
-          price: 28,
-          photoKey: 'peonies',
-          src: '',
-        },
-        {
-          id: 'pers-carte',
-          title: 'Cartes & faire-part',
-          description: 'Décoration florale artisanale sur papier de qualité.',
-          price: 32,
-          photoKey: 'flatlayBlooms',
-          src: '',
-        },
-        {
-          id: 'pers-boite',
-          title: 'Boîte à chapeau fleurie',
-          description: 'Grande boîte décorée, idéale pour cadeau ou rangement.',
+          id: 'sai-paques-lapin',
+          title: 'Lapin de Pâques en roses',
+          description: 'Lapin en roses crème sur socle rayé, œufs dorés et herbe verte.',
           price: 65,
           photoKey: 'tulips',
-          src: '',
+          src: '/images/articles/paques/001.png',
         },
-      ],
-    },
-    /** Sous-pages Événements floraux & saisonniers (5 articles chacune) */
-    mariage: {
-      sectionTitle: 'Créations mariage',
-      intro: 'Exemples de prestations avec tarifs indicatifs — personnalisation et devis selon votre lieu et la saison.',
-      items: [
-        { id: 'mar-bouquet-mariee', title: 'Bouquet de mariée', description: 'Bouquet signature, forme et palette au choix.', price: 95, photoKey: 'weddingBouquet', src: '' },
-        { id: 'mar-lancer', title: 'Bouquet à lancer', description: 'Version compacte pour la tradition du lancer.', price: 48, photoKey: 'bouquetSoft', src: '' },
-        { id: 'mar-centre-table', title: 'Centre de table invités', description: 'Composition basse par table (format standard).', price: 42, photoKey: 'weddingTableFlorals', src: '' },
-        { id: 'mar-boutonnieres', title: 'Lot boutonnières', description: 'Pour le cortège (prix pour 5 unités, ajustable).', price: 55, photoKey: 'peonies', src: '' },
-        { id: 'mar-arche', title: 'Décoration arche / entrée', description: 'Mise en scène florale pour cérémonie (devis détaillé).', price: 180, photoKey: 'flowerWall', src: '' },
-      ],
-    },
-    anniversaire: {
-      sectionTitle: 'Créations anniversaire',
-      intro: 'Idées festives avec prix de départ — couleurs et thème adaptés à l’âge fêté.',
-      items: [
-        { id: 'ann-bouquet', title: 'Bouquet surprise', description: 'Bouquet généreux, tons vifs ou pastels.', price: 44, photoKey: 'dahlias', src: '' },
-        { id: 'ann-centre', title: 'Centre de table festif', description: 'Pour table ronde ou rectangulaire.', price: 38, photoKey: 'bouquetGift', src: '' },
-        { id: 'ann-ballons-fleurs', title: 'Composition « joyeux anniversaire »', description: 'Arrangement avec message floral intégré.', price: 52, photoKey: 'peonies', src: '' },
-        { id: 'ann-cadeau', title: 'Coffret fleuri', description: 'Fleurs + présentation cadeau.', price: 48, photoKey: 'wildflowers', src: '' },
-        { id: 'ann-salle', title: 'Pack décoration salle', description: 'Plusieurs points floraux (sur devis précis).', price: 120, photoKey: 'vaseInterior', src: '' },
-      ],
-    },
-    baptemeCommunion: {
-      sectionTitle: 'Créations baptême & communion',
-      intro: 'Compositions douces et lumineuses — tons blanc, ivoire ou pastel.',
-      items: [
-        { id: 'bap-bouquet-enfant', title: 'Petit bouquet enfant', description: 'Format léger pour la cérémonie.', price: 32, photoKey: 'peonies', src: '' },
-        { id: 'bap-autel', title: 'Composition autel / table', description: 'Arrangement discret et élégant.', price: 58, photoKey: 'bouquetSoft', src: '' },
-        { id: 'bap-corsage', title: 'Bracelet ou barrette fleurie', description: 'Accessoire assorti (unité).', price: 22, photoKey: 'wildflowers', src: '' },
-        { id: 'bap-salle', title: 'Décoration salle de fête', description: 'Ensemble coordonné (devis).', price: 85, photoKey: 'vaseInterior', src: '' },
-        { id: 'bap-cadeaux', title: 'Petits bouquets invités', description: 'Lot de 8 mini-bouquets (prix de base).', price: 96, photoKey: 'weddingBouquet', src: '' },
-      ],
-    },
-    paques: {
-      sectionTitle: 'Créations Pâques',
-      intro: 'Printemps et renouveau — compositions fraîches et colorées.',
-      items: [
-        { id: 'paq-table', title: 'Centre de table printanier', description: 'Tulipes, jonquilles ou fleurs de saison.', price: 46, photoKey: 'tulips', src: '' },
-        { id: 'paq-corbeille', title: 'Corbeille fleurie', description: 'Corbeille décorée, taille moyenne.', price: 52, photoKey: 'peonies', src: '' },
-        { id: 'paq-couronne', title: 'Couronne de porte', description: 'Couronne légère tons pastels.', price: 48, photoKey: 'bouquetSoft', src: '' },
-        { id: 'paq-bouquet', title: 'Bouquet à offrir', description: 'Prêt à offrir pour Pâques.', price: 40, photoKey: 'wildflowers', src: '' },
-        { id: 'paq-oeuf', title: 'Composition « œuf » fleuri', description: 'Création originale sur socle.', price: 55, photoKey: 'flatlayBlooms', src: '' },
+        {
+          id: 'sai-paques-lapin-gris',
+          title: 'Lapin Pâques roses gris',
+          description: 'Lapin en roses grises et rouges, œufs décorés sur socle fleuri.',
+          price: 65,
+          photoKey: 'peonies',
+          src: '/images/articles/paques/002.png',
+        },
+        {
+          id: 'sai-fete-meres-plaque',
+          title: 'Plaque cœur fête des mères',
+          description: 'Cœur en bois gravé et roses séchées — cadeau tendre pour maman.',
+          price: 32,
+          photoKey: 'rosesBouquet',
+          src: '/images/articles/fete-des-meres/001.png',
+        },
+        {
+          id: 'sai-fete-meres-coeur',
+          title: 'Cœur « Bonne fête Maman »',
+          description: 'Grand cœur de roses rouges et blanches avec message d’amour.',
+          price: 68,
+          photoKey: 'bouquetSoft',
+          src: '/images/articles/fete-des-meres/002.png',
+        },
+        {
+          id: 'sai-fete-meres-ours',
+          title: 'Ourson « Je t’aime Maman »',
+          description: 'Ourson en roses avec couronne de perles et cœur gravé.',
+          price: 55,
+          photoKey: 'bouquetGift',
+          src: '/images/articles/fete-des-meres/005.png',
+        },
       ],
     },
     noel: {
@@ -455,17 +313,6 @@ export const SITE_CONTENT_DEFAULTS = {
         { id: 'noe-sapin', title: 'Décoration pied de sapin', description: 'Composition pour base d’arbre.', price: 45, photoKey: 'wildflowers', src: '' },
         { id: 'noe-cadeau', title: 'Bouquet cadeau hivernal', description: 'Roses, baies et conifères.', price: 48, photoKey: 'rosesPink', src: '' },
         { id: 'noe-cheminee', title: 'Composition manteau cheminée', description: 'Longueur au choix (devis).', price: 75, photoKey: 'vaseInterior', src: '' },
-      ],
-    },
-    feteDesMeres: {
-      sectionTitle: 'Créations Fête des Mères',
-      intro: 'Pour dire merci avec des fleurs — tons doux et romantiques.',
-      items: [
-        { id: 'fdm-bouquet-rose', title: 'Bouquet roses & saison', description: 'Classique élégant, taille moyenne.', price: 52, photoKey: 'rosesBouquet', src: '' },
-        { id: 'fdm-pivoines', title: 'Bouquet pivoines', description: 'Selon disponibilité saisonnière.', price: 58, photoKey: 'peonies', src: '' },
-        { id: 'fdm-boite', title: 'Boîte à fleurs', description: 'Présentation chic, fleurs assorties.', price: 55, photoKey: 'bouquetSoft', src: '' },
-        { id: 'fdm-plant', title: 'Plante fleurie en pot', description: 'Rose ou orchidée selon stock.', price: 38, photoKey: 'tulips', src: '' },
-        { id: 'fdm-coffret', title: 'Coffret gourmand fleuri', description: 'Fleurs + petite attention (sur devis).', price: 65, photoKey: 'bouquetGift', src: '' },
       ],
     },
   },

@@ -1,20 +1,29 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
+import CartTotals from '../components/CartTotals'
+import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
+import PromoCodeForm from '../components/PromoCodeForm'
 import { buildCartPrefillMessage, useCart } from '../context/CartContext'
+import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
 import { formatEuro } from '../utils/formatEuro'
 import { P, w1200 } from '../data/flowerPhotos'
 
 export default function Panier() {
-  const { items, itemCount, subtotal, setQuantity, removeItem, clearCart } = useCart()
+  const { items, itemCount, subtotal, total, appliedPromo, promoError, setQuantity, removeItem, clearCart } = useCart()
+  const { pay, busy, error, paymentsBlocked } = useSumupCartCheckout()
 
   const contactState = useMemo(
     () => ({
       prefillSujet: 'Commande (panier)',
-      prefillMessage: buildCartPrefillMessage(items),
+      prefillMessage: buildCartPrefillMessage(items, appliedPromo, subtotal, total),
     }),
-    [items],
+    [items, appliedPromo, subtotal, total],
   )
+
+  const startCheckout = () => {
+    pay(items, { promoCode: appliedPromo?.code })
+  }
 
   return (
     <>
@@ -109,14 +118,26 @@ export default function Panier() {
                 className="rounded-2xl border border-mauve-light/40 p-6 sm:p-8 mb-8"
                 style={{ background: 'rgba(240,210,221,0.12)' }}
               >
-                <div className="flex justify-between items-baseline gap-4 mb-2">
-                  <span className="font-heading text-xl" style={{ color: 'var(--violet)' }}>Total indicatif</span>
-                  <span className="font-heading text-2xl" style={{ color: 'var(--mauve)' }}>{formatEuro(subtotal)}</span>
-                </div>
+                <MaintenancePaymentNotice />
+                <CartTotals size="large" />
+                {!paymentsBlocked ? (
+                  <div className="mt-6 mb-6">
+                    <PromoCodeForm />
+                  </div>
+                ) : null}
                 <p className="font-body text-xs mb-6" style={{ color: 'var(--text-mid)', lineHeight: 1.65 }}>
                   Montant indicatif : la commande florale est souvent personnalisée (couleurs, taille, date). Ce total sera
                   confirmé par devis. Les créations sur mesure ne sont pas définitives tant que nous ne nous sommes pas accordés par écrit.
                 </p>
+                {error ? (
+                  <p className="text-sm rounded-xl border border-red-200 bg-red-50/90 px-4 py-3 mb-4" style={{ color: '#7f1d1d' }}>
+                    {error}
+                    <span className="block mt-1 text-xs opacity-90">
+                      En développement, lancez <code className="font-mono">npm run dev:vercel</code> (ou proxy{' '}
+                      <code className="font-mono">VITE_DEV_API_PROXY</code> vers votre API — voir .env.example).
+                    </span>
+                  </p>
+                ) : null}
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                   <Link
                     to="/contact"
@@ -125,9 +146,24 @@ export default function Panier() {
                   >
                     Demander un devis avec ce panier
                   </Link>
-                  <Link to="/paiement" className="btn-outline text-center text-sm py-3 px-6">
-                    Page paiement (SumUp)
-                  </Link>
+                  <button
+                    type="button"
+                    disabled={busy || Boolean(promoError) || paymentsBlocked}
+                    className="btn-primary text-center text-sm py-3 px-6 disabled:opacity-60"
+                    onClick={startCheckout}
+                    title={paymentsBlocked ? 'Paiements suspendus (maintenance)' : undefined}
+                  >
+                    {paymentsBlocked
+                      ? 'Paiement en ligne indisponible'
+                      : busy
+                        ? 'Redirection vers SumUp…'
+                        : 'Payer en ligne (carte bancaire)'}
+                  </button>
+                  {!paymentsBlocked ? (
+                    <Link to="/paiement" className="btn-outline text-center text-sm py-3 px-6">
+                      Page paiement (lien manuel)
+                    </Link>
+                  ) : null}
                   <button type="button" className="text-sm font-body underline py-2 px-2" style={{ color: 'var(--text-mid)' }} onClick={() => clearCart()}>
                     Vider le panier
                   </button>

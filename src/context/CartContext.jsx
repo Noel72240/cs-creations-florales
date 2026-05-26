@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { formatEuro } from '../utils/formatEuro'
+import { validatePromoCode } from '../lib/promoCodes'
 
 const STORAGE_KEY = 'cs_cart_v1'
+const PROMO_STORAGE_KEY = 'cs_cart_promo_v1'
 
 const CartContext = createContext(null)
 
@@ -37,6 +39,14 @@ function loadStored() {
   }
 }
 
+function loadStoredPromoCode() {
+  try {
+    return sessionStorage.getItem(PROMO_STORAGE_KEY) || ''
+  } catch {
+    return ''
+  }
+}
+
 function persist(items) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
@@ -45,31 +55,46 @@ function persist(items) {
   }
 }
 
+function persistPromoCode(code) {
+  try {
+    if (code) sessionStorage.setItem(PROMO_STORAGE_KEY, code)
+    else sessionStorage.removeItem(PROMO_STORAGE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Texte prêt à coller dans le formulaire contact */
-export function buildCartPrefillMessage(items) {
+export function buildCartPrefillMessage(items, appliedPromo = null, subtotal = 0, total = 0) {
   if (!items?.length) return ''
   const lines = items.map(
     (i) =>
       `• ${i.title}${i.selectedColor ? ` (couleur ${i.selectedColor})` : ''} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`,
   )
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0)
-  return [
+  const sum = subtotal || items.reduce((s, i) => s + i.price * i.quantity, 0)
+  const finalTotal = total || sum
+  const parts = [
     'Bonjour,',
     '',
     'Je souhaite vous contacter au sujet des articles suivants (panier sur le site) :',
     '',
     ...lines,
     '',
-    `Total indicatif : ${formatEuro(total)}`,
-    '',
-    'Merci de me confirmer la disponibilité, les délais et les modalités de retrait ou de livraison.',
-    '',
-    'Cordialement',
-  ].join('\n')
+    `Sous-total : ${formatEuro(sum)}`,
+  ]
+  if (appliedPromo) {
+    parts.push(`Code promo : ${appliedPromo.code} (−${formatEuro(appliedPromo.discount)})`)
+  }
+  parts.push(`Total indicatif : ${formatEuro(finalTotal)}`, '', 'Merci de me confirmer la disponibilité, les délais et les modalités de retrait ou de livraison.', '', 'Cordialement')
+  return parts.join('\n')
 }
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => loadStored())
+  const [promoCodeInput, setPromoCodeInput] = useState(() => loadStoredPromoCode())
+  const [appliedPromo, setAppliedPromo] = useState(null)
+  const [promoError, setPromoError] = useState('')
+  const [promoCatalog, setPromoCatalog] = useState(null)
 
   useEffect(() => {
     persist(items)
@@ -78,6 +103,73 @@ export function CartProvider({ children }) {
   const itemCount = useMemo(() => items.reduce((s, i) => s + i.quantity, 0), [items])
 
   const subtotal = useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0), [items])
+
+  const total = useMemo(() => appliedPromo?.total ?? subtotal, [appliedPromo, subtotal])
+
+  const revalidatePromo = useCallback(
+    (code, catalog, sub) => {
+      if (!code?.trim()) {
+        setAppliedPromo(null)
+        setPromoError('')
+        persistPromoCode('')
+        return
+      }
+      const result = validatePromoCode(code, sub, { catalog })
+      if (!result.valid) {
+        setAppliedPromo(null)
+        setPromoError(result.message)
+        persistPromoCode('')
+        return
+      }
+      setAppliedPromo(result)
+      setPromoError('')
+      persistPromoCode(result.code)
+    },
+    [],
+  )
+
+  useEffect(() => {
+    if (!promoCodeInput.trim()) {
+      setAppliedPromo(null)
+      return
+    }
+    if (promoCatalog) {
+      revalidatePromo(promoCodeInput, promoCatalog, subtotal)
+    }
+  }, [subtotal, promoCodeInput, promoCatalog, revalidatePromo])
+
+  const applyPromoCode = useCallback(
+    (rawCode, { catalog } = {}) => {
+      if (catalog) setPromoCatalog(catalog)
+      const cat = catalog || promoCatalog
+      if (!cat) {
+        setPromoError('Configuration promo indisponible.')
+        return false
+      }
+      setPromoCodeInput(rawCode)
+      const result = validatePromoCode(rawCode, subtotal, { catalog: cat })
+      if (!result.valid) {
+        setAppliedPromo(null)
+        setPromoError(result.message)
+        persistPromoCode('')
+        return false
+      }
+      setAppliedPromo(result)
+      setPromoError('')
+      persistPromoCode(result.code)
+      return true
+    },
+    [subtotal, promoCatalog],
+  )
+
+  const removePromo = useCallback(() => {
+    setPromoCodeInput('')
+    setAppliedPromo(null)
+    setPromoError('')
+    persistPromoCode('')
+  }, [])
+
+  const clearPromoError = useCallback(() => setPromoError(''), [])
 
   const addItem = useCallback((raw) => {
     const next = normalizeItem(raw)
@@ -107,19 +199,42 @@ export function CartProvider({ children }) {
     setItems((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
-  const clearCart = useCallback(() => setItems([]), [])
+  const clearCart = useCallback(() => {
+    setItems([])
+    removePromo()
+  }, [removePromo])
 
   const value = useMemo(
     () => ({
       items,
       itemCount,
       subtotal,
+      total,
+      appliedPromo,
+      promoError,
+      applyPromoCode,
+      removePromo,
+      clearPromoError,
       addItem,
       setQuantity,
       removeItem,
       clearCart,
     }),
-    [items, itemCount, subtotal, addItem, setQuantity, removeItem, clearCart],
+    [
+      items,
+      itemCount,
+      subtotal,
+      total,
+      appliedPromo,
+      promoError,
+      applyPromoCode,
+      removePromo,
+      clearPromoError,
+      addItem,
+      setQuantity,
+      removeItem,
+      clearCart,
+    ],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

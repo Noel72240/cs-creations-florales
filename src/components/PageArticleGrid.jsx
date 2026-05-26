@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { resolvePhotoSrc } from '../data/photoResolver'
 import { formatEuro } from '../utils/formatEuro'
@@ -15,7 +16,7 @@ function normalizeHexColor(value) {
   return ''
 }
 
-function ArticleCard({ item, pagePath }) {
+function ArticleCard({ item, pagePath, onPreview }) {
   const customSrc = (item.src || '').trim()
   const customSrc2 = (item.src2 || '').trim()
   const primary = resolvePhotoSrc(customSrc || item.photoKey)
@@ -52,14 +53,26 @@ function ArticleCard({ item, pagePath }) {
       className="flex flex-col rounded-2xl overflow-hidden bg-white border border-mauve-light/25 shadow-sm hover:shadow-md transition-shadow"
       style={{ boxShadow: '0 4px 24px rgba(139, 75, 106, 0.08)' }}
     >
-      <div className="aspect-[4/3] w-full overflow-hidden bg-mauve-pale">
+      <div className="aspect-[4/3] w-full overflow-hidden bg-mauve-pale relative group">
+        <button
+          type="button"
+          className="absolute inset-0 z-[1] cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-mauve focus-visible:ring-inset"
+          onClick={() => onPreview?.({ src: imgSrc, title: item.title })}
+          aria-label={`Agrandir la photo : ${item.title}`}
+        />
         <img
           src={imgSrc}
           alt={item.title}
           loading="lazy"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover pointer-events-none"
           onError={handleImgError}
         />
+        <span
+          className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+          aria-hidden
+        >
+          Agrandir
+        </span>
       </div>
       <div className="flex flex-col flex-1 p-5 sm:p-6">
         <h3 className="font-heading text-lg font-medium mb-2 leading-snug" style={{ color: 'var(--violet)' }}>
@@ -136,37 +149,106 @@ function ArticleCard({ item, pagePath }) {
   )
 }
 
+function ImageLightbox({ open, onClose, src, title }) {
+  const titleId = useId()
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [open, onClose])
+
+  if (!open || !src) return null
+
+  const node = (
+    <div
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onClick={onClose}
+    >
+      <div className="relative flex max-h-[min(92vh,900px)] w-full max-w-5xl flex-col items-center" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="absolute -top-1 right-0 z-10 rounded-full bg-white/95 px-3 py-1.5 text-sm font-medium shadow-md transition hover:bg-white sm:-right-2 sm:-top-10"
+          style={{ color: 'var(--violet)' }}
+          onClick={onClose}
+          aria-label="Fermer l’aperçu"
+        >
+          Fermer
+        </button>
+        <p id={titleId} className="mb-3 max-w-full truncate text-center text-sm text-white/95 sm:text-base">
+          {title}
+        </p>
+        <img
+          src={src}
+          alt=""
+          className="max-h-[min(85vh,820px)] w-auto max-w-full rounded-lg object-contain shadow-2xl"
+          style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.45)' }}
+        />
+        <p className="mt-4 text-center text-xs text-white/70">Clic en dehors de l’image ou Échap pour fermer</p>
+      </div>
+    </div>
+  )
+
+  return typeof document !== 'undefined' ? createPortal(node, document.body) : null
+}
+
 /**
  * Grille d’articles (photo, titre, description, prix) pour les pages rubrique.
  * @param {{ sectionTitle?: string, intro?: string, items?: Array<{ id: string, title: string, description: string, price: number, photoKey?: string, src?: string }>, pagePath: string }} props
  */
 export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath }) {
   const list = Array.isArray(items) ? items.slice(0, MAX_PAGE_ARTICLES) : []
+  const [preview, setPreview] = useState(null)
+  const closePreview = useCallback(() => setPreview(null), [])
+
   if (!list.length) return null
 
   return (
-    <section className="py-16 px-4" style={{ background: 'var(--beige)' }}>
-      <div className="max-w-6xl mx-auto">
-        <h2 className="section-title mb-2">{sectionTitle}</h2>
-        <div className="floral-divider mb-6">
-          <span className="floral-icon">✿</span>
+    <>
+      <section className="py-16 px-4" style={{ background: 'var(--beige)' }}>
+        <div className="max-w-6xl mx-auto">
+          <h2 className="section-title mb-2">{sectionTitle}</h2>
+          <div className="floral-divider mb-6">
+            <span className="floral-icon">✿</span>
+          </div>
+          {intro ? (
+            <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p>
+          ) : null}
+          <p
+            className="font-refined text-sm text-center max-w-2xl mx-auto mb-10 px-4 py-3 rounded-xl border border-mauve-light/35"
+            style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
+          >
+            <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
+            réalisation en général sous <strong>1 semaine</strong>, selon disponibilité des fleurs et créneaux du planning — confirmé lors de votre commande ou devis.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {list.map((item, index) => (
+              <ArticleCard
+                key={item.id || `article-${index}`}
+                item={item}
+                pagePath={pagePath}
+                onPreview={setPreview}
+              />
+            ))}
+          </div>
         </div>
-        {intro ? (
-          <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p>
-        ) : null}
-        <p
-          className="font-refined text-sm text-center max-w-2xl mx-auto mb-10 px-4 py-3 rounded-xl border border-mauve-light/35"
-          style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
-        >
-          <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
-          réalisation en général sous <strong>1 semaine</strong>, selon disponibilité des fleurs et créneaux du planning — confirmé lors de votre commande ou devis.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {list.map((item, index) => (
-            <ArticleCard key={item.id || `article-${index}`} item={item} pagePath={pagePath} />
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+      <ImageLightbox
+        open={Boolean(preview)}
+        onClose={closePreview}
+        src={preview?.src}
+        title={preview?.title}
+      />
+    </>
   )
 }

@@ -21,6 +21,8 @@ export default {
         heading: ['"Great Vibes"', 'cursive'],
         /** Même manuscrite élégante que le reste du site (Great Vibes) */
         refined: ['"Great Vibes"', 'cursive'],
+        /** Nom de marque C&S Créations Florales */
+        brand: ['Cookie', 'cursive'],
       },
       animation: {
         'fade-up': 'fadeUp 0.7s ease forwards',

@@ -1,3 +1,4 @@
+import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
 import { useSiteConfig } from '../context/SiteContentContext'
 
@@ -17,7 +18,10 @@ export default function PolitiqueConfidentialite() {
             <h2>1. Responsable du traitement</h2>
             <p>
               Le responsable du traitement des données personnelles collectées sur ce site est : <br />
-              <strong style={{ color: 'var(--text-dark)' }}>{SITE.ownerFullName} — {SITE.businessName}</strong><br />
+              <strong style={{ color: 'var(--text-dark)' }}>
+                {SITE.ownerFullName} — <BrandName>{SITE.businessName}</BrandName>
+              </strong>
+              <br />
               {SITE.postalCode} {SITE.city}, {SITE.region} — {SITE.email}
             </p>
           </div>

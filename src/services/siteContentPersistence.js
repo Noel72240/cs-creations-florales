@@ -12,6 +12,29 @@ export function migrateStoredOverrides(stored) {
   const v = stored.version ?? 1
   if (v >= SITE_CONTENT_VERSION) return { stored, changed: false }
 
+  if (!stored.googleReviews) {
+    return {
+      stored: {
+        ...stored,
+        version: SITE_CONTENT_VERSION,
+        googleReviews: SITE_CONTENT_DEFAULTS.googleReviews,
+        maintenance: stored.maintenance ?? SITE_CONTENT_DEFAULTS.maintenance,
+      },
+      changed: true,
+    }
+  }
+
+  if (!stored.maintenance) {
+    return {
+      stored: {
+        ...stored,
+        version: SITE_CONTENT_VERSION,
+        maintenance: SITE_CONTENT_DEFAULTS.maintenance,
+      },
+      changed: true,
+    }
+  }
+
   const hero = stored.home?.hero
   if (!hero) {
     return { stored: { ...stored, version: SITE_CONTENT_VERSION }, changed: true }

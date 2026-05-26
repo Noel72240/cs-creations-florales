@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
+import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
@@ -327,6 +328,7 @@ export default function Admin() {
   const [importText, setImportText] = useState('')
   const coupsDraftRef = useRef(null)
   const prestationsDraftRef = useRef(null)
+  const googleReviewsDraftRef = useRef(null)
   const heroBackgroundDraftRef = useRef({
     backgroundSrc: '',
     backgroundPhotoKey: '',
@@ -336,6 +338,9 @@ export default function Admin() {
   }, [])
   const handlePrestationsDraft = useCallback((next) => {
     prestationsDraftRef.current = next
+  }, [])
+  const handleGoogleReviewsDraft = useCallback((next) => {
+    googleReviewsDraftRef.current = next
   }, [])
   const handleHeroBackgroundDraft = useCallback((next) => {
     heroBackgroundDraftRef.current = next
@@ -358,6 +363,11 @@ export default function Admin() {
     if (!auth || tab !== 'home') return
     prestationsDraftRef.current = content.home.prestations
   }, [auth, tab, content.home.prestations])
+
+  useEffect(() => {
+    if (!auth || tab !== 'reviews') return
+    googleReviewsDraftRef.current = content.googleReviews
+  }, [auth, tab, content.googleReviews])
 
   const login = (e) => {
     e.preventDefault()
@@ -492,6 +502,11 @@ export default function Admin() {
       e.preventDefault()
       const fd = new FormData(e.target)
       save({
+        maintenance: {
+          enabled: fd.get('maint_enabled') === 'on',
+          title: fd.get('maint_title')?.trim() || '',
+          message: fd.get('maint_message')?.trim() || '',
+        },
         navbar: {
           topBarMessage: fd.get('topBar') || '',
           promoBanner: {
@@ -533,6 +548,16 @@ export default function Admin() {
       setMsg('Enregistré.')
     },
     [save],
+  )
+
+  const handleSaveGoogleReviews = useCallback(
+    (e) => {
+      e.preventDefault()
+      const draft = googleReviewsDraftRef.current || content.googleReviews
+      save({ googleReviews: draft })
+      setMsg('Avis Google enregistrés.')
+    },
+    [save, content.googleReviews],
   )
 
   const doImport = () => {
@@ -623,7 +648,7 @@ export default function Admin() {
       </p>
 
       <div className="flex flex-wrap gap-2 mb-8">
-        {['identity', 'home', 'articles', 'footer', 'contact', 'import'].map((t) => (
+        {['identity', 'home', 'articles', 'reviews', 'footer', 'contact', 'import'].map((t) => (
           <button
             key={t}
             type="button"
@@ -633,6 +658,7 @@ export default function Admin() {
             {t === 'identity' && 'Identité & légal'}
             {t === 'home' && 'Accueil'}
             {t === 'articles' && 'Articles (boutique)'}
+            {t === 'reviews' && 'Avis Google'}
             {t === 'footer' && 'Menu & pied de page'}
             {t === 'contact' && 'Contact (page)'}
             {t === 'import' && 'Import / export'}
@@ -753,8 +779,61 @@ export default function Admin() {
         />
       )}
 
+      {tab === 'reviews' && (
+        <form onSubmit={handleSaveGoogleReviews} className="space-y-6">
+          <GoogleReviewsEditor
+            key={JSON.stringify(c.googleReviews)}
+            initial={c.googleReviews}
+            onDraftChange={handleGoogleReviewsDraft}
+          />
+          <button type="submit" className="btn-primary">
+            Enregistrer les avis Google
+          </button>
+        </form>
+      )}
+
       {tab === 'footer' && (
         <form onSubmit={handleSaveFooter} className="space-y-3">
+          <fieldset className="space-y-2 rounded-xl border-2 border-amber-400/50 p-4" style={{ background: 'rgba(251, 191, 36, 0.08)' }}>
+            <legend className="text-lg mb-2 px-1" style={{ color: 'var(--violet)' }}>
+              Maintenance du site
+            </legend>
+            <label className="flex items-center gap-2 mb-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="maint_enabled"
+                defaultChecked={c.maintenance?.enabled === true}
+                className="rounded border-mauve-light"
+              />
+              <span className="text-sm font-medium">Activer le bandeau de maintenance</span>
+            </label>
+            <p className="text-xs mb-3 leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+              Affiche un bandeau en haut du site et <strong>bloque tous les paiements en ligne</strong> (panier, page
+              paiement, SumUp). La bannière promo est masquée tant que la maintenance est active. En production avec
+              Supabase, le blocage serveur suit ce réglage ; vous pouvez aussi forcer via{' '}
+              <code className="text-[11px]">SITE_MAINTENANCE=true</code> sur Vercel.
+            </p>
+            <label className="block text-sm">
+              Titre du bandeau
+              <input
+                name="maint_title"
+                defaultValue={c.maintenance?.title || ''}
+                className="form-field mt-1"
+                placeholder="Site en cours de maintenance"
+              />
+            </label>
+            <label className="block text-sm mt-2">
+              Message
+              <textarea
+                name="maint_message"
+                rows={3}
+                className="form-field mt-1"
+                defaultValue={c.maintenance?.message || ''}
+                placeholder="Les paiements en ligne sont suspendus…"
+              />
+            </label>
+          </fieldset>
+
           <fieldset className="space-y-2">
             <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>
               Bannière promo (tout en haut)
@@ -1260,7 +1339,7 @@ const ARTICLE_PAGE_OPTIONS = [
   { value: 'baptemeCommunion', label: 'Baptême & Communion' },
   { value: 'paques', label: 'Pâques' },
   { value: 'noel', label: 'Noël' },
-  { value: 'feteDesMeres', label: 'Fête des Mères' },
+  { value: 'feteDesMeres', label: 'Fête des Mères/Père' },
 ]
 
 function emptyArticleItem() {

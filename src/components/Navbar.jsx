@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import MaintenanceBanner from './MaintenanceBanner'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { useCart } from '../context/CartContext'
+import { getMaintenanceState } from '../lib/maintenance'
 
 function PromoBannerRich({ text, code }) {
   const c = (code || '').trim()
@@ -34,10 +36,11 @@ const menuItems = [
     children: [
       { label: 'Pâques', path: '/creations-saisonnieres/paques' },
       { label: 'Noël', path: '/creations-saisonnieres/noel' },
-      { label: 'Fête des Mères', path: '/creations-saisonnieres/fete-des-meres' },
+      { label: 'Fête des Mères/Père', path: '/creations-saisonnieres/fete-des-meres' },
     ],
   },
   { label: 'Personnalisation', path: '/personnalisation' },
+  { label: 'Avis Google', path: '/avis-google' },
   { label: 'Paiement', path: '/paiement' },
   { label: 'Contact', path: '/contact' },
 ]
@@ -52,8 +55,9 @@ export default function Navbar() {
   const dropdownRef = useRef(null)
   const headerRef = useRef(null)
 
+  const maintenance = getMaintenanceState(content)
   const promo = content.navbar?.promoBanner
-  const showPromo = promo?.enabled && (promo?.text || '').trim().length > 0
+  const showPromo = !maintenance.active && promo?.enabled && (promo?.text || '').trim().length > 0
   const promoFontScale = (() => {
     const v = promo?.fontScale
     const n = typeof v === 'number' ? v : parseFloat(v)
@@ -75,7 +79,7 @@ export default function Navbar() {
       window.removeEventListener('resize', apply)
       if (ro) ro.disconnect()
     }
-  }, [showPromo, location.pathname, content.navbar?.topBarMessage])
+  }, [maintenance.active, showPromo, location.pathname, content.navbar?.topBarMessage])
 
   const isNavActive = (path) => {
     if (path === '/') return location.pathname === '/'
@@ -112,6 +116,8 @@ export default function Navbar() {
           : 'bg-white/80 backdrop-blur-sm'
       }`}
     >
+      <MaintenanceBanner />
+
       {showPromo && (
         <div
           className="site-promo-banner bg-fuchsia-600 text-white text-center px-2 sm:px-4 py-1 sm:py-1.5 border-b border-fuchsia-800/40 shadow-sm"

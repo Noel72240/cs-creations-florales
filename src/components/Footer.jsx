@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { openCookiePreferences } from '../lib/cookieConsent'
+import BrandName from './BrandName'
 import SocialIconLinks from './SocialIconLinks'
 
 export default function Footer() {
@@ -19,7 +20,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 py-8">
           {/* Brand */}
           <div>
-            <h3 className="font-heading text-2xl font-medium mb-3" style={{ color: 'var(--violet)' }}>
+            <h3 className="font-brand text-2xl font-medium mb-3" style={{ color: 'var(--violet)' }}>
               {ft.brandTitle}
             </h3>
             <p className="text-sm font-body mb-4" style={{ color: 'var(--text-mid)', lineHeight: '1.8' }}>
@@ -50,6 +51,7 @@ export default function Footer() {
                 ['Créations funéraires', '/creations-funeraires'],
                 ['Créations saisonnières', '/creations-saisonnieres'],
                 ['Personnalisation', '/personnalisation'],
+                ['Avis Google', '/avis-google'],
                 ['Paiement', '/paiement'],
                 ['Contact', '/contact'],
               ].map(([label, path]) => (
@@ -117,7 +119,9 @@ export default function Footer() {
           className="footer-bottom-bar border-t border-mauve-light/30 pt-4 sm:pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 text-center sm:text-left"
           style={{ color: 'var(--text-mid)' }}
         >
-          <p className="max-w-prose px-1 sm:px-0 m-0">© {year} {SITE.businessName} — {SITE.ownerFullName}</p>
+          <p className="max-w-prose px-1 sm:px-0 m-0">
+            © {year} <BrandName>{SITE.businessName}</BrandName> — {SITE.ownerFullName}
+          </p>
           <div className="flex gap-2.5 sm:gap-3 flex-wrap justify-center sm:justify-end items-center">
             <Link to="/mentions-legales" className="hover:text-mauve transition-colors shrink-0">
               Mentions légales
