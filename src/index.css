@@ -608,6 +608,84 @@
   color: rgba(61, 42, 74, 0.45);
 }
 
+.hero-search__clear {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(192, 122, 151, 0.15);
+  color: var(--violet);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-search__clear:hover {
+  background: rgba(192, 122, 151, 0.28);
+}
+
+.hero-search-wrap {
+  position: relative;
+  z-index: 20;
+}
+
+.hero-search-results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  max-height: min(18rem, 50vh);
+  overflow-y: auto;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(192, 122, 151, 0.35);
+  box-shadow: 0 16px 40px rgba(139, 75, 106, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.hero-search-results__item {
+  display: block;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.hero-search-results__item:hover,
+.hero-search-results__item--active {
+  background: rgba(240, 210, 221, 0.45);
+}
+
+.hero-search-results__title {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  color: var(--violet);
+  line-height: 1.3;
+}
+
+.hero-search-results__meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  color: rgba(61, 42, 74, 0.62);
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+.hero-search-results__empty {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: rgba(61, 42, 74, 0.7);
+  text-align: center;
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
 /* Ligne d’aide sous la recherche hero : serif lisible, comme le surtitre / bandeau */
 .hero-search-hint {
   text-rendering: optimizeLegibility;
@@ -792,6 +870,12 @@ main.site-main {
   box-shadow: 0 2px 8px rgba(120, 53, 15, 0.2);
   font-family: var(--font-script);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 2;
+}
+
+.site-maintenance-notice {
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
 }
 
 .site-maintenance-banner__title {

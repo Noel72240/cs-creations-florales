@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import HeroSearch from '../components/HeroSearch'
 import { useSiteConfig } from '../context/SiteContentContext'
-import { resolvePhotoSrc } from '../data/photoResolver'
+import { resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
@@ -74,21 +75,7 @@ function HeroSection({ site, hero }) {
         </div>
 
         <div className="max-w-xl mx-auto mt-7">
-          <div className="hero-search">
-            <span className="hero-search__icon" aria-hidden="true">⌕</span>
-            <input
-              type="search"
-              className="hero-search__input"
-              placeholder={hero.searchPlaceholder}
-              aria-label="Rechercher sur le site"
-            />
-          </div>
-          <p
-            className="hero-search-hint mt-3 text-lg sm:text-xl md:text-[1.35rem] font-refined font-medium leading-snug sm:leading-normal tracking-wide text-center px-1"
-            style={{ color: 'rgba(61, 42, 74, 0.68)' }}
-          >
-            {hero.searchHint}
-          </p>
+          <HeroSearch placeholder={hero.searchPlaceholder} hint={hero.searchHint} />
         </div>
 
         <div className="flex flex-wrap gap-4 justify-center mt-10">
@@ -335,7 +322,7 @@ function CoupsDeCoeurSection({ cd }) {
           {(cd.items || []).map((item, idx) => (
             <div key={`${item.label}-${idx}`} className="text-center">
               <div className="coup-rond img-overlay mx-auto">
-                <img src={resolvePhotoSrc(item.src || item.photoKey)} alt={item.label} className="w-full h-full object-cover" />
+                <img src={resolveItemPhoto(item)} alt={item.label} className="w-full h-full object-cover" />
                 <div className="overlay">
                   <span>{item.label}</span>
                 </div>
@@ -373,7 +360,7 @@ function CategoryPreviewSection({ prest }) {
           {(prest.categories || []).map((cat) => (
             <Link key={cat.path} to={cat.path} className="card group block overflow-hidden">
               <div className="img-overlay h-64 sm:h-72 rounded-2xl">
-                <img src={resolvePhotoSrc(cat.src || cat.photoKey)} alt={cat.title} className="w-full h-full object-cover" />
+                <img src={resolveItemPhoto(cat)} alt={cat.title} className="w-full h-full object-cover" />
                 <div className="overlay">
                   <div>
                     <p
