@@ -5,12 +5,8 @@ import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
-import { getSupabase, isSupabaseConfigured } from '../services/supabaseClient'
-import {
-  isLikelySupabaseBucketUrl,
-  isSupabaseStorageConfigured,
-  uploadPublicSiteImage,
-} from '../services/supabaseStorageUpload'
+import { uploadSiteImageViaApi, storeAdminPasswordForApi, clearAdminPasswordForApi } from '../lib/adminServerApi'
+import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 
 const AUTH_KEY = 'cs_admin_auth'
 
@@ -116,256 +112,31 @@ function useAdminMedia() {
   return ctx
 }
 
-function AdminMediaGate({ children, setMsg }) {
-  const supabaseOn = isSupabaseConfigured()
+function AdminMediaGate({ children, setMsg, adminAuthed }) {
   const storageOn = isSupabaseStorageConfigured()
-  const [session, setSession] = useState(null)
-  const [authReady, setAuthReady] = useState(!storageOn)
-  const [authBusy, setAuthBusy] = useState(false)
-  const [authMode, setAuthMode] = useState('password') // 'password' | 'magic'
-  const [sbEmail, setSbEmail] = useState('')
-  const [sbPassword, setSbPassword] = useState('')
-  const [sbErr, setSbErr] = useState('')
-  const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim().replace(/\/$/, '')
-  const [connStatus, setConnStatus] = useState('idle') // idle | checking | ok | fail
-
-  useEffect(() => {
-    if (!supabaseOn || !supabaseUrl) {
-      setConnStatus('idle')
-      return undefined
-    }
-    if (!supabaseUrl.includes('.supabase.co')) {
-      setConnStatus('fail')
-      return undefined
-    }
-    let cancelled = false
-    setConnStatus('checking')
-    fetch(`${supabaseUrl}/auth/v1/health`)
-      .then((r) => {
-        if (!cancelled) setConnStatus(r.ok ? 'ok' : 'fail')
-      })
-      .catch(() => {
-        if (!cancelled) setConnStatus('fail')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [supabaseOn, supabaseUrl])
-
-  useEffect(() => {
-    if (!supabaseOn) return undefined
-    const sb = getSupabase()
-    if (!sb) {
-      setAuthReady(true)
-      return undefined
-    }
-    let cancelled = false
-    sb.auth.getSession().then(({ data: { session: s } }) => {
-      if (!cancelled) {
-        setSession(s ?? null)
-        setAuthReady(true)
-      }
-    })
-    const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {
-      setSession(s ?? null)
-    })
-    return () => {
-      cancelled = true
-      sub.subscription.unsubscribe()
-    }
-  }, [supabaseOn])
-
-  const magicLinkRedirectTo = useMemo(() => {
-    // Utilise l'URL actuelle (dev ou prod) et renvoie sur /admin.
-    // Important: doit être autorisé dans Supabase (Auth -> URL Configuration -> Redirect URLs).
-    try {
-      return new URL('/admin', window.location.href).toString()
-    } catch {
-      return undefined
-    }
-  }, [])
-
-  const signInSupabase = async (e) => {
-    e.preventDefault()
-    setSbErr('')
-    const sb = getSupabase()
-    if (!sb) {
-      setSbErr('Client Supabase indisponible.')
-      return
-    }
-    setAuthBusy(true)
-    const email = sbEmail.trim()
-    const { error } =
-      authMode === 'magic'
-        ? await sb.auth.signInWithOtp({
-            email,
-            options: magicLinkRedirectTo ? { emailRedirectTo: magicLinkRedirectTo } : undefined,
-          })
-        : await sb.auth.signInWithPassword({
-            email,
-            password: sbPassword,
-          })
-    setAuthBusy(false)
-    if (error) {
-      const msg = error.message || 'Connexion impossible.'
-      setSbErr(
-        msg === 'Failed to fetch'
-          ? 'Impossible de joindre Supabase. Vérifiez VITE_SUPABASE_URL (https://xxx.supabase.co, pas le lien dashboard) et redémarrez npm run dev.'
-          : msg,
-      )
-      return
-    }
-    if (authMode === 'magic') {
-      setMsg("Email envoyé (lien magique). Ouvrez-le pour finaliser la connexion, puis revenez sur cette page.")
-    } else {
-      setSbPassword('')
-      setMsg('Compte Supabase connecté — vos prochains envois de photos iront dans le stockage cloud.')
-    }
-  }
-
-  const signOutSupabase = async () => {
-    const sb = getSupabase()
-    setSbErr('')
-    if (sb) await sb.auth.signOut()
-    setMsg('Déconnecté du stockage Supabase.')
-  }
 
   const fileToSrc = useCallback(
     async (file, { variant, folder }) => {
       if (!file || !file.type.startsWith('image/')) return undefined
-      const sb = getSupabase()
-      if (storageOn && sb && session && folder) {
+      if (storageOn && adminAuthed && folder) {
         try {
-          const url = await uploadPublicSiteImage(sb, file, folder)
+          const url = await uploadSiteImageViaApi(file, folder)
           setMsg('')
           return url
         } catch (err) {
           const msg = err?.message || String(err)
-          setMsg(`Envoi Supabase : ${msg}. Réessai en image intégrée (navigateur)…`)
+          setMsg(`Envoi cloud : ${msg}. Réessai en image intégrée (navigateur)…`)
         }
-      } else if (storageOn && sb && !session) {
-        setMsg('Connectez-vous à Supabase (bloc « Photos sur le cloud ») pour envoyer les fichiers sur le serveur.')
       }
       if (variant === 'article') return fileToArticleImageSrc(file)
       return fileToGallerySrc(file)
     },
-    [storageOn, session, setMsg],
+    [storageOn, adminAuthed, setMsg],
   )
 
-  const value = useMemo(
-    () => ({
-      storageOn,
-      session,
-      authReady,
-      fileToSrc,
-    }),
-    [storageOn, session, authReady, fileToSrc],
-  )
+  const value = useMemo(() => ({ storageOn, fileToSrc }), [storageOn, fileToSrc])
 
-  return (
-    <AdminMediaContext.Provider value={value}>
-      {supabaseOn && authReady ? (
-        <div
-          className="mb-6 rounded-xl border p-4 space-y-3"
-          style={{ borderColor: 'rgba(139,75,106,0.35)', background: 'rgba(255,248,251,0.85)' }}
-        >
-          <h2 className="text-base font-semibold" style={{ color: 'var(--violet)' }}>
-            Connexion Supabase
-          </h2>
-          <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-            Compte <strong>Supabase Auth</strong> (différent du mot de passe admin du site). Obligatoire pour{' '}
-            <strong>enregistrer le contenu</strong> sur le serveur quand{' '}
-            <code className="text-[10px]">VITE_CONTENT_DRIVER=supabase</code>
-            {storageOn ? (
-              <> et pour envoyer les <strong>photos</strong> dans le cloud.</>
-            ) : (
-              <>
-                . Pour les photos, ajoutez aussi <code className="text-[10px]">VITE_SUPABASE_STORAGE_BUCKET</code> (voir{' '}
-                <code className="text-[10px]">supabase/README.md</code>).
-              </>
-            )}
-            {' '}
-            Créez l’utilisateur dans Supabase → Authentication → Users.
-          </p>
-          {supabaseUrl ? (
-            <p className="text-[11px] font-mono break-all" style={{ color: 'var(--text-mid)' }}>
-              URL configurée : {supabaseUrl}
-              {connStatus === 'checking' && ' — test en cours…'}
-              {connStatus === 'ok' && ' — ✓ joignable'}
-              {connStatus === 'fail' && ' — ✗ injoignable (copiez Project URL dans Supabase → Settings → API)'}
-            </p>
-          ) : null}
-          {connStatus === 'fail' ? (
-            <p className="text-xs leading-relaxed rounded-lg border border-amber-500/50 px-3 py-2" style={{ background: 'rgba(251,191,36,0.12)', color: '#92400e' }}>
-              Ouvrez cette adresse dans un nouvel onglet : si la page ne charge pas, le projet est en pause, supprimé, ou l’URL est fausse.
-              Dans Supabase, copiez <strong>Project URL</strong> et <strong>anon public</strong> sur la même page, collez dans{' '}
-              <code className="text-[10px]">.env</code>, enregistrez, puis <code className="text-[10px]">npm run dev</code>.
-            </p>
-          ) : null}
-          {session?.user ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs">
-                Connecté : <strong>{session.user.email}</strong>
-              </span>
-              <button type="button" className="btn-outline text-xs py-2 px-3" onClick={signOutSupabase}>
-                Déconnexion Supabase
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={signInSupabase} className="flex flex-col sm:flex-row flex-wrap gap-2 items-end">
-              <label className="block w-full">
-                <span className="text-[11px]">Mode de connexion</span>
-                <select
-                  className="form-field mt-1"
-                  value={authMode}
-                  onChange={(e) => {
-                    setAuthMode(e.target.value)
-                    setSbErr('')
-                    setMsg('')
-                  }}
-                >
-                  <option value="password">Email + mot de passe</option>
-                  <option value="magic">Lien magique par email</option>
-                </select>
-              </label>
-              <label className="block flex-1 min-w-[10rem]">
-                <span className="text-[11px]">Email Supabase</span>
-                <input
-                  type="email"
-                  autoComplete="username"
-                  className="form-field mt-1"
-                  value={sbEmail}
-                  onChange={(e) => setSbEmail(e.target.value)}
-                  placeholder="admin@votredomaine.fr"
-                />
-              </label>
-              {authMode === 'password' ? (
-                <label className="block flex-1 min-w-[10rem]">
-                  <span className="text-[11px]">Mot de passe</span>
-                  <input
-                    type="password"
-                    autoComplete="current-password"
-                    className="form-field mt-1"
-                    value={sbPassword}
-                    onChange={(e) => setSbPassword(e.target.value)}
-                  />
-                </label>
-              ) : null}
-              <button type="submit" className="btn-primary text-xs py-2 px-4 mb-0.5" disabled={authBusy}>
-                {authBusy ? 'En cours…' : authMode === 'magic' ? 'Envoyer le lien' : 'Connexion'}
-              </button>
-            </form>
-          )}
-          {sbErr ? (
-            <p className="text-xs" style={{ color: 'var(--mauve)' }}>
-              {sbErr}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-      {children}
-    </AdminMediaContext.Provider>
-  )
+  return <AdminMediaContext.Provider value={value}>{children}</AdminMediaContext.Provider>
 }
 
 function computeFullName(first, last) {
@@ -377,6 +148,10 @@ export default function Admin() {
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD?.trim()
   const [auth, setAuth] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1')
   const [pwd, setPwd] = useState('')
+
+  useEffect(() => {
+    if (auth && adminPassword) storeAdminPasswordForApi(adminPassword)
+  }, [auth, adminPassword])
   const [tab, setTab] = useState('identity')
   const [articlePageKey, setArticlePageKey] = useState('evenementsFloraux')
   const [msg, setMsg] = useState('')
@@ -432,6 +207,7 @@ export default function Admin() {
     }
     if (pwd === adminPassword) {
       sessionStorage.setItem(AUTH_KEY, '1')
+      storeAdminPasswordForApi(pwd)
       setAuth(true)
       setPwd('')
       setMsg('')
@@ -442,6 +218,7 @@ export default function Admin() {
 
   const logout = () => {
     sessionStorage.removeItem(AUTH_KEY)
+    clearAdminPasswordForApi()
     setAuth(false)
   }
 
@@ -591,7 +368,7 @@ export default function Admin() {
       }
       if (contentDriver === 'supabase' && !result.supabaseOk) {
         setMsg(
-          `Visible sur cet ordinateur seulement. Serveur : ${result.supabaseError || 'échec Supabase'}. Connectez-vous au bloc « Connexion Supabase » puis réessayez.`,
+          `Visible sur cet ordinateur seulement. Serveur : ${result.supabaseError || 'échec Supabase'}. Vérifiez SUPABASE_SERVICE_ROLE_KEY sur Vercel et reconnectez-vous à l’admin.`,
         )
         return
       }
@@ -690,7 +467,7 @@ export default function Admin() {
   const h = c.home
 
   return (
-    <AdminMediaGate setMsg={setMsg}>
+    <AdminMediaGate setMsg={setMsg} adminAuthed={auth}>
     <div className="admin-page font-sans pt-24 pb-20 px-4 max-w-4xl mx-auto text-sm" style={{ color: 'var(--text-mid)' }}>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--violet)' }}>Administration du site</h1>
@@ -707,7 +484,7 @@ export default function Admin() {
       <p className="text-xs mb-6 leading-relaxed">
         {contentDriver === 'supabase' ? (
           <>
-            Contenu : <strong>Supabase</strong> (synchronisation en arrière-plan) + copie locale dans le navigateur. Vérifiez les politiques RLS et la table <code className="text-[11px]">site_content</code> (voir <code className="text-[11px]">src/services/siteContentSupabase.js</code>).
+            Contenu : <strong>Supabase</strong> — enregistrement via votre mot de passe admin (pas de compte Supabase séparé). Copie locale dans le navigateur en secours.
           </>
         ) : (
           <>
