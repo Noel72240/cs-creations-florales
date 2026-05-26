@@ -1,10 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
 import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
-import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
+import { resolveBackgroundSrc, resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
 import {
   uploadSiteImageViaApi,
   storeAdminPasswordForApi,
@@ -124,20 +124,26 @@ function AdminMediaGate({ children, setMsg, adminAuthed }) {
   const fileToSrc = useCallback(
     async (file, { variant, folder }) => {
       if (!file || !file.type.startsWith('image/')) return undefined
-      if (storageOn && adminAuthed && folder) {
+      if (adminAuthed && folder) {
         try {
           const url = await uploadSiteImageViaApi(file, folder)
-          setMsg('')
+          setMsg(url.startsWith('http') ? 'Photo envoyée sur le cloud.' : '')
           return url
         } catch (err) {
           const msg = err?.message || String(err)
-          setMsg(`Envoi cloud : ${msg}. Réessai en image intégrée (navigateur)…`)
+          if (msg.includes('Bucket Storage non configuré')) {
+            setMsg(
+              'Stockage Supabase non configuré : les photos PC ne seront pas visibles en ligne. Ajoutez SUPABASE_STORAGE_BUCKET=site-images sur Vercel (voir supabase/README.md).',
+            )
+            return undefined
+          }
+          setMsg(`Envoi cloud : ${msg}`)
         }
       }
       if (variant === 'article') return fileToArticleImageSrc(file)
       return fileToGallerySrc(file)
     },
-    [storageOn, adminAuthed, setMsg],
+    [adminAuthed, setMsg],
   )
 
   const value = useMemo(() => ({ storageOn, fileToSrc }), [storageOn, fileToSrc])
@@ -147,6 +153,31 @@ function AdminMediaGate({ children, setMsg, adminAuthed }) {
 
 function computeFullName(first, last) {
   return `${first || ''} ${last || ''}`.trim()
+}
+
+const QUI_VALUES_FALLBACK = [
+  { icon: '🌸', label: 'Artisanat' },
+  { icon: '💜', label: 'Passion' },
+  { icon: '✨', label: 'Sur mesure' },
+]
+
+function parseQuiValuesFromForm(fd, fallback = QUI_VALUES_FALLBACK) {
+  const values = []
+  for (let i = 0; i < 3; i++) {
+    const icon = String(fd.get(`qs_val${i}_icon`) || '').trim()
+    const label = String(fd.get(`qs_val${i}_label`) || '').trim()
+    if (label || icon) {
+      values.push({ icon: icon || '✿', label })
+    }
+  }
+  if (values.length === 0) {
+    return (fallback || QUI_VALUES_FALLBACK).slice(0, 3).map((v) => ({ ...v }))
+  }
+  while (values.length < 3) {
+    const fb = fallback?.[values.length] || QUI_VALUES_FALLBACK[values.length]
+    values.push(fb ? { ...fb } : { icon: '✿', label: '' })
+  }
+  return values.slice(0, 3)
 }
 
 export default function Admin() {
@@ -316,7 +347,9 @@ export default function Admin() {
         sectionTitle: fd.get('qs_title') || '',
         badgeTitle: fd.get('qs_badgeT') || '',
         badgeLine: fd.get('qs_badgeL') || '',
+        values: parseQuiValuesFromForm(fd, content.home.quiSuisJe?.values),
         ctaLabel: fd.get('qs_cta') || '',
+        ctaPath: fd.get('qs_cta_path') || '/contact',
         paragraphs: (fd.get('qs_paragraphs') || '')
           .split(/\n\n+/)
           .map((s) => s.trim())
@@ -355,7 +388,7 @@ export default function Admin() {
         },
       })
     },
-    [applySaveMsg, content.home.coupsDeCoeur, content.home.prestations],
+    [applySaveMsg, content.home.coupsDeCoeur, content.home.prestations, content.home.quiSuisJe?.values],
   )
 
   const handleSaveFooter = useCallback(
@@ -364,7 +397,7 @@ export default function Admin() {
       const fd = new FormData(e.target)
       await applySaveMsg({
         maintenance: {
-          enabled: fd.get('maint_enabled') === 'on',
+          enabled: fd.has('maint_enabled'),
           title: fd.get('maint_title')?.trim() || '',
           message: fd.get('maint_message')?.trim() || '',
         },
@@ -530,7 +563,18 @@ export default function Admin() {
           }}
         >
           {serverHealth.supabaseServiceConfigured && serverHealth.adminPasswordConfigured ? (
-            <>Serveur prêt : enregistrement en ligne possible (Supabase + mot de passe admin).</>
+            <>
+              Serveur prêt : enregistrement en ligne possible (Supabase + mot de passe admin).
+              {!serverHealth.storageBucketConfigured ? (
+                <>
+                  {' '}
+                  <strong>Photos « Parcourir » :</strong> configurez le bucket Storage{' '}
+                  <code className="text-[10px]">site-images</code> +{' '}
+                  <code className="text-[10px]">SUPABASE_STORAGE_BUCKET</code> sur Vercel, sinon elles ne
+                  s’affichent pas sur le site public.
+                </>
+              ) : null}
+            </>
           ) : (
             <>
               <strong>Enregistrement en ligne bloqué sur Vercel.</strong> Ajoutez{' '}
@@ -665,7 +709,59 @@ export default function Admin() {
             <input name="qs_badgeL" defaultValue={h.quiSuisJe.badgeLine} className="form-field" />
             <label className="block text-xs">Paragraphes (séparés par une ligne vide). Utilisez {'{firstName}'} pour le prénom.</label>
             <textarea name="qs_paragraphs" rows={12} className="form-field" defaultValue={(h.quiSuisJe.paragraphs || []).join('\n\n')} />
-            <input name="qs_cta" defaultValue={h.quiSuisJe.ctaLabel} className="form-field" />
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+              <strong>3 encarts</strong> (icône + texte) — police <strong>Cookie</strong> sur le site. Évitez les MAJUSCULES
+              forcées : écrivez par ex. « Artisanat », « Passion », « Sur mesure ».
+            </p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {(h.quiSuisJe.values?.length ? h.quiSuisJe.values : QUI_VALUES_FALLBACK).slice(0, 3).map((v, i) => (
+                <div key={i} className="rounded-xl border border-mauve-light/35 p-3 space-y-2 bg-white/60">
+                  <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: 'var(--violet)' }}>
+                    Encart {i + 1}
+                  </p>
+                  <label className="block text-xs">
+                    Icône (emoji)
+                    <input
+                      name={`qs_val${i}_icon`}
+                      defaultValue={v.icon || ''}
+                      className="form-field mt-1 text-center text-xl"
+                      placeholder="🌸"
+                    />
+                  </label>
+                  <label className="block text-xs">
+                    Texte (Cookie)
+                    <input
+                      name={`qs_val${i}_label`}
+                      defaultValue={v.label || ''}
+                      className="form-field mt-1 font-brand text-lg"
+                      placeholder="Artisanat"
+                    />
+                  </label>
+                  <p
+                    className="text-center font-brand text-lg pt-1"
+                    style={{ color: 'var(--mauve)' }}
+                    aria-hidden
+                  >
+                    {v.icon} {(v.label || '').slice(0, 24)}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="grid sm:grid-cols-2 gap-2">
+              <label className="block text-xs sm:col-span-1">
+                Bouton — libellé
+                <input name="qs_cta" defaultValue={h.quiSuisJe.ctaLabel} className="form-field mt-1 font-brand text-lg" />
+              </label>
+              <label className="block text-xs sm:col-span-1">
+                Bouton — lien
+                <input
+                  name="qs_cta_path"
+                  defaultValue={h.quiSuisJe.ctaPath || '/contact'}
+                  className="form-field mt-1"
+                  placeholder="/contact"
+                />
+              </label>
+            </div>
           </fieldset>
 
           <fieldset className="space-y-2">
@@ -715,11 +811,15 @@ export default function Admin() {
               <input
                 type="checkbox"
                 name="maint_enabled"
+                value="on"
                 defaultChecked={c.maintenance?.enabled === true}
                 className="rounded border-mauve-light"
               />
               <span className="text-sm font-medium">Activer le bandeau de maintenance</span>
             </label>
+            <p className="text-xs mb-3 leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+              Cochez la case puis cliquez sur <strong>Enregistrer</strong> en bas du formulaire. Un bandeau orange apparaît en haut du site et les paiements SumUp sont bloqués.
+            </p>
             <p className="text-xs mb-3 leading-relaxed" style={{ color: 'var(--text-mid)' }}>
               Affiche un bandeau en haut du site et <strong>bloque tous les paiements en ligne</strong> (panier, page
               paiement, SumUp). La bannière promo est masquée tant que la maintenance est active. En production avec
@@ -980,6 +1080,14 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
     setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
   }
 
+  const setPhotoKey = (idx, photoKey) => {
+    setItems((prev) =>
+      prev.map((it, i) =>
+        i === idx ? { ...it, photoKey, src: '' } : it,
+      ),
+    )
+  }
+
   const pickImage = async (idx, fileList) => {
     const file = fileList?.[0]
     if (!file) return
@@ -1008,7 +1116,7 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
     })
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onDraftChange({
       pretitle,
       title,
@@ -1027,7 +1135,9 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
     <fieldset className="space-y-3">
       <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Coups de cœur (page d’accueil)</legend>
       <p className="text-xs leading-relaxed">
-        Gérez le titre, le texte et chaque photo (clé Unsplash, fichier depuis l’ordinateur, ou URL / chemin <code>/...</code> dans « src »).
+        Pour changer la galerie Unsplash : modifiez la <strong>clé photo</strong> (le champ « src » est vidé automatiquement).
+        Pour une photo perso : « Parcourir » (de préférence avec stockage cloud configuré) ou collez une URL / chemin{' '}
+        <code>/images/...</code> dans « src ». Puis <strong>Enregistrer l’accueil</strong> en bas de page.
       </p>
       <input className="form-field" value={pretitle} onChange={(e) => setPretitle(e.target.value)} placeholder="Sous-titre (ex. Mes réalisations)" />
       <input className="form-field" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titre (ex. Coup de cœur)" />
@@ -1071,7 +1181,11 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
             </label>
             <label className="block">
               Clé photo (Unsplash)
-              <select className="form-field mt-1" value={it.photoKey || 'weddingBouquet'} onChange={(e) => setField(idx, 'photoKey', e.target.value)}>
+              <select
+                className="form-field mt-1"
+                value={it.photoKey || 'weddingBouquet'}
+                onChange={(e) => setPhotoKey(idx, e.target.value)}
+              >
                 {PHOTO_KEY_OPTIONS.map((k) => (
                   <option key={k} value={k}>
                     {k}
@@ -1112,12 +1226,12 @@ function HomeCoupsEditor({ initial, onDraftChange }) {
             </label>
             <div className="flex items-start gap-3">
               <img
-                src={it.src?.trim() ? resolvePhotoSrc(it.src) : resolvePhotoSrc(it.photoKey)}
+                src={resolveItemPhoto(it)}
                 alt=""
                 className="h-20 w-28 rounded-lg object-cover border border-mauve-light/30 shrink-0 bg-mauve-light/10"
               />
               <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-                Aperçu : « src » si présent, sinon la clé Unsplash.
+                Aperçu identique au site. Si l’image ne change pas après enregistrement : videz « src » ou changez la clé photo.
               </p>
             </div>
           </div>
@@ -1147,6 +1261,12 @@ function HomePrestationsEditor({ initial, onDraftChange }) {
     setCategories((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
   }
 
+  const setPhotoKey = (idx, photoKey) => {
+    setCategories((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, photoKey, src: '' } : it)),
+    )
+  }
+
   const pickImage = async (idx, fileList) => {
     const file = fileList?.[0]
     if (!file) return
@@ -1158,7 +1278,7 @@ function HomePrestationsEditor({ initial, onDraftChange }) {
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onDraftChange({
       pretitle,
       title,
@@ -1192,7 +1312,7 @@ function HomePrestationsEditor({ initial, onDraftChange }) {
             <input className="form-field" value={cat.path} onChange={(e) => setField(i, 'path', e.target.value)} placeholder="/chemin" />
             <label className="block">
               Clé photo (Unsplash)
-              <select className="form-field mt-1" value={cat.photoKey} onChange={(e) => setField(i, 'photoKey', e.target.value)}>
+              <select className="form-field mt-1" value={cat.photoKey} onChange={(e) => setPhotoKey(i, e.target.value)}>
                 {PHOTO_KEY_OPTIONS.map((k) => (
                   <option key={k} value={k}>{k}</option>
                 ))}
