@@ -19,6 +19,13 @@ export function resolvePhotoSrc(srcOrKey) {
   return photoW600(v)
 }
 
+/** Coups de cœur / prestations : « src » personnalisé seulement s’il est renseigné, sinon clé Unsplash. */
+export function resolveItemPhoto(item) {
+  const src = (item?.src || '').trim()
+  if (src) return resolvePhotoSrc(src)
+  return resolvePhotoSrc(item?.photoKey || 'weddingBouquet')
+}
+
 /**
  * Fond d’accueil (admin). Vide = dégradé CSS sans image.
  */
