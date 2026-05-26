@@ -5,7 +5,7 @@ import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
-import { getSupabase } from '../services/supabaseClient'
+import { getSupabase, isSupabaseConfigured } from '../services/supabaseClient'
 import {
   isLikelySupabaseBucketUrl,
   isSupabaseStorageConfigured,
@@ -117,6 +117,7 @@ function useAdminMedia() {
 }
 
 function AdminMediaGate({ children, setMsg }) {
+  const supabaseOn = isSupabaseConfigured()
   const storageOn = isSupabaseStorageConfigured()
   const [session, setSession] = useState(null)
   const [authReady, setAuthReady] = useState(!storageOn)
@@ -125,9 +126,34 @@ function AdminMediaGate({ children, setMsg }) {
   const [sbEmail, setSbEmail] = useState('')
   const [sbPassword, setSbPassword] = useState('')
   const [sbErr, setSbErr] = useState('')
+  const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim().replace(/\/$/, '')
+  const [connStatus, setConnStatus] = useState('idle') // idle | checking | ok | fail
 
   useEffect(() => {
-    if (!storageOn) return undefined
+    if (!supabaseOn || !supabaseUrl) {
+      setConnStatus('idle')
+      return undefined
+    }
+    if (!supabaseUrl.includes('.supabase.co')) {
+      setConnStatus('fail')
+      return undefined
+    }
+    let cancelled = false
+    setConnStatus('checking')
+    fetch(`${supabaseUrl}/auth/v1/health`)
+      .then((r) => {
+        if (!cancelled) setConnStatus(r.ok ? 'ok' : 'fail')
+      })
+      .catch(() => {
+        if (!cancelled) setConnStatus('fail')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [supabaseOn, supabaseUrl])
+
+  useEffect(() => {
+    if (!supabaseOn) return undefined
     const sb = getSupabase()
     if (!sb) {
       setAuthReady(true)
@@ -147,7 +173,7 @@ function AdminMediaGate({ children, setMsg }) {
       cancelled = true
       sub.subscription.unsubscribe()
     }
-  }, [storageOn])
+  }, [supabaseOn])
 
   const magicLinkRedirectTo = useMemo(() => {
     // Utilise l'URL actuelle (dev ou prod) et renvoie sur /admin.
@@ -181,7 +207,12 @@ function AdminMediaGate({ children, setMsg }) {
           })
     setAuthBusy(false)
     if (error) {
-      setSbErr(error.message || 'Connexion impossible.')
+      const msg = error.message || 'Connexion impossible.'
+      setSbErr(
+        msg === 'Failed to fetch'
+          ? 'Impossible de joindre Supabase. Vérifiez VITE_SUPABASE_URL (https://xxx.supabase.co, pas le lien dashboard) et redémarrez npm run dev.'
+          : msg,
+      )
       return
     }
     if (authMode === 'magic') {
@@ -233,20 +264,44 @@ function AdminMediaGate({ children, setMsg }) {
 
   return (
     <AdminMediaContext.Provider value={value}>
-      {storageOn && authReady ? (
+      {supabaseOn && authReady ? (
         <div
           className="mb-6 rounded-xl border p-4 space-y-3"
           style={{ borderColor: 'rgba(139,75,106,0.35)', background: 'rgba(255,248,251,0.85)' }}
         >
           <h2 className="text-base font-semibold" style={{ color: 'var(--violet)' }}>
-            Photos sur le cloud (Supabase Storage)
+            Connexion Supabase
           </h2>
           <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-            Un compte <strong>Supabase Auth</strong> (différent du mot de passe admin du site) permet d’uploader les images
-            depuis cette page. Créez un utilisateur dans le tableau Supabase : Authentication → Users. Le bucket doit être
-            public en lecture ; les policies Storage autorisent l’écriture aux utilisateurs authentifiés (voir commentaires dans{' '}
-            <code className="text-[10px]">src/services/supabaseStorageUpload.js</code>).
+            Compte <strong>Supabase Auth</strong> (différent du mot de passe admin du site). Obligatoire pour{' '}
+            <strong>enregistrer le contenu</strong> sur le serveur quand{' '}
+            <code className="text-[10px]">VITE_CONTENT_DRIVER=supabase</code>
+            {storageOn ? (
+              <> et pour envoyer les <strong>photos</strong> dans le cloud.</>
+            ) : (
+              <>
+                . Pour les photos, ajoutez aussi <code className="text-[10px]">VITE_SUPABASE_STORAGE_BUCKET</code> (voir{' '}
+                <code className="text-[10px]">supabase/README.md</code>).
+              </>
+            )}
+            {' '}
+            Créez l’utilisateur dans Supabase → Authentication → Users.
           </p>
+          {supabaseUrl ? (
+            <p className="text-[11px] font-mono break-all" style={{ color: 'var(--text-mid)' }}>
+              URL configurée : {supabaseUrl}
+              {connStatus === 'checking' && ' — test en cours…'}
+              {connStatus === 'ok' && ' — ✓ joignable'}
+              {connStatus === 'fail' && ' — ✗ injoignable (copiez Project URL dans Supabase → Settings → API)'}
+            </p>
+          ) : null}
+          {connStatus === 'fail' ? (
+            <p className="text-xs leading-relaxed rounded-lg border border-amber-500/50 px-3 py-2" style={{ background: 'rgba(251,191,36,0.12)', color: '#92400e' }}>
+              Ouvrez cette adresse dans un nouvel onglet : si la page ne charge pas, le projet est en pause, supprimé, ou l’URL est fausse.
+              Dans Supabase, copiez <strong>Project URL</strong> et <strong>anon public</strong> sur la même page, collez dans{' '}
+              <code className="text-[10px]">.env</code>, enregistrez, puis <code className="text-[10px]">npm run dev</code>.
+            </p>
+          ) : null}
           {session?.user ? (
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-xs">
@@ -498,10 +553,10 @@ export default function Admin() {
   )
 
   const handleSaveFooter = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
-      save({
+      const result = await save({
         maintenance: {
           enabled: fd.get('maint_enabled') === 'on',
           title: fd.get('maint_title')?.trim() || '',
@@ -530,9 +585,23 @@ export default function Admin() {
           tiktokUrl: fd.get('tt') || '',
         },
       })
-      setMsg('Enregistré.')
+      if (!result.localOk) {
+        setMsg('Erreur : impossible d’enregistrer dans ce navigateur.')
+        return
+      }
+      if (contentDriver === 'supabase' && !result.supabaseOk) {
+        setMsg(
+          `Visible sur cet ordinateur seulement. Serveur : ${result.supabaseError || 'échec Supabase'}. Connectez-vous au bloc « Connexion Supabase » puis réessayez.`,
+        )
+        return
+      }
+      setMsg(
+        contentDriver === 'supabase'
+          ? 'Menu, bannière promo et pied de page enregistrés (Supabase).'
+          : 'Enregistré.',
+      )
     },
-    [save],
+    [save, contentDriver],
   )
 
   const handleSaveContact = useCallback(
@@ -1444,7 +1513,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     }
   }
 
-  const savePage = () => {
+  const savePage = async () => {
     const items = localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
       title: String(it.title || '').trim(),
@@ -1458,7 +1527,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
     }))
-    const ok = save({
+    const result = await save({
       pageArticles: {
         [pageKey]: {
           sectionTitle: localTitle.trim(),
@@ -1467,14 +1536,16 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         },
       },
     })
-    if (ok) {
+    if (result.localOk) {
       setMsg('Articles enregistrés pour cette page.')
       setSaveFeedback({
         ok: true,
         text:
-          contentDriver === 'supabase'
+          contentDriver === 'supabase' && result.supabaseOk
             ? 'Enregistré (Supabase + copie locale). Les images en URL cloud allègent le JSON.'
-            : 'Enregistré dans ce navigateur (localStorage).',
+            : contentDriver === 'supabase'
+              ? `Enregistré localement. Supabase : ${result.supabaseError || 'échec'}`
+              : 'Enregistré dans ce navigateur (localStorage).',
       })
     } else {
       setMsg(

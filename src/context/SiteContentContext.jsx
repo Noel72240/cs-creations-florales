@@ -60,7 +60,9 @@ export function SiteContentProvider({ children }) {
       if (USE_SUPABASE) {
         const seed = await fetchStaticSiteContentSeed()
         const fromDb = await fetchSiteContentPayload()
-        const merged = deepMerge(seed || {}, fromDb || readLocalSiteOverrides() || {})
+        const local = readLocalSiteOverrides()
+        // DB + copie locale : la locale garde les derniers enregistrements si la sync serveur a échoué
+        const merged = deepMerge(seed || {}, deepMerge(fromDb || {}, local || {}))
         if (!cancelled) setOverrides(merged)
         if (!cancelled) setRemoteLoaded(true)
         return
@@ -82,26 +84,29 @@ export function SiteContentProvider({ children }) {
 
   const content = useMemo(() => getMergedContent(overrides), [overrides])
 
-  const save = useCallback((patch) => {
+  const save = useCallback(async (patch) => {
     const prev = overridesRef.current
     const next = deepMerge(prev || {}, patch)
 
     if (USE_SUPABASE) {
-      const ok = writeLocalSiteOverrides(next)
-      if (ok) {
+      const localOk = writeLocalSiteOverrides(next)
+      if (localOk) {
         overridesRef.current = next
         setOverrides(next)
       }
-      void upsertSiteContentPayload(next)
-      return ok
+      const r = await upsertSiteContentPayload(next)
+      if (!r.ok && import.meta.env.DEV) {
+        console.warn('[SiteContent] sync Supabase:', r.error)
+      }
+      return { localOk, supabaseOk: r.ok, supabaseError: r.error }
     }
 
-    const ok = writeLocalSiteOverrides(next)
-    if (ok) {
+    const localOk = writeLocalSiteOverrides(next)
+    if (localOk) {
       overridesRef.current = next
       setOverrides(next)
     }
-    return ok
+    return { localOk, supabaseOk: true }
   }, [])
 
   const reset = useCallback(() => {
