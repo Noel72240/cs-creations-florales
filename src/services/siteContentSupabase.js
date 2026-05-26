@@ -8,11 +8,10 @@
  *      updated_at timestamptz not null default now()
  *    );
  *
- * 2. RLS : lecture `anon` si le site doit lire le contenu sans auth ;
- *    écriture réservée à un rôle service / utilisateurs authentifiés (admin).
+ * 2. RLS : lecture `anon` ; écriture via API serveur + SUPABASE_SERVICE_ROLE_KEY.
  *
- * 3. Définir sur Vercel : VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, puis
- *    VITE_CONTENT_DRIVER=supabase dans `SiteContentContext` (chargement + save).
+ * 3. Vercel : VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_CONTENT_DRIVER=supabase,
+ *    SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD (ou VITE_ADMIN_PASSWORD).
  */
 import { getSupabase } from './supabaseClient'
 
@@ -33,23 +32,8 @@ export async function fetchSiteContentPayload() {
   return p && typeof p === 'object' ? p : null
 }
 
-/** @returns {Promise<boolean>} */
+/** @returns {Promise<{ ok: boolean, error?: string }>} */
 export async function upsertSiteContentPayload(payload) {
-  const sb = getSupabase()
-  if (!sb) return false
-  const { error } = await sb.from('site_content').upsert(
-    {
-      id: ROW_ID,
-      payload,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'id' },
-  )
-  if (error) {
-    if (import.meta.env.DEV) {
-      console.warn('[siteContentSupabase] upsert', error.message)
-    }
-    return false
-  }
-  return true
+  const { saveSiteContentViaApi } = await import('../lib/adminServerApi.js')
+  return saveSiteContentViaApi(payload)
 }
