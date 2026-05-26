@@ -103,7 +103,7 @@ export const SITE_CONTENT_DEFAULTS = {
       titleLine1: 'C&S Créations Florales',
       titleLine2: 'et Personnalisation',
       searchPlaceholder: 'Rechercher : mariage, bouquet, fête des mères…',
-      searchHint: 'Tapez au moins 2 lettres, puis choisissez un résultat ou appuyez sur Entrée.',
+      searchHint: 'Mariage, anniversaire, deuil, fête des mères… — 2 lettres minimum.',
       ctaPrimaryLabel: 'Découvrir mes créations',
       ctaPrimaryPath: '/evenements-floraux',
       ctaSecondaryLabel: 'Demander un devis',
@@ -121,6 +121,7 @@ export const SITE_CONTENT_DEFAULTS = {
         { icon: '✨', label: 'Sur mesure' },
       ],
       ctaLabel: 'Me contacter',
+      ctaPath: '/contact',
       /** {firstName} sera remplacé par le prénom du site */
       paragraphs: [
         'Bonjour, je suis {firstName}, j’ai 33 ans.',
