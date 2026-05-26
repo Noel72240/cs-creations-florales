@@ -53,7 +53,7 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState(null)
   const location = useLocation()
   const dropdownRef = useRef(null)
-  const headerRef = useRef(null)
+  const headerBarRef = useRef(null)
 
   const maintenance = getMaintenanceState(content)
   const promo = content.navbar?.promoBanner
@@ -66,7 +66,7 @@ export default function Navbar() {
   })()
 
   useLayoutEffect(() => {
-    const el = headerRef.current
+    const el = headerBarRef.current
     if (!el) return
     const apply = () => {
       document.documentElement.style.setProperty('--site-header-offset', `${el.offsetHeight}px`)
@@ -80,6 +80,15 @@ export default function Navbar() {
       if (ro) ro.disconnect()
     }
   }, [maintenance.active, showPromo, location.pathname, content.navbar?.topBarMessage])
+
+  useEffect(() => {
+    if (!mobileOpen) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileOpen])
 
   const isNavActive = (path) => {
     if (path === '/') return location.pathname === '/'
@@ -109,13 +118,13 @@ export default function Navbar() {
 
   return (
     <header
-      ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 overflow-visible transition-all duration-500 ${
         scrolled
           ? 'bg-white/95 backdrop-blur-md shadow-md shadow-mauve/5'
           : 'bg-white/80 backdrop-blur-sm'
       }`}
     >
+      <div ref={headerBarRef}>
       <MaintenanceBanner />
 
       {showPromo && (
@@ -260,33 +269,70 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — panneau fixe défilable sous la barre (téléphone) */}
       {mobileOpen && (
-        <div className="lg:hidden bg-white border-t border-mauve-light/30 shadow-lg animate-fade-in">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+        <div
+          className="mobile-nav-panel lg:hidden fixed left-0 right-0 z-[60] bg-white border-t border-mauve-light/30 shadow-lg animate-fade-in overflow-y-auto overscroll-y-contain"
+          style={{
+            top: 'var(--site-header-offset, 7rem)',
+            maxHeight: 'calc(100dvh - var(--site-header-offset, 7rem))',
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-4 pb-8 space-y-1">
             {menuItems.map((item) => (
               <div key={item.path}>
-                <Link
-                  to={item.path}
-                  className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
-                  style={{ color: 'var(--text-dark)' }}
-                >
-                  {item.label}
-                </Link>
-                {item.children && (
-                  <div className="pl-6 space-y-1 mt-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.path}
-                        to={child.path}
-                        className="block py-2 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
-                        style={{ color: 'var(--text-mid)' }}
+                {item.children ? (
+                  <>
+                    <button
+                      type="button"
+                      className="w-full flex items-center justify-between gap-2 py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors text-left"
+                      style={{ color: 'var(--text-dark)' }}
+                      onClick={() => setOpenDropdown(openDropdown === item.path ? null : item.path)}
+                      aria-expanded={openDropdown === item.path}
+                    >
+                      <span>{item.label}</span>
+                      <svg
+                        className={`w-4 h-4 shrink-0 transition-transform ${openDropdown === item.path ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden
                       >
-                        → {child.label}
-                      </Link>
-                    ))}
-                  </div>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {openDropdown === item.path && (
+                      <div className="pl-3 sm:pl-6 space-y-1 mt-1 mb-2 border-l-2 border-mauve-light/40 ml-3">
+                        <Link
+                          to={item.path}
+                          className="block py-2 px-3 rounded-lg text-[0.875rem] font-body hover:bg-mauve-pale transition-colors"
+                          style={{ color: 'var(--violet)' }}
+                        >
+                          Voir tout
+                        </Link>
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.path}
+                            to={child.path}
+                            className="block py-2 px-3 rounded-lg text-[0.875rem] font-body hover:bg-mauve-pale transition-colors"
+                            style={{ color: 'var(--text-mid)' }}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
+                    style={{ color: 'var(--text-dark)' }}
+                  >
+                    {item.label}
+                  </Link>
                 )}
               </div>
             ))}

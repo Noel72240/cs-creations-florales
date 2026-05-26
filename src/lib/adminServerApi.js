@@ -81,7 +81,12 @@ export async function saveSiteContentViaApi(payload) {
     await parseApiResponse(r)
     return { ok: true, strippedImages: strippedCount }
   } catch (e) {
-    const msg = e?.message || 'Échec enregistrement serveur'
+    let msg = e?.message || 'Échec enregistrement serveur'
+    if (msg === 'Failed to fetch' || msg.includes('fetch failed')) {
+      msg = import.meta.env.DEV
+        ? 'API injoignable en local. Ajoutez SUPABASE_SERVICE_ROLE_KEY dans .env, redémarrez npm run dev, ou utilisez npm run dev:vercel.'
+        : 'API injoignable. Vérifiez le déploiement Vercel (onglet Functions) et ouvrez /api/admin-health sur votre site.'
+    }
     if (msg.includes('413') || msg.toLowerCase().includes('too large')) {
       return { ok: false, error: msg, payloadTooLarge: true, strippedImages: strippedCount }
     }

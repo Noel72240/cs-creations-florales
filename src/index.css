@@ -734,6 +734,11 @@ body::before {
   --site-header-offset: 7rem;
 }
 
+.mobile-nav-panel {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
 main.site-main {
   position: relative;
   z-index: 1;

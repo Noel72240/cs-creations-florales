@@ -1,11 +1,9 @@
 /**
  * Enregistre le JSON site_content via service_role (mot de passe admin requis).
  */
-import { readAdminPassword, verifyAdminPassword } from './lib/adminAuth.js'
-import { getSupabaseServiceClient } from './lib/supabaseService.js'
+import { readAdminPassword } from './lib/adminAuth.js'
+import { saveSiteContentCore } from './lib/saveSiteContentCore.js'
 import { corsHeaders, readJsonBody, sendJson } from './lib/http.js'
-
-const ROW_ID = 'main'
 
 export default async function handler(req, res) {
   const origin = req.headers.origin
@@ -23,47 +21,14 @@ export default async function handler(req, res) {
 
   try {
     const body = await readJsonBody(req)
-    const auth = verifyAdminPassword(readAdminPassword(body, req.headers))
-    if (!auth.ok) {
-      sendJson(res, 401, { ok: false, error: auth.error }, origin)
+    const result = await saveSiteContentCore(readAdminPassword(body, req.headers), body.payload)
+    if (!result.ok) {
+      const status = result.error?.includes('incorrect') ? 401 : result.error?.includes('configuré') ? 503 : 500
+      sendJson(res, status, result, origin)
       return
     }
 
-    const payload = body.payload
-    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-      sendJson(res, 400, { ok: false, error: 'payload JSON invalide' }, origin)
-      return
-    }
-
-    const sb = getSupabaseServiceClient()
-    if (!sb) {
-      sendJson(
-        res,
-        503,
-        {
-          ok: false,
-          error: 'Supabase serveur non configuré (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY sur Vercel).',
-        },
-        origin,
-      )
-      return
-    }
-
-    const { error } = await sb.from('site_content').upsert(
-      {
-        id: ROW_ID,
-        payload,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'id' },
-    )
-
-    if (error) {
-      sendJson(res, 500, { ok: false, error: error.message }, origin)
-      return
-    }
-
-    sendJson(res, 200, { ok: true }, origin)
+    sendJson(res, 200, result, origin)
   } catch (e) {
     sendJson(res, 500, { ok: false, error: e?.message || 'Erreur serveur' }, origin)
   }

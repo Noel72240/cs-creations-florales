@@ -61,8 +61,11 @@ export function SiteContentProvider({ children }) {
         const seed = await fetchStaticSiteContentSeed()
         const fromDb = await fetchSiteContentPayload()
         const local = readLocalSiteOverrides()
-        // DB + copie locale : la locale garde les derniers enregistrements si la sync serveur a échoué
-        const merged = deepMerge(seed || {}, deepMerge(fromDb || {}, local || {}))
+        // Supabase = source de vérité pour tous les appareils. localStorage seulement si la base est vide.
+        const merged =
+          fromDb && typeof fromDb === 'object' && Object.keys(fromDb).length > 0
+            ? deepMerge(seed || {}, fromDb)
+            : deepMerge(seed || {}, deepMerge(fromDb || {}, local || {}))
         if (!cancelled) setOverrides(merged)
         if (!cancelled) setRemoteLoaded(true)
         return

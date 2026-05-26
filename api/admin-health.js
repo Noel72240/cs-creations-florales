@@ -1,8 +1,7 @@
 /**
  * Diagnostic (sans secrets) : variables serveur pour l’admin Supabase.
  */
-import { getAdminPasswordFromEnv } from './lib/adminAuth.js'
-import { getSupabaseServiceClient } from './lib/supabaseService.js'
+import { getAdminHealthStatus } from './lib/adminHealthCore.js'
 import { corsHeaders, sendJson } from './lib/http.js'
 
 export default async function handler(req, res) {
@@ -19,21 +18,5 @@ export default async function handler(req, res) {
     return
   }
 
-  const sb = getSupabaseServiceClient()
-  const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim()
-
-  sendJson(
-    res,
-    200,
-    {
-      ok: true,
-      supabaseUrlConfigured: Boolean(url),
-      supabaseServiceConfigured: Boolean(sb),
-      adminPasswordConfigured: Boolean(getAdminPasswordFromEnv()),
-      storageBucketConfigured: Boolean(
-        (process.env.SUPABASE_STORAGE_BUCKET || process.env.VITE_SUPABASE_STORAGE_BUCKET || '').trim(),
-      ),
-    },
-    origin,
-  )
+  sendJson(res, 200, getAdminHealthStatus(), origin)
 }
