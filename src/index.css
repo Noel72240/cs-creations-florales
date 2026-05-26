@@ -1039,11 +1039,17 @@ h1, h2, h3, h4 {
 }
 
 .qui-suis-je-section a.btn-primary,
-.qui-suis-je-section .btn-primary {
+.qui-suis-je-section .btn-primary,
+.qui-suis-je-section .qui-cta-btn {
   font-family: 'Cookie', cursive !important;
   font-weight: 400 !important;
   letter-spacing: 0.04em;
   text-transform: none !important;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem) !important;
+}
+
+.admin-page .font-brand {
+  font-family: 'Cookie', cursive !important;
 }
 
 /* « Qui suis-je » : manuscrite pour le titre + accents dans le texte */
