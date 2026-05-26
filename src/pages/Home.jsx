@@ -172,7 +172,7 @@ function QuiSuisJeSection({ site, qui }) {
 
   return (
     <section
-      className="py-20 px-4"
+      className="qui-suis-je-section py-20 px-4"
       style={{ background: 'linear-gradient(to bottom, #fff7fb, var(--beige))' }}
     >
       <div className="max-w-6xl mx-auto">
@@ -223,13 +223,22 @@ function QuiSuisJeSection({ site, qui }) {
               {(q.values || []).map(({ icon, label }) => (
                 <div key={label} className="text-center p-3 rounded-xl" style={{ background: 'rgba(240,210,221,0.22)' }}>
                   <p className="text-2xl mb-1">{icon}</p>
-                  <p className="font-body text-xs tracking-wider uppercase" style={{ color: 'var(--mauve)' }}>{label}</p>
+                  <p
+                    className="qui-value-label font-brand"
+                    style={{ color: 'var(--mauve)', fontFamily: "'Cookie', cursive" }}
+                  >
+                    {label}
+                  </p>
                 </div>
               ))}
             </div>
 
-            <Link to="/contact" className="btn-primary">
-              {q.ctaLabel}
+            <Link
+              to={q.ctaPath || '/contact'}
+              className="btn-primary font-brand qui-cta-btn"
+              style={{ fontFamily: "'Cookie', cursive" }}
+            >
+              {q.ctaLabel || 'Me contacter'}
             </Link>
           </div>
         </div>
