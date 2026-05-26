@@ -43,22 +43,49 @@ async function parseApiResponse(r) {
   return data
 }
 
-/** @returns {Promise<{ ok: boolean, error?: string }>} */
+/** @returns {Promise<{ ok: boolean, serverHealth?: object }>} */
+export async function fetchAdminServerHealth() {
+  try {
+    const r = await fetch('/api/admin-health', { method: 'GET' })
+    return await parseApiResponse(r)
+  } catch {
+    return { ok: false, supabaseServiceConfigured: false, adminPasswordConfigured: false }
+  }
+}
+
+/** @returns {Promise<{ ok: boolean, error?: string, strippedImages?: number, payloadTooLarge?: boolean }>} */
 export async function saveSiteContentViaApi(payload) {
   const adminPassword = getStoredAdminPassword()
   if (!adminPassword) {
     return { ok: false, error: 'Reconnectez-vous à l’admin (mot de passe du site).' }
   }
+
+  const { preparePayloadForCloudSave } = await import('./siteContentCloudPayload.js')
+  const { payload: cloudPayload, strippedCount, byteSize } = preparePayloadForCloudSave(payload)
+
+  if (byteSize > 4_200_000) {
+    return {
+      ok: false,
+      error: `Contenu trop lourd (${Math.round(byteSize / 1024)} Ko). Réduisez les photos intégrées.`,
+      payloadTooLarge: true,
+      strippedImages: strippedCount,
+    }
+  }
+
   try {
     const r = await fetch('/api/save-site-content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminPassword, payload }),
+      body: JSON.stringify({ adminPassword, payload: cloudPayload }),
     })
     await parseApiResponse(r)
-    return { ok: true }
+    return { ok: true, strippedImages: strippedCount }
   } catch (e) {
-    return { ok: false, error: e?.message || 'Échec enregistrement serveur' }
+    const msg = e?.message || 'Échec enregistrement serveur'
+    if (msg.includes('413') || msg.toLowerCase().includes('too large')) {
+      return { ok: false, error: msg, payloadTooLarge: true, strippedImages: strippedCount }
+    }
+    return { ok: false, error: msg, strippedImages: strippedCount }
   }
 }
 

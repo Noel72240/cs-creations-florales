@@ -98,7 +98,13 @@ export function SiteContentProvider({ children }) {
       if (!r.ok && import.meta.env.DEV) {
         console.warn('[SiteContent] sync Supabase:', r.error)
       }
-      return { localOk, supabaseOk: r.ok, supabaseError: r.error }
+      return {
+        localOk,
+        supabaseOk: r.ok,
+        supabaseError: r.error,
+        strippedImages: r.strippedImages,
+        payloadTooLarge: r.payloadTooLarge,
+      }
     }
 
     const localOk = writeLocalSiteOverrides(next)

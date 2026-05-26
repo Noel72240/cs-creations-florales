@@ -5,7 +5,13 @@ import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc } from '../data/photoResolver'
-import { uploadSiteImageViaApi, storeAdminPasswordForApi, clearAdminPasswordForApi } from '../lib/adminServerApi'
+import {
+  uploadSiteImageViaApi,
+  storeAdminPasswordForApi,
+  clearAdminPasswordForApi,
+  fetchAdminServerHealth,
+} from '../lib/adminServerApi'
+import { messageAfterAdminSave } from '../lib/reportAdminSave'
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 
 const AUTH_KEY = 'cs_admin_auth'
@@ -152,9 +158,34 @@ export default function Admin() {
   useEffect(() => {
     if (auth && adminPassword) storeAdminPasswordForApi(adminPassword)
   }, [auth, adminPassword])
+
+  useEffect(() => {
+    if (!auth) {
+      setServerHealth(null)
+      return
+    }
+    let cancelled = false
+    fetchAdminServerHealth().then((h) => {
+      if (!cancelled) setServerHealth(h)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [auth])
+
+  const applySaveMsg = useCallback(
+    async (patch) => {
+      const result = await save(patch)
+      const { text } = messageAfterAdminSave(result, contentDriver)
+      setMsg(text)
+      return result
+    },
+    [save, contentDriver],
+  )
   const [tab, setTab] = useState('identity')
   const [articlePageKey, setArticlePageKey] = useState('evenementsFloraux')
   const [msg, setMsg] = useState('')
+  const [serverHealth, setServerHealth] = useState(null)
   const [importText, setImportText] = useState('')
   const coupsDraftRef = useRef(null)
   const prestationsDraftRef = useRef(null)
@@ -223,7 +254,7 @@ export default function Admin() {
   }
 
   const handleSaveIdentity = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
       const site = {
@@ -251,14 +282,13 @@ export default function Admin() {
         siret: fd.get('siret')?.trim() || '',
       }
       const sumupPaymentUrl = fd.get('sumupPaymentUrl')?.trim() || ''
-      save({ site, webDev, sumupPaymentUrl })
-      setMsg('Enregistré.')
+      await applySaveMsg({ site, webDev, sumupPaymentUrl })
     },
-    [save],
+    [applySaveMsg],
   )
 
   const handleSaveHome = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
       const intro = {
@@ -313,7 +343,7 @@ export default function Admin() {
         ctaLabel: fd.get('cs_cta') || '',
         phoneCtaPrefix: fd.get('cs_phone') || '',
       }
-      save({
+      await applySaveMsg({
         home: {
           intro,
           hero,
@@ -324,16 +354,15 @@ export default function Admin() {
           contactStrip,
         },
       })
-      setMsg('Enregistré.')
     },
-    [save, content.home.coupsDeCoeur, content.home.prestations],
+    [applySaveMsg, content.home.coupsDeCoeur, content.home.prestations],
   )
 
   const handleSaveFooter = useCallback(
     async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
-      const result = await save({
+      await applySaveMsg({
         maintenance: {
           enabled: fd.get('maint_enabled') === 'on',
           title: fd.get('maint_title')?.trim() || '',
@@ -362,48 +391,31 @@ export default function Admin() {
           tiktokUrl: fd.get('tt') || '',
         },
       })
-      if (!result.localOk) {
-        setMsg('Erreur : impossible d’enregistrer dans ce navigateur.')
-        return
-      }
-      if (contentDriver === 'supabase' && !result.supabaseOk) {
-        setMsg(
-          `Visible sur cet ordinateur seulement. Serveur : ${result.supabaseError || 'échec Supabase'}. Vérifiez SUPABASE_SERVICE_ROLE_KEY sur Vercel et reconnectez-vous à l’admin.`,
-        )
-        return
-      }
-      setMsg(
-        contentDriver === 'supabase'
-          ? 'Menu, bannière promo et pied de page enregistrés (Supabase).'
-          : 'Enregistré.',
-      )
     },
-    [save, contentDriver],
+    [applySaveMsg],
   )
 
   const handleSaveContact = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
-      save({
+      await applySaveMsg({
         contact: {
           addressLine: fd.get('addr') || '',
           availability: fd.get('avail') || '',
         },
       })
-      setMsg('Enregistré.')
     },
-    [save],
+    [applySaveMsg],
   )
 
   const handleSaveGoogleReviews = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault()
       const draft = googleReviewsDraftRef.current || content.googleReviews
-      save({ googleReviews: draft })
-      setMsg('Avis Google enregistrés.')
+      await applySaveMsg({ googleReviews: draft })
     },
-    [save, content.googleReviews],
+    [applySaveMsg, content.googleReviews],
   )
 
   const doImport = () => {
@@ -479,16 +491,71 @@ export default function Admin() {
         </div>
       </div>
 
-      {msg && <p className="mb-4 text-xs" style={{ color: 'var(--violet)' }}>{msg}</p>}
+      {msg && (
+        <p
+          className="mb-4 text-xs rounded-lg px-3 py-2 border"
+          role="status"
+          style={{
+            color: 'var(--violet)',
+            borderColor: msg.includes('Pas enregistré') || msg.includes('seulement') ? 'rgba(192,122,151,0.6)' : 'rgba(139,75,106,0.25)',
+            background: 'rgba(255,248,251,0.9)',
+          }}
+        >
+          {msg}
+        </p>
+      )}
+
+      {contentDriver !== 'supabase' ? (
+        <p
+          className="text-xs mb-4 leading-relaxed rounded-lg border border-amber-500/50 px-3 py-2"
+          style={{ background: 'rgba(251,191,36,0.12)', color: '#92400e' }}
+        >
+          <strong>Site en ligne non synchronisé.</strong> Ajoutez{' '}
+          <code className="text-[10px]">VITE_CONTENT_DRIVER=supabase</code> sur Vercel (Production + Preview), puis{' '}
+          <strong>Redeploy</strong>. Sans cela, seul votre navigateur voit les changements.
+        </p>
+      ) : null}
+
+      {serverHealth && contentDriver === 'supabase' ? (
+        <p
+          className="text-xs mb-4 leading-relaxed rounded-lg border px-3 py-2"
+          style={{
+            borderColor: serverHealth.supabaseServiceConfigured && serverHealth.adminPasswordConfigured
+              ? 'rgba(34,139,34,0.4)'
+              : 'rgba(251,191,36,0.5)',
+            background: serverHealth.supabaseServiceConfigured && serverHealth.adminPasswordConfigured
+              ? 'rgba(230,255,230,0.45)'
+              : 'rgba(251,191,36,0.12)',
+            color: serverHealth.supabaseServiceConfigured && serverHealth.adminPasswordConfigured ? '#1d5a1d' : '#92400e',
+          }}
+        >
+          {serverHealth.supabaseServiceConfigured && serverHealth.adminPasswordConfigured ? (
+            <>Serveur prêt : enregistrement en ligne possible (Supabase + mot de passe admin).</>
+          ) : (
+            <>
+              <strong>Enregistrement en ligne bloqué sur Vercel.</strong> Ajoutez{' '}
+              {!serverHealth.supabaseServiceConfigured ? (
+                <code className="text-[10px]">SUPABASE_SERVICE_ROLE_KEY</code>
+              ) : null}
+              {!serverHealth.supabaseServiceConfigured && !serverHealth.adminPasswordConfigured ? ' et ' : null}
+              {!serverHealth.adminPasswordConfigured ? (
+                <code className="text-[10px]">ADMIN_PASSWORD</code>
+              ) : null}{' '}
+              (identique à <code className="text-[10px]">VITE_ADMIN_PASSWORD</code>), puis Redeploy.
+            </>
+          )}
+        </p>
+      ) : null}
 
       <p className="text-xs mb-6 leading-relaxed">
         {contentDriver === 'supabase' ? (
           <>
-            Contenu : <strong>Supabase</strong> — enregistrement via votre mot de passe admin (pas de compte Supabase séparé). Copie locale dans le navigateur en secours.
+            Mode <strong>Supabase</strong> : après <strong>Enregistrer</strong>, lisez le message ci-dessus. Si c’est vert « en ligne », ouvrez le site en navigation privée pour vérifier.
           </>
         ) : (
           <>
-            Les modifications sont enregistrées dans le navigateur (localStorage). Pour le site en ligne, exportez le JSON et placez-le dans <code>public/site-content.json</code>, puis déployez — ou passez à <strong>Supabase</strong> (<code className="text-[11px]">VITE_CONTENT_DRIVER=supabase</code> sur Vercel).
+            Mode <strong>local</strong> : les visiteurs ne voient pas vos changements tant que{' '}
+            <code className="text-[11px]">VITE_CONTENT_DRIVER=supabase</code> n’est pas sur Vercel.
           </>
         )}
       </p>
@@ -1313,26 +1380,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         },
       },
     })
-    if (result.localOk) {
-      setMsg('Articles enregistrés pour cette page.')
-      setSaveFeedback({
-        ok: true,
-        text:
-          contentDriver === 'supabase' && result.supabaseOk
-            ? 'Enregistré (Supabase + copie locale). Les images en URL cloud allègent le JSON.'
-            : contentDriver === 'supabase'
-              ? `Enregistré localement. Supabase : ${result.supabaseError || 'échec'}`
-              : 'Enregistré dans ce navigateur (localStorage).',
-      })
-    } else {
-      setMsg(
-        'Impossible d’enregistrer : stockage plein. Préférez des photos Supabase (URL) ou des fichiers dans public/.',
-      )
-      setSaveFeedback({
-        ok: false,
-        text: 'Échec : espace navigateur insuffisant. Utilisez Supabase Storage ou des chemins /… vers public/.',
-      })
-    }
+    const feedback = messageAfterAdminSave(result, contentDriver)
+    setMsg(feedback.text)
+    setSaveFeedback(feedback)
   }
 
   return (
