@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /panier
+Disallow: /paiement
+
+Sitemap: https://www.cs-creations-florales.fr/sitemap.xml

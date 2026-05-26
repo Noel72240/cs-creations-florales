@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSearch from '../components/HeroSearch'
 import { useSiteConfig } from '../context/SiteContentContext'
-import { resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
+import { resolveItemPhoto } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
@@ -312,47 +312,6 @@ function CreationSurMesureSection({ moto }) {
   )
 }
 
-function CoupsDeCoeurSection({ cd }) {
-  return (
-    <section className="py-20 px-4" style={{ background: 'linear-gradient(to bottom, var(--beige), #fff7fb)' }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="section-subtitle mb-2">{cd.pretitle}</p>
-          <h2 className="section-title">{cd.title}</h2>
-          <div className="floral-divider mt-3">
-            <span className="floral-icon">✿</span>
-          </div>
-          <p className="text-refined--sm mt-4 max-w-xl mx-auto">
-            {cd.intro}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6">
-          {(cd.items || []).map((item, idx) => (
-            <div key={`${item.label}-${idx}`} className="text-center">
-              <div className="coup-rond img-overlay mx-auto">
-                <img src={resolveItemPhoto(item)} alt={item.label} className="w-full h-full object-cover" />
-                <div className="overlay">
-                  <span>{item.label}</span>
-                </div>
-              </div>
-              <p className="mt-3 font-heading italic text-sm" style={{ color: 'var(--violet)', opacity: 0.92 }}>
-                {item.label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center mt-10">
-          <Link to={cd.ctaPath} className="btn-outline">
-            {cd.ctaLabel}
-          </Link>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function CategoryPreviewSection({ prest }) {
   return (
     <section className="py-20 px-4" style={{ background: 'var(--blanc)' }}>
@@ -446,7 +405,6 @@ export default function Home() {
       <HeroSection site={site} hero={h.hero} />
       <QuiSuisJeSection site={site} qui={h.quiSuisJe} />
       <IntroSection intro={h.intro} />
-      <CoupsDeCoeurSection cd={h.coupsDeCoeur} />
       <CreationSurMesureSection moto={h.moto} />
       <CategoryPreviewSection prest={h.prestations} />
       <ContactStrip site={site} strip={h.contactStrip} />

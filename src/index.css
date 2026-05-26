@@ -1027,6 +1027,21 @@ h1, h2, h3, h4 {
   color: var(--violet);
 }
 
+/* « Qui suis-je » : cartes valeurs + bouton en Cookie */
+.qui-suis-je-section .qui-value-label {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.qui-suis-je-section .btn-primary {
+  font-family: var(--font-brand);
+  letter-spacing: 0.04em;
+}
+
 /* « Qui suis-je » : manuscrite pour le titre + accents dans le texte */
 .qui-section-title {
   font-family: var(--font-script);

@@ -53,15 +53,54 @@ export async function fetchAdminServerHealth() {
   }
 }
 
-/** @returns {Promise<{ ok: boolean, error?: string, strippedImages?: number, payloadTooLarge?: boolean }>} */
+/** @returns {Promise<{ ok: boolean, error?: string, strippedImages?: number, payloadTooLarge?: boolean, uploadedImages?: number }>} */
 export async function saveSiteContentViaApi(payload) {
   const adminPassword = getStoredAdminPassword()
   if (!adminPassword) {
     return { ok: false, error: 'Reconnectez-vous à l’admin (mot de passe du site).' }
   }
 
+  const { countLargeDataUrls, uploadLargeDataUrlsInPayload } = await import('./siteContentInlineImages.js')
+  const embeddedCount = countLargeDataUrls(payload)
+  let working = payload
+
+  if (embeddedCount > 0) {
+    const health = await fetchAdminServerHealth()
+    if (!health.storageBucketConfigured) {
+      return {
+        ok: false,
+        error:
+          `${embeddedCount} photo(s) depuis l’ordinateur ne peuvent pas être enregistrées en ligne sans Stockage Supabase. Créez le bucket public « site-images », ajoutez SUPABASE_STORAGE_BUCKET=site-images (et VITE_SUPABASE_STORAGE_BUCKET) sur Vercel, puis Redeploy. Sinon mettez l’image dans public/ et saisissez /images/... dans src.`,
+        strippedImages: embeddedCount,
+      }
+    }
+    const { payload: uploadedPayload, uploaded, failed } = await uploadLargeDataUrlsInPayload(
+      payload,
+      (file, folder) => uploadSiteImageViaApi(file, folder),
+    )
+    if (failed > 0) {
+      return {
+        ok: false,
+        error: `Échec envoi de ${failed} photo(s) sur le cloud. Vérifiez le bucket Storage (public + policies dans supabase/setup-complet.sql).`,
+        strippedImages: failed,
+      }
+    }
+    working = uploadedPayload
+    if (uploaded > 0 && import.meta.env.DEV) {
+      console.info(`[SiteContent] ${uploaded} image(s) envoyée(s) sur Supabase Storage avant enregistrement.`)
+    }
+  }
+
   const { preparePayloadForCloudSave } = await import('./siteContentCloudPayload.js')
-  const { payload: cloudPayload, strippedCount, byteSize } = preparePayloadForCloudSave(payload)
+  const { payload: cloudPayload, strippedCount, byteSize } = preparePayloadForCloudSave(working)
+
+  if (strippedCount > 0) {
+    return {
+      ok: false,
+      error: `${strippedCount} image(s) trop lourdes pour l’enregistrement en ligne. Réduisez la taille ou configurez le stockage cloud.`,
+      strippedImages: strippedCount,
+    }
+  }
 
   if (byteSize > 4_200_000) {
     return {

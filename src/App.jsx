@@ -26,14 +26,20 @@ import Panier from './pages/Panier'
 import Admin from './pages/Admin'
 import ScrollReveal from './components/ScrollReveal'
 import ScrollToTop from './components/ScrollToTop'
+import MaintenanceBodyNotice from './components/MaintenanceBodyNotice'
+import SeoRouteHandler from './components/SeoRouteHandler'
+import SeoHub from './pages/guides/SeoHub'
+import SeoLandingPage from './pages/guides/SeoLandingPage'
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <ScrollReveal />
+      <SeoRouteHandler />
       <Navbar />
       <main className="site-main">
+        <MaintenanceBodyNotice />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/evenements-floraux" element={<EvenementsFloraux />} />
@@ -56,6 +62,8 @@ function App() {
           <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
           <Route path="/cgv" element={<CGV />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/guides" element={<SeoHub />} />
+          <Route path="/guides/:slug" element={<SeoLandingPage />} />
         </Routes>
       </main>
       <Footer />

@@ -132,6 +132,9 @@ export default function Footer() {
             <Link to="/cgv" className="hover:text-mauve transition-colors shrink-0">
               CGV
             </Link>
+            <Link to="/guides" className="hover:text-mauve transition-colors shrink-0">
+              Guides floraux
+            </Link>
             <button
               type="button"
               onClick={openCookiePreferences}

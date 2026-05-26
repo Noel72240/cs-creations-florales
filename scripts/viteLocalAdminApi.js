@@ -53,6 +53,16 @@ export function createLocalAdminApiMiddleware() {
       return
     }
 
+    if (url === '/api/upload-site-image') {
+      try {
+        const { default: handler } = await import('../api/upload-site-image.js')
+        await handler(req, res)
+      } catch (e) {
+        sendJson(res, 500, { ok: false, error: e?.message || 'Erreur serveur' })
+      }
+      return
+    }
+
     next()
   }
 }

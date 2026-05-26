@@ -15,9 +15,14 @@ export function messageAfterAdminSave(result, contentDriver) {
   }
 
   if (!result.supabaseOk) {
+    const err = result.supabaseError || 'erreur serveur'
+    const storageHint =
+      result.strippedImages > 0 && /stockage|bucket|base64|ordinateur/i.test(err)
+        ? ' Voir supabase/README.md → Étape 2 (Storage).'
+        : ''
     return {
       ok: false,
-      text: `Pas enregistré en ligne : ${result.supabaseError || 'erreur serveur'}. Vérifiez SUPABASE_SERVICE_ROLE_KEY et ADMIN_PASSWORD sur Vercel (identique au mot de passe admin).`,
+      text: `Pas enregistré en ligne : ${err}.${storageHint} Vérifiez aussi SUPABASE_SERVICE_ROLE_KEY et ADMIN_PASSWORD sur Vercel.`,
     }
   }
 

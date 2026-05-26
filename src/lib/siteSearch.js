@@ -1,3 +1,5 @@
+import { SEO_PAGES, SEO_HUB } from '../data/seoPages'
+
 /** Métadonnées des rubriques articles (clé pageArticles → URL). */
 export const ARTICLE_PAGE_META = {
   evenementsFloraux: { path: '/evenements-floraux', label: 'Événements floraux' },
@@ -46,6 +48,27 @@ export function buildSiteSearchIndex(pageArticles) {
       subtitle: 'Page du site',
       path: page.path,
       searchText: normalizeSearchText(`${page.label} ${page.keywords || ''}`),
+    })
+  }
+
+  index.push({
+    id: 'seo:hub',
+    kind: 'page',
+    title: SEO_HUB.title,
+    subtitle: 'Guide',
+    path: SEO_HUB.path,
+    searchText: normalizeSearchText(`${SEO_HUB.title} ${SEO_HUB.description}`),
+  })
+  for (const guide of SEO_PAGES) {
+    index.push({
+      id: `seo:${guide.slug}`,
+      kind: 'page',
+      title: guide.h1,
+      subtitle: 'Guide floral',
+      path: `/guides/${guide.slug}`,
+      searchText: normalizeSearchText(
+        [guide.h1, guide.metaDescription, ...(guide.keywords || [])].join(' '),
+      ),
     })
   }
 

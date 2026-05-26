@@ -101,6 +101,20 @@ export function SiteContentProvider({ children }) {
       if (!r.ok && import.meta.env.DEV) {
         console.warn('[SiteContent] sync Supabase:', r.error)
       }
+      if (r.ok) {
+        try {
+          const fromDb = await fetchSiteContentPayload()
+          if (fromDb && typeof fromDb === 'object' && Object.keys(fromDb).length > 0) {
+            const seed = await fetchStaticSiteContentSeed()
+            const synced = deepMerge(seed || {}, fromDb)
+            overridesRef.current = synced
+            setOverrides(synced)
+            writeLocalSiteOverrides(synced)
+          }
+        } catch {
+          /* garde next */
+        }
+      }
       return {
         localOk,
         supabaseOk: r.ok,
