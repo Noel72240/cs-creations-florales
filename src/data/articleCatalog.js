@@ -3,13 +3,13 @@
  * Une entrée par image dans public/images/articles/{slug}/
  */
 
-function item(slug, num, { title, description, price, photoKey = 'vaseInterior' }) {
+function item(slug, num, { title, description, price: _price, photoKey = 'vaseInterior' }) {
   const n = String(num).padStart(3, '0')
   return {
     id: `${slug}-${n}`,
     title,
     description,
-    price,
+    price: 0,
     photoKey,
     src: `/images/articles/${slug}/${n}.png`,
   }
