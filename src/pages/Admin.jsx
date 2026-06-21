@@ -298,6 +298,7 @@ export default function Admin() {
         email: fd.get('email')?.trim() || '',
         phoneDisplay: fd.get('phoneDisplay')?.trim() || '',
         phoneHref: fd.get('phoneHref')?.trim() || '',
+        siret: fd.get('site_siret')?.trim() || '',
       }
       site.ownerFullName = computeFullName(site.ownerFirstName, site.ownerLastName)
       const webDev = {
@@ -643,8 +644,15 @@ export default function Admin() {
             <label className="block sm:col-span-2">Email <input name="email" type="email" defaultValue={c.site.email} className="form-field mt-1" /></label>
             <label className="block">Téléphone (affichage) <input name="phoneDisplay" defaultValue={c.site.phoneDisplay} className="form-field mt-1" /></label>
             <label className="block">Lien tel <input name="phoneHref" defaultValue={c.site.phoneHref} className="form-field mt-1" placeholder="tel:+33..." /></label>
+            <label className="block sm:col-span-2">
+              SIREN / SIRET (votre entreprise)
+              <input name="site_siret" defaultValue={c.site.siret || ''} className="form-field mt-1" placeholder="ex. 123 456 789 00012" />
+              <span className="text-xs block mt-1" style={{ color: 'var(--text-mid)' }}>
+                Affiché dans les CGV et les mentions légales (section vendeur / éditeur).
+              </span>
+            </label>
           </div>
-          <h2 className="text-lg pt-4" style={{ color: 'var(--violet)' }}>Agence web (mentions)</h2>
+          <h2 className="text-lg pt-4" style={{ color: 'var(--violet)' }}>Agence web (mentions légales — créateur du site)</h2>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">Contact <input name="contactName" defaultValue={c.webDev.contactName} className="form-field mt-1" /></label>
             <label className="block">Entreprise <input name="company" defaultValue={c.webDev.company} className="form-field mt-1" /></label>
@@ -655,7 +663,7 @@ export default function Admin() {
             <label className="block">Tél <input name="wd_phoneDisplay" defaultValue={c.webDev.phoneDisplay} className="form-field mt-1" /></label>
             <label className="block">Lien tel <input name="wd_phoneHref" defaultValue={c.webDev.phoneHref} className="form-field mt-1" /></label>
             <label className="block sm:col-span-2">Email <input name="wd_email" type="email" defaultValue={c.webDev.email} className="form-field mt-1" /></label>
-            <label className="block">SIRET <input name="siret" defaultValue={c.webDev.siret} className="form-field mt-1" /></label>
+            <label className="block">SIRET agence web <input name="siret" defaultValue={c.webDev.siret} className="form-field mt-1" /></label>
           </div>
           <h2 className="text-lg pt-4" style={{ color: 'var(--violet)' }}>Paiement SumUp</h2>
           <label className="block">URL lien de paiement (optionnel, remplace .env) <input name="sumupPaymentUrl" defaultValue={c.sumupPaymentUrl || ''} className="form-field mt-1" placeholder="https://..." /></label>

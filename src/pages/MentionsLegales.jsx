@@ -27,7 +27,7 @@ export default function MentionsLegales() {
                 <li><strong>Adresse :</strong> {SITE.postalCode} {SITE.city}, {SITE.region}, France</li>
                 <li><strong>Email :</strong> <a href={`mailto:${SITE.email}`} style={{ color: 'var(--mauve)' }}>{SITE.email}</a></li>
                 <li><strong>Téléphone :</strong> {SITE.phoneDisplay}</li>
-                <li><strong>SIREN / SIRET :</strong> [À compléter par l’artisan]</li>
+                <li><strong>SIREN / SIRET :</strong> {SITE.siret?.trim() || '—'}</li>
               </ul>
             </div>
 

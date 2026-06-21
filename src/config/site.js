@@ -16,6 +16,8 @@ export const SITE = {
   email: 'contact@cs-creations-florales.fr',
   phoneDisplay: '06 XX XX XX XX',
   phoneHref: 'tel:+33600000000',
+  /** SIREN ou SIRET de l’artisan (CGV, mentions légales) */
+  siret: '',
 }
 
 /**

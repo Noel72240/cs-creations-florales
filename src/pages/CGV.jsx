@@ -22,7 +22,7 @@ export default function CGV() {
               </strong>
               <br />
               {SITE.postalCode} {SITE.city}, {SITE.region} — {SITE.email}<br />
-              SIREN / SIRET : [À compléter]
+              SIREN / SIRET : {SITE.siret?.trim() || '—'}
             </p>
           </div>
 
