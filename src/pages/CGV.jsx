@@ -1,5 +1,6 @@
 import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
+import { TVA_MICRO_ENTREPRISE_NOTICE } from '../config/siteUrl'
 import { useSiteConfig } from '../context/SiteContentContext'
 
 export default function CGV() {
@@ -22,6 +23,7 @@ export default function CGV() {
               </strong>
               <br />
               {SITE.postalCode} {SITE.city}, {SITE.region} — {SITE.email}<br />
+              Forme juridique : {SITE.legalForm || 'Micro-entreprise'}<br />
               SIREN / SIRET : {SITE.siret?.trim() || '—'}
             </p>
           </div>
@@ -45,7 +47,9 @@ export default function CGV() {
           <div>
             <h2>4. Prix</h2>
             <p>
-              Les prix sont indiqués en euros, toutes taxes comprises (TTC). Ils peuvent varier selon la complexité de la création, les fleurs choisies et la période. Un devis personnalisé est établi gratuitement sur demande.
+              Les prix sont indiqués en euros TTC. {TVA_MICRO_ENTREPRISE_NOTICE} Les tarifs peuvent varier selon la
+              complexité de la création, les fleurs choisies et la période. Un devis personnalisé est établi gratuitement
+              sur demande.
             </p>
           </div>
 

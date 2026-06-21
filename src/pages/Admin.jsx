@@ -298,6 +298,7 @@ export default function Admin() {
         email: fd.get('email')?.trim() || '',
         phoneDisplay: fd.get('phoneDisplay')?.trim() || '',
         phoneHref: fd.get('phoneHref')?.trim() || '',
+        legalForm: fd.get('site_legalForm')?.trim() || 'Micro-entreprise',
         siret: fd.get('site_siret')?.trim() || '',
       }
       site.ownerFullName = computeFullName(site.ownerFirstName, site.ownerLastName)
@@ -638,6 +639,7 @@ export default function Admin() {
             <label className="block">Prénom <input name="ownerFirstName" defaultValue={c.site.ownerFirstName} className="form-field mt-1" /></label>
             <label className="block">Nom <input name="ownerLastName" defaultValue={c.site.ownerLastName} className="form-field mt-1" /></label>
             <label className="block sm:col-span-2">Raison sociale <input name="businessName" defaultValue={c.site.businessName} className="form-field mt-1" /></label>
+            <label className="block sm:col-span-2">Forme juridique <input name="site_legalForm" defaultValue={c.site.legalForm || 'Micro-entreprise'} className="form-field mt-1" /></label>
             <label className="block">Ville <input name="city" defaultValue={c.site.city} className="form-field mt-1" /></label>
             <label className="block">Code postal <input name="postalCode" defaultValue={c.site.postalCode} className="form-field mt-1" /></label>
             <label className="block sm:col-span-2">Région <input name="region" defaultValue={c.site.region} className="form-field mt-1" /></label>

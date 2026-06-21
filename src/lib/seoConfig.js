@@ -1,6 +1,8 @@
 import { SITE } from '../config/site'
 
-const DEFAULT_ORIGIN = 'https://www.cs-creations-florales.fr'
+import { SITE_ORIGIN } from '../config/siteUrl'
+
+const DEFAULT_ORIGIN = SITE_ORIGIN
 
 export function getSiteOrigin() {
   const fromEnv = (import.meta.env.VITE_SITE_URL || '').trim().replace(/\/$/, '')

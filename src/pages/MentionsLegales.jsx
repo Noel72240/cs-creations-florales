@@ -1,5 +1,6 @@
 import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
+import { HOSTING_LEGAL, TVA_MICRO_ENTREPRISE_NOTICE } from '../config/siteUrl'
 import { useSiteConfig } from '../context/SiteContentContext'
 
 export default function MentionsLegales() {
@@ -24,10 +25,12 @@ export default function MentionsLegales() {
                   <strong>Raison sociale :</strong> <BrandName>{SITE.businessName}</BrandName>
                 </li>
                 <li><strong>Responsable de publication :</strong> {SITE.ownerFullName}</li>
+                <li><strong>Forme juridique :</strong> {SITE.legalForm || 'Micro-entreprise'}</li>
                 <li><strong>Adresse :</strong> {SITE.postalCode} {SITE.city}, {SITE.region}, France</li>
                 <li><strong>Email :</strong> <a href={`mailto:${SITE.email}`} style={{ color: 'var(--mauve)' }}>{SITE.email}</a></li>
                 <li><strong>Téléphone :</strong> {SITE.phoneDisplay}</li>
                 <li><strong>SIREN / SIRET :</strong> {SITE.siret?.trim() || '—'}</li>
+                <li><strong>TVA :</strong> {TVA_MICRO_ENTREPRISE_NOTICE}</li>
               </ul>
             </div>
 
@@ -47,9 +50,14 @@ export default function MentionsLegales() {
             <div>
               <h2>3. Hébergeur</h2>
               <ul className="mt-3 space-y-1 pl-4 list-disc" style={{ color: 'var(--text-dark)' }}>
-                <li><strong>Hébergeur :</strong> [Nom de l'hébergeur à compléter]</li>
-                <li><strong>Adresse :</strong> [Adresse de l'hébergeur]</li>
-                <li><strong>Site web :</strong> [URL de l'hébergeur]</li>
+                <li><strong>Hébergeur :</strong> {HOSTING_LEGAL.name}</li>
+                <li><strong>Adresse :</strong> {HOSTING_LEGAL.address}</li>
+                <li>
+                  <strong>Site web :</strong>{' '}
+                  <a href={HOSTING_LEGAL.website} target="_blank" rel="noreferrer" style={{ color: 'var(--mauve)' }}>
+                    {HOSTING_LEGAL.website.replace(/^https:\/\//, '')}
+                  </a>
+                </li>
               </ul>
             </div>
 

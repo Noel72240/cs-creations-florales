@@ -1,6 +1,6 @@
 /**
  * Génère public/sitemap.xml et public/robots.txt avant le build.
- * Définir VITE_SITE_URL sur Vercel (ex. https://www.cs-creations-florales.fr).
+ * Définir VITE_SITE_URL sur Vercel (ex. https://www.cscreationsflorales.com).
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -11,7 +11,7 @@ import { ROUTE_SEO } from '../src/data/routeSeo.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicDir = path.join(__dirname, '..', 'public')
 
-const origin = (process.env.VITE_SITE_URL || 'https://www.cs-creations-florales.fr').replace(/\/$/, '')
+const origin = (process.env.VITE_SITE_URL || 'https://www.cscreationsflorales.com').replace(/\/$/, '')
 const today = new Date().toISOString().slice(0, 10)
 
 const paths = new Set(['/'])
