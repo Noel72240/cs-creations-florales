@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { resolvePhotoSrc } from '../data/photoResolver'
 import { formatEuro } from '../utils/formatEuro'
+import { resolveArticlePrice } from '../lib/articlePrices'
 import AddToCartButton from './AddToCartButton'
 
 function normalizeHexColor(value) {
@@ -38,7 +39,7 @@ function ArticleCard({ item, pagePath, onPreview }) {
     })
   }, [item.colors])
 
-  const price = typeof item.price === 'number' ? item.price : Number(item.price) || 0
+  const price = resolveArticlePrice(item.price)
 
   const handleImgError = () => {
     if (customSrc && imgSrc !== fallback) {

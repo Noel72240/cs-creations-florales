@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { formatEuro } from '../utils/formatEuro'
 import { validatePromoCode } from '../lib/promoCodes'
+import { resolveArticlePrice } from '../lib/articlePrices'
 
 const STORAGE_KEY = 'cs_cart_v1'
 const PROMO_STORAGE_KEY = 'cs_cart_promo_v1'
@@ -11,7 +12,7 @@ function normalizeItem(raw) {
   const id = String(raw?.id ?? '').trim()
   if (!id) return null
   const title = String(raw?.title ?? 'Article').slice(0, 220)
-  const price = Math.max(0, Number(raw?.price) || 0)
+  const price = resolveArticlePrice(raw?.price)
   let qty = parseInt(raw?.quantity, 10)
   if (!Number.isFinite(qty) || qty < 1) qty = 1
   if (qty > 99) qty = 99

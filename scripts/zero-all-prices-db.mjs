@@ -33,6 +33,11 @@ function zeroPrices(pageArticles) {
   return out
 }
 
+/** @param {object} pageArticles */
+export function zeroAllArticlePrices(pageArticles) {
+  return zeroPrices(pageArticles)
+}
+
 const env = loadEnv()
 const url = env.SUPABASE_URL || env.VITE_SUPABASE_URL
 const key = env.SUPABASE_SERVICE_ROLE_KEY
@@ -49,7 +54,8 @@ if (fetchError) {
 }
 
 const prev = data?.payload && typeof data.payload === 'object' ? data.payload : {}
-const pageArticles = zeroPrices(prev.pageArticles || PAGE_ARTICLE_CATALOG)
+/** Catalogue code = source de vérité (prix forcés à 0 dans item()). */
+const pageArticles = structuredClone(PAGE_ARTICLE_CATALOG)
 let count = 0
 for (const section of Object.values(pageArticles)) {
   count += (section.items || []).length
