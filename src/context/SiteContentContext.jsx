@@ -97,7 +97,7 @@ export function SiteContentProvider({ children }) {
         overridesRef.current = next
         setOverrides(next)
       }
-      const r = await upsertSiteContentPayload(next)
+      const r = await upsertSiteContentPayload(getMergedContent(next))
       if (!r.ok && import.meta.env.DEV) {
         console.warn('[SiteContent] sync Supabase:', r.error)
       }

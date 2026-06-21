@@ -395,9 +395,10 @@ export default function Admin() {
     async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
-      await applySaveMsg({
+      const maintenanceOn = fd.has('maint_enabled')
+      const result = await save({
         maintenance: {
-          enabled: fd.has('maint_enabled'),
+          enabled: maintenanceOn,
           title: fd.get('maint_title')?.trim() || '',
           message: fd.get('maint_message')?.trim() || '',
         },
@@ -424,8 +425,14 @@ export default function Admin() {
           tiktokUrl: fd.get('tt') || '',
         },
       })
+      const { text, ok } = messageAfterAdminSave(result, contentDriver)
+      const maintHint = maintenanceOn
+        ? ' Bandeau maintenance : activé (bandeau orange en haut du site).'
+        : ' Bandeau maintenance : désactivé.'
+      setMsg(ok ? `${text}${maintHint}` : text)
+      return result
     },
-    [applySaveMsg],
+    [save, contentDriver],
   )
 
   const handleSaveContact = useCallback(
@@ -807,6 +814,11 @@ export default function Admin() {
             <legend className="text-lg mb-2 px-1" style={{ color: 'var(--violet)' }}>
               Maintenance du site
             </legend>
+            <p className="text-xs mb-3 leading-relaxed rounded-lg px-2 py-1.5" style={{ background: c.maintenance?.enabled ? 'rgba(251,191,36,0.25)' : 'rgba(230,255,230,0.35)', color: 'var(--text-mid)' }}>
+              <strong>État enregistré :</strong>{' '}
+              {c.maintenance?.enabled ? 'maintenance ACTIVE' : 'maintenance désactivée'}
+              {' — '}cochez/décochez puis <strong>Enregistrer menu & maintenance</strong> tout en bas.
+            </p>
             <label className="flex items-center gap-2 mb-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -919,7 +931,7 @@ export default function Admin() {
           <label className="block">TikTok URL
             <input name="tt" defaultValue={c.footer.tiktokUrl || ''} className="form-field mt-1" placeholder="https://www.tiktok.com/@..." />
           </label>
-          <button type="submit" className="btn-primary">Enregistrer</button>
+          <button type="submit" className="btn-primary">Enregistrer menu & maintenance</button>
         </form>
       )}
 
