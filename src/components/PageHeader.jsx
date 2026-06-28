@@ -1,7 +1,7 @@
 export default function PageHeader({ title, subtitle, image, legal }) {
   return (
     <div
-      className={`page-header page-header--fx pt-8 pb-16 relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}`}
+      className={`page-header page-header--fx page-header--responsive pt-6 pb-10 sm:pt-8 sm:pb-16 relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}`}
       style={image ? {
         backgroundImage: `linear-gradient(to bottom, rgba(139,75,106,0.55), rgba(192,122,151,0.3)), url(${image})`,
         backgroundSize: 'cover',

@@ -44,7 +44,7 @@ function ArticleCatalogCard({ item, pageKey, onPreview }) {
         ) : null}
         <Link to={productPath} className="article-catalog-card__zoom block" aria-label={`Voir la fiche : ${item.title}`}>
           {imgSrc ? (
-            <img src={imgSrc} alt={item.title} loading="lazy" />
+            <img src={imgSrc} alt={item.title} loading="lazy" draggable={false} />
           ) : (
             <span className="article-catalog-card__placeholder" aria-hidden />
           )}
@@ -84,7 +84,7 @@ function ArticleCatalogCard({ item, pageKey, onPreview }) {
         <p className="font-refined text-base font-semibold mb-3" style={{ color: 'var(--mauve)' }}>
           {formatEuro(price)}
         </p>
-        <Link to={productPath} className="btn-outline text-sm py-2 px-4 inline-block">
+        <Link to={productPath} className="article-catalog-card__cta btn-outline text-sm py-2.5 px-4">
           Voir la fiche →
         </Link>
       </div>
@@ -159,7 +159,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
 
   return (
     <>
-      <section className="py-16 px-4" style={{ background: 'var(--beige)' }}>
+      <section className="article-catalog-section py-10 px-3 sm:py-16 sm:px-4" style={{ background: 'var(--beige)' }}>
         <div className="max-w-3xl mx-auto lg:max-w-4xl">
           <h2 className="section-title mb-2">{sectionTitle}</h2>
           <div className="floral-divider mb-6">
@@ -183,7 +183,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
           </div>
 
           <p
-            className="font-refined text-sm text-center max-w-2xl mx-auto mb-10 px-4 py-3 rounded-xl border border-mauve-light/35"
+            className="article-catalog-notice font-refined text-sm text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-3 py-3 sm:px-4 rounded-xl border border-mauve-light/35"
             style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
           >
             <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
