@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -36,10 +36,13 @@ export default function EvenementsFloraux() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Événements Floraux"
-          subtitle="Créations sur mesure"
-          image={w1200(P.weddingTableFlorals)}
+        <ConfigurablePageHeader
+          pagePath="/evenements-floraux"
+          fallback={{
+            title: 'Événements Floraux',
+            subtitle: 'Créations sur mesure',
+            image: w1200(P.weddingTableFlorals),
+          }}
         />
       </div>
       <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
@@ -78,6 +81,7 @@ export default function EvenementsFloraux() {
         intro={pa?.intro}
         items={pa?.items}
         pagePath="/evenements-floraux"
+        pageKey="evenementsFloraux"
       />
 
       <ContactCTA message="Vous avez un événement à préparer ? Contactez-moi pour un devis personnalisé et gratuit." />

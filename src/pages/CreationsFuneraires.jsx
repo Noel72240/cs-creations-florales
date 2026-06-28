@@ -1,4 +1,4 @@
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { Link } from 'react-router-dom'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -12,10 +12,13 @@ export default function CreationsFuneraires() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Créations Funéraires"
-          subtitle="Hommage floral"
-          image={w1200(P.wildflowers)}
+        <ConfigurablePageHeader
+          pagePath="/creations-funeraires"
+          fallback={{
+            title: 'Créations Funéraires',
+            subtitle: 'Hommage floral',
+            image: w1200(P.wildflowers),
+          }}
         />
       </div>
 
@@ -47,6 +50,7 @@ export default function CreationsFuneraires() {
         intro={pa?.intro}
         items={pa?.items}
         pagePath="/creations-funeraires"
+        pageKey="creationsFuneraires"
       />
 
       {/* Contact CTA sobre */}

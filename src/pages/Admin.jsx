@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
 import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
+import { ARTICLE_PAGE_META, PAGE_BANNER_FALLBACKS } from '../data/pageCatalog'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
 import {
@@ -1407,6 +1408,8 @@ function emptyArticleItem() {
     src: '',
     photoKey2: '',
     src2: '',
+    photoKey3: '',
+    src3: '',
     colors: ['', '', ''],
   }
 }
@@ -1414,9 +1417,17 @@ function emptyArticleItem() {
 function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, contentDriver }) {
   const { fileToSrc } = useAdminMedia()
   const current = pageArticles?.[pageKey] || { sectionTitle: '', intro: '', items: [] }
+  const pagePath = ARTICLE_PAGE_META[pageKey]?.path || ''
+  const defaultBanner = PAGE_BANNER_FALLBACKS[pagePath] || {}
   const [saveFeedback, setSaveFeedback] = useState(null)
   const [localTitle, setLocalTitle] = useState(current.sectionTitle || '')
   const [localIntro, setLocalIntro] = useState(current.intro || '')
+  const [localBanner, setLocalBanner] = useState(() => ({
+    title: current.banner?.title || '',
+    subtitle: current.banner?.subtitle || '',
+    src: current.banner?.src || '',
+    photoKey: current.banner?.photoKey || defaultBanner.photoKey || '',
+  }))
   const [localItems, setLocalItems] = useState(() =>
     (current.items || [])
       .slice(0, MAX_PAGE_ARTICLES)
@@ -1425,6 +1436,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         price: Number(it.price) || 0,
         photoKey2: it.photoKey2 || '',
         src2: it.src2 || '',
+        photoKey3: it.photoKey3 || '',
+        src3: it.src3 || '',
         colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
       })),
   )
@@ -1435,8 +1448,16 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
 
   useEffect(() => {
     const next = pageArticles?.[pageKey] || { sectionTitle: '', intro: '', items: [] }
+    const path = ARTICLE_PAGE_META[pageKey]?.path || ''
+    const fallback = PAGE_BANNER_FALLBACKS[path] || {}
     setLocalTitle(next.sectionTitle || '')
     setLocalIntro(next.intro || '')
+    setLocalBanner({
+      title: next.banner?.title || '',
+      subtitle: next.banner?.subtitle || '',
+      src: next.banner?.src || '',
+      photoKey: next.banner?.photoKey || fallback.photoKey || '',
+    })
     setLocalItems(
       (next.items || [])
         .slice(0, MAX_PAGE_ARTICLES)
@@ -1445,6 +1466,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           price: Number(it.price) || 0,
           photoKey2: it.photoKey2 || '',
           src2: it.src2 || '',
+          photoKey3: it.photoKey3 || '',
+          src3: it.src3 || '',
           colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
         })),
     )
@@ -1499,6 +1522,40 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     }
   }
 
+  const pickImage3 = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'article', folder: 'articles' })
+      if (url) {
+        setField(idx, 'src3', url)
+        setMsg('')
+      } else {
+        setMsg(
+          'Image (photo 3) trop lourde même après réduction. Connectez-vous à Supabase pour l’envoyer dans le cloud, ou placez le fichier dans public/.',
+        )
+      }
+    } catch {
+      setMsg('Impossible de lire cette image.')
+    }
+  }
+
+  const pickBannerImage = async (fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'banners' })
+      if (url) {
+        setLocalBanner((b) => ({ ...b, src: url, photoKey: '' }))
+        setMsg('')
+      } else {
+        setMsg('Image du bandeau trop lourde. Essayez une image plus légère ou connectez-vous à Supabase.')
+      }
+    } catch {
+      setMsg('Impossible de lire cette image.')
+    }
+  }
+
   const savePage = async () => {
     const items = localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
@@ -1509,6 +1566,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       src: String(it.src || '').trim(),
       photoKey2: String(it.photoKey2 || '').trim(),
       src2: String(it.src2 || '').trim(),
+      photoKey3: String(it.photoKey3 || '').trim(),
+      src3: String(it.src3 || '').trim(),
       colors: Array.isArray(it.colors)
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
@@ -1518,6 +1577,12 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         [pageKey]: {
           sectionTitle: localTitle.trim(),
           intro: localIntro.trim(),
+          banner: {
+            title: localBanner.title.trim(),
+            subtitle: localBanner.subtitle.trim(),
+            src: localBanner.src.trim(),
+            photoKey: localBanner.photoKey.trim(),
+          },
           items,
         },
       },
@@ -1588,6 +1653,68 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       ) : null}
 
       <div className="grid gap-3">
+        <fieldset className="rounded-xl border border-mauve-light/35 p-4 space-y-3">
+          <legend className="text-sm font-medium px-1" style={{ color: 'var(--violet)' }}>
+            Bandeau (haut de page)
+          </legend>
+          <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+            Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez le titre vide pour garder le texte par défaut.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <label className="block">
+              Titre
+              <input
+                className="form-field mt-1"
+                value={localBanner.title}
+                onChange={(e) => setLocalBanner((b) => ({ ...b, title: e.target.value }))}
+                placeholder={defaultBanner.title || 'ex. Anniversaire'}
+              />
+            </label>
+            <label className="block">
+              Sous-titre
+              <input
+                className="form-field mt-1"
+                value={localBanner.subtitle}
+                onChange={(e) => setLocalBanner((b) => ({ ...b, subtitle: e.target.value }))}
+                placeholder={defaultBanner.subtitle || 'ex. Événements floraux'}
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="btn-primary text-xs py-2 px-4 cursor-pointer">
+              Choisir une photo
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(e) => {
+                  pickBannerImage(e.target.files)
+                  e.target.value = ''
+                }}
+              />
+            </label>
+            {localBanner.src?.trim() ? (
+              <button
+                type="button"
+                className="btn-outline text-xs py-2 px-4"
+                onClick={() => setLocalBanner((b) => ({ ...b, src: '', photoKey: '' }))}
+              >
+                Photo par défaut
+              </button>
+            ) : null}
+          </div>
+          <img
+            src={
+              localBanner.src?.trim()
+                ? resolvePhotoSrc(localBanner.src)
+                : defaultBanner.photoKey
+                  ? resolvePhotoSrc(defaultBanner.photoKey)
+                  : ''
+            }
+            alt="Aperçu du bandeau"
+            className="h-28 w-full rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
+          />
+        </fieldset>
         <label className="block">
           Titre de la section
           <input className="form-field mt-1" value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} placeholder="ex. Nos créations…" />
@@ -1769,52 +1896,112 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                 )}
               </div>
 
+              <label className="block">
+                Clé photo 3 (Unsplash, optionnel)
+                <select
+                  className="form-field mt-1"
+                  value={it.photoKey3 || ''}
+                  onChange={(e) => setField(idx, 'photoKey3', e.target.value)}
+                >
+                  <option value="">— aucune —</option>
+                  {PHOTO_KEY_OPTIONS.map((k) => (
+                    <option key={k} value={k}>
+                      {k}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="sm:col-span-2 space-y-2">
+                <span className="block text-sm">Image tertiaire (photo 3)</span>
+                <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+                  Affichée sur la fiche produit (jusqu’à 3 photos au total).
+                </p>
+                <label className="btn-outline text-xs py-2 px-4 cursor-pointer inline-block">
+                  Parcourir…
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => {
+                      pickImage3(idx, e.target.files)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                {adminSrcIsRemovable(it.src3) && (
+                  <button type="button" className="btn-outline text-[11px] py-2 px-3 ml-2" onClick={() => setField(idx, 'src3', '')}>
+                    Retirer la photo 3
+                  </button>
+                )}
+                <label className="block">
+                  src3 (optionnel — URL ou /chemin/public)
+                  <input
+                    className="form-field mt-1"
+                    value={it.src3 || ''}
+                    onChange={(e) => setField(idx, 'src3', e.target.value)}
+                    placeholder="vide = clé photo 3 (ou aucune photo 3)"
+                  />
+                </label>
+                {(it.src3?.trim() || it.photoKey3?.trim()) ? (
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={it.src3?.trim() ? resolvePhotoSrc(it.src3) : resolvePhotoSrc(it.photoKey3)}
+                      alt=""
+                      className="h-20 w-28 rounded-lg object-cover border border-mauve-light/30 shrink-0 bg-mauve-light/10"
+                    />
+                    <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+                      Aperçu : « src3 » si renseigné, sinon la clé photo 3.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[11px]" style={{ color: 'var(--text-mid)' }}>
+                    Aucune photo 3 renseignée.
+                  </p>
+                )}
+              </div>
+
               <div className="sm:col-span-2">
-                <p className="text-sm font-medium mb-1" style={{ color: 'var(--violet)' }}>
-                  Couleurs (3 ronds)
+                <p className="text-sm font-medium mb-2" style={{ color: 'var(--violet)' }}>
+                  Couleurs proposées au client (3 max.)
                 </p>
-                <p className="text-[11px] leading-snug mb-2" style={{ color: 'var(--text-mid)' }}>
-                  Choisissez jusqu’à 3 couleurs (hex). Si une couleur est vide, le rond n’apparaît pas sur le site.
-                </p>
-                <div className="flex flex-wrap gap-3 items-end">
-                  {[0, 1, 2].map((i) => (
-                    <label key={i} className="block">
-                      <span className="block text-[11px] mb-1">Couleur {i + 1}</span>
-                      <div className="flex items-center gap-2">
+                <div className="flex flex-wrap gap-4 items-center">
+                  {[0, 1, 2].map((i) => {
+                    const hex = (it.colors?.[i] || '').trim()
+                    return (
+                      <label key={i} className="flex flex-col items-center gap-1 cursor-pointer">
                         <input
                           type="color"
-                          value={(it.colors?.[i] || '#ffffff').trim() || '#ffffff'}
+                          value={hex || '#e8d4dc'}
                           onChange={(e) => {
                             const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
                             next[i] = e.target.value
                             setField(idx, 'colors', next)
                           }}
-                          className="h-9 w-12 rounded border border-mauve-light/40 bg-white"
+                          className="article-admin-color-pick"
+                          title={`Couleur ${i + 1}`}
                         />
-                        <input
-                          className="form-field font-mono text-xs w-28"
-                          value={(it.colors?.[i] || '').trim()}
-                          onChange={(e) => {
-                            const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
-                            next[i] = e.target.value
-                            setField(idx, 'colors', next)
-                          }}
-                          placeholder="#RRGGBB"
-                        />
-                        <button
-                          type="button"
-                          className="btn-outline text-[11px] py-2 px-3"
-                          onClick={() => {
-                            const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
-                            next[i] = ''
-                            setField(idx, 'colors', next)
-                          }}
-                        >
-                          Vider
-                        </button>
-                      </div>
-                    </label>
-                  ))}
+                        {hex ? (
+                          <button
+                            type="button"
+                            className="text-[10px] underline opacity-70"
+                            style={{ color: 'var(--mauve)' }}
+                            onClick={() => {
+                              const next = Array.isArray(it.colors) ? [...it.colors] : ['', '', '']
+                              next[i] = ''
+                              setField(idx, 'colors', next)
+                            }}
+                          >
+                            retirer
+                          </button>
+                        ) : (
+                          <span className="text-[10px] opacity-50" style={{ color: 'var(--text-mid)' }}>
+                            vide
+                          </span>
+                        )}
+                      </label>
+                    )
+                  })}
                 </div>
               </div>
             </div>

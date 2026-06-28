@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -39,10 +39,13 @@ export default function CreationsSaisonnieres() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Créations Saisonnières"
-          subtitle="Tout au long de l'année"
-          image={w1200(P.tulips)}
+        <ConfigurablePageHeader
+          pagePath="/creations-saisonnieres"
+          fallback={{
+            title: 'Créations Saisonnières',
+            subtitle: "Tout au long de l'année",
+            image: w1200(P.tulips),
+          }}
         />
       </div>
 
@@ -61,6 +64,7 @@ export default function CreationsSaisonnieres() {
         intro={pa?.intro}
         items={pa?.items}
         pagePath="/creations-saisonnieres"
+        pageKey="creationsSaisonnieres"
       />
 
       <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>

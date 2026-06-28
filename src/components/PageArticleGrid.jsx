@@ -1,21 +1,11 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Link } from 'react-router-dom'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
-import { resolvePhotoSrc } from '../data/photoResolver'
+import { articleProductPath, pageKeyFromPath } from '../data/pageCatalog'
+import { getArticlePhotoUrls } from '../lib/articlePhotos'
 import { formatEuro } from '../utils/formatEuro'
 import { resolveArticlePrice } from '../lib/articlePrices'
-import { useCart } from '../context/CartContext'
-
-function normalizeHexColor(value) {
-  const s = String(value || '').trim()
-  if (!s) return ''
-  if (/^#([0-9a-fA-F]{6})$/.test(s)) return s.toLowerCase()
-  if (/^#([0-9a-fA-F]{3})$/.test(s)) {
-    const h = s.slice(1)
-    return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`.toLowerCase()
-  }
-  return ''
-}
 
 function sortArticles(list, mode) {
   const copy = [...list]
@@ -25,40 +15,11 @@ function sortArticles(list, mode) {
   return copy
 }
 
-function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
-  return (
-    <div className="article-catalog-qty" role="group" aria-label="Quantité">
-      <button type="button" onClick={() => onChange(Math.max(min, value - 1))} aria-label="Diminuer">
-        −
-      </button>
-      <span aria-live="polite">{value}</span>
-      <button type="button" onClick={() => onChange(Math.min(max, value + 1))} aria-label="Augmenter">
-        +
-      </button>
-    </div>
-  )
-}
-
-function ArticleCatalogCard({ item, pagePath, onPreview }) {
-  const { addItem } = useCart()
-  const customSrc = (item.src || '').trim()
-  const customSrc2 = (item.src2 || '').trim()
-  const primary = resolvePhotoSrc(customSrc || item.photoKey)
-  const fallback = resolvePhotoSrc(item.photoKey)
-  const secondaryRaw = (customSrc2 || item.photoKey2 || '').trim()
-  const secondarySrc = secondaryRaw ? resolvePhotoSrc(secondaryRaw) : ''
-  const slides = useMemo(() => {
-    const urls = [primary]
-    if (secondarySrc && secondarySrc !== primary) urls.push(secondarySrc)
-    return urls
-  }, [primary, secondarySrc])
-
+function ArticleCatalogCard({ item, pageKey, onPreview }) {
+  const slides = useMemo(() => getArticlePhotoUrls(item), [item])
+  const primary = slides[0] || ''
   const [slideIndex, setSlideIndex] = useState(0)
   const [imgSrc, setImgSrc] = useState(primary)
-  const [expanded, setExpanded] = useState(false)
-  const [quantity, setQuantity] = useState(1)
-  const [selectedColor, setSelectedColor] = useState('')
-  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     setImgSrc(slides[slideIndex] || primary)
@@ -67,43 +28,11 @@ function ArticleCatalogCard({ item, pagePath, onPreview }) {
   useEffect(() => {
     setSlideIndex(0)
     setImgSrc(primary)
-  }, [customSrc, item.photoKey, primary])
-
-  useEffect(() => {
-    const colorList = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
-    setSelectedColor((prev) => {
-      if (prev && colorList.includes(prev)) return prev
-      return colorList[0] || ''
-    })
-  }, [item.colors])
+  }, [item.id, primary])
 
   const price = resolveArticlePrice(item.price)
-  const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
-  const cartId = selectedColor ? `${item.id}::${selectedColor}` : item.id
   const isNew = item.isNew === true || item.badge === 'nouveaute'
-
-  const handleImgError = () => {
-    if (customSrc && imgSrc !== fallback) setImgSrc(fallback)
-  }
-
-  const handleAddToCart = () => {
-    addItem({
-      id: cartId,
-      title: item.title,
-      price,
-      imageUrl: imgSrc,
-      path: pagePath,
-      selectedColor,
-      quantity,
-    })
-    setAdded(true)
-    window.setTimeout(() => setAdded(false), 2200)
-  }
-
-  const descriptionBlocks = String(item.description || '')
-    .split(/\n+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
+  const productPath = articleProductPath(pageKey, item.id)
 
   return (
     <article className="article-catalog-card">
@@ -113,13 +42,21 @@ function ArticleCatalogCard({ item, pagePath, onPreview }) {
             Nouveauté ✿
           </span>
         ) : null}
+        <Link to={productPath} className="article-catalog-card__zoom block" aria-label={`Voir la fiche : ${item.title}`}>
+          {imgSrc ? (
+            <img src={imgSrc} alt={item.title} loading="lazy" />
+          ) : (
+            <span className="article-catalog-card__placeholder" aria-hidden />
+          )}
+        </Link>
         <button
           type="button"
-          className="article-catalog-card__zoom"
+          className="article-catalog-card__lightbox-btn"
           onClick={() => onPreview?.({ src: imgSrc, title: item.title })}
           aria-label={`Agrandir : ${item.title}`}
+          disabled={!imgSrc}
         >
-          <img src={imgSrc} alt={item.title} loading="lazy" onError={handleImgError} />
+          Agrandir
         </button>
         {slides.length > 1 ? (
           <div className="article-catalog-dots" role="tablist" aria-label="Photos du produit">
@@ -140,68 +77,17 @@ function ArticleCatalogCard({ item, pagePath, onPreview }) {
 
       <div className="article-catalog-card__summary">
         <h3 className="font-heading text-lg sm:text-xl font-medium leading-snug mb-1" style={{ color: 'var(--violet)' }}>
-          {item.title}
+          <Link to={productPath} className="hover:text-mauve transition-colors">
+            {item.title}
+          </Link>
         </h3>
         <p className="font-refined text-base font-semibold mb-3" style={{ color: 'var(--mauve)' }}>
           {formatEuro(price)}
         </p>
-        <button
-          type="button"
-          className="btn-outline text-sm py-2 px-4"
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-        >
-          {expanded ? 'Masquer le détail' : 'Voir le détail'}
-        </button>
+        <Link to={productPath} className="btn-outline text-sm py-2 px-4 inline-block">
+          Voir la fiche →
+        </Link>
       </div>
-
-      {expanded ? (
-        <div className="article-catalog-card__detail">
-          {colors.length > 0 ? (
-            <label className="block">
-              <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
-                Couleur *
-              </span>
-              <select
-                className="form-field w-full"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-              >
-                <option value="">Sélectionner</option>
-                {colors.map((c, i) => (
-                  <option key={c} value={c}>
-                    {item.colorLabels?.[i] || `Teinte ${i + 1}`}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
-
-          <label className="block">
-            <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
-              Quantité *
-            </span>
-            <QuantityStepper value={quantity} onChange={setQuantity} />
-          </label>
-
-          <button
-            type="button"
-            className="btn-primary w-full text-center justify-center py-3"
-            onClick={handleAddToCart}
-            disabled={colors.length > 0 && !selectedColor}
-          >
-            {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
-          </button>
-
-          {descriptionBlocks.length > 0 ? (
-            <div className="text-refined text-sm leading-relaxed space-y-3" style={{ color: 'var(--text-elegant)' }}>
-              {descriptionBlocks.map((block, i) => (
-                <p key={i}>{block}</p>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
     </article>
   )
 }
@@ -258,10 +144,10 @@ function ImageLightbox({ open, onClose, src, title }) {
 }
 
 /**
- * Vitrine articles — présentation type catalogue (liste, détail dépliable, options, panier).
- * Charte graphique C&S (pas le style visuel du site de référence).
+ * Vitrine articles — clic vers fiche produit dédiée.
  */
-export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath }) {
+export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath, pageKey: pageKeyProp }) {
+  const pageKey = pageKeyProp || pageKeyFromPath(pagePath)
   const list = Array.isArray(items) ? items.slice(0, MAX_PAGE_ARTICLES) : []
   const [preview, setPreview] = useState(null)
   const [sort, setSort] = useState('default')
@@ -269,7 +155,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
 
   const sorted = useMemo(() => sortArticles(list, sort), [list, sort])
 
-  if (!list.length) return null
+  if (!list.length || !pageKey) return null
 
   return (
     <>
@@ -309,7 +195,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
               <ArticleCatalogCard
                 key={item.id || `article-${index}`}
                 item={item}
-                pagePath={pagePath}
+                pageKey={pageKey}
                 onPreview={setPreview}
               />
             ))}

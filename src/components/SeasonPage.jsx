@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import PageHeader from './PageHeader'
+import ConfigurablePageHeader from './ConfigurablePageHeader'
 import ContactCTA from './ContactCTA'
 import PageArticleGrid from './PageArticleGrid'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -12,7 +12,10 @@ export default function SeasonPage({ title, subtitle, coverImg, intro, icon, ite
   return (
     <>
       <div>
-        <PageHeader title={title} subtitle={subtitle} image={coverImg} />
+        <ConfigurablePageHeader
+          pagePath={pagePath}
+          fallback={{ title, subtitle, image: coverImg }}
+        />
       </div>
 
       {/* Intro */}
@@ -29,6 +32,7 @@ export default function SeasonPage({ title, subtitle, coverImg, intro, icon, ite
           intro={pa.intro}
           items={pa.items}
           pagePath={pagePath}
+          pageKey={articlePageKey}
         />
       )}
 

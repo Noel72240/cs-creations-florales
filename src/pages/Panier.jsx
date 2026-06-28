@@ -71,14 +71,14 @@ export default function Panier() {
                         <p className="font-heading text-lg" style={{ color: 'var(--violet)' }}>{line.title}</p>
                       )}
                       {line.selectedColor ? (
-                        <p className="font-body text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
-                          Couleur :{' '}
+                        <p className="font-body text-xs mt-1 flex items-center gap-1.5" style={{ color: 'var(--text-mid)' }}>
+                          Couleur :
                           <span
-                            className="inline-block align-middle h-3.5 w-3.5 rounded-full border border-mauve-light/40 mr-1"
+                            className="inline-block h-4 w-4 rounded-full border border-mauve-light/40 shrink-0"
                             style={{ background: line.selectedColor }}
+                            title={line.selectedColor}
                             aria-hidden="true"
                           />
-                          <span className="font-mono">{line.selectedColor}</span>
                         </p>
                       ) : null}
                       <p className="font-body text-sm mt-1" style={{ color: 'var(--text-mid)' }}>

@@ -30,6 +30,7 @@ import MaintenanceBodyNotice from './components/MaintenanceBodyNotice'
 import SeoRouteHandler from './components/SeoRouteHandler'
 import SeoHub from './pages/guides/SeoHub'
 import SeoLandingPage from './pages/guides/SeoLandingPage'
+import ArticleProduct from './pages/ArticleProduct'
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           <Route path="/creations-saisonnieres/noel" element={<Noel />} />
           <Route path="/creations-saisonnieres/fete-des-meres" element={<FeteDesMeres />} />
           <Route path="/personnalisation" element={<Personnalisation />} />
+          <Route path="/produit/:pageKey/:articleId" element={<ArticleProduct />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/avis-google" element={<AvisGoogle />} />
           <Route path="/panier" element={<Panier />} />

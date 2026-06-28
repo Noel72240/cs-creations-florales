@@ -1818,7 +1818,36 @@ button.nav-link.nav-link-header {
   background: transparent;
   border-radius: 0.75rem;
   overflow: hidden;
-  cursor: zoom-in;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.article-catalog-card__placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--mauve-pale, #f7e9ef);
+}
+
+.article-catalog-card__lightbox-btn {
+  position: absolute;
+  right: 0.55rem;
+  bottom: 0.55rem;
+  z-index: 2;
+  border: none;
+  border-radius: 0.45rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.68rem;
+  font-family: var(--font-body);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--violet);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(139, 75, 106, 0.15);
+}
+
+.article-catalog-card__lightbox-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .article-catalog-card__zoom img {
@@ -1907,4 +1936,76 @@ button.nav-link.nav-link-header {
   font-weight: 600;
   min-width: 2rem;
   color: var(--violet);
+}
+
+.article-product-gallery__main {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1rem;
+  display: block;
+  background: var(--mauve-pale, #f7e9ef);
+  box-shadow: 0 8px 32px rgba(139, 75, 106, 0.1);
+}
+
+.article-product-thumb {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.article-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.article-product-thumb.is-active {
+  border-color: var(--mauve);
+}
+
+.article-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.article-color-swatch {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(139, 75, 106, 0.35);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.article-color-swatch:hover {
+  transform: scale(1.06);
+}
+
+.article-color-swatch.is-active {
+  box-shadow:
+    0 0 0 2px var(--violet),
+    0 0 0 4px rgba(240, 210, 221, 0.85);
+  transform: scale(1.1);
+}
+
+.article-admin-color-pick {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 2px solid rgba(192, 122, 151, 0.45);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
 }

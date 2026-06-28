@@ -1,4 +1,4 @@
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { Link } from 'react-router-dom'
@@ -12,10 +12,13 @@ export default function Personnalisation() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Personnalisation"
-          subtitle="Créations sur mesure"
-          image={w1200(P.bouquetGift)}
+        <ConfigurablePageHeader
+          pagePath="/personnalisation"
+          fallback={{
+            title: 'Personnalisation',
+            subtitle: 'Créations sur mesure',
+            image: w1200(P.bouquetGift),
+          }}
         />
       </div>
 
@@ -64,6 +67,7 @@ export default function Personnalisation() {
         intro={pa?.intro}
         items={pa?.items}
         pagePath="/personnalisation"
+        pageKey="personnalisation"
       />
 
       <ContactCTA message="Une idée de cadeau personnalisé ? Parlons-en ensemble, je suis là pour concrétiser votre vision !" />

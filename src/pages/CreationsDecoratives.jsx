@@ -1,4 +1,4 @@
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { Link } from 'react-router-dom'
@@ -12,10 +12,13 @@ export default function CreationsDecoratives() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Créations Florales & Décoratives"
-          subtitle="Mon univers artisanal"
-          image={w1200(P.vaseInterior)}
+        <ConfigurablePageHeader
+          pagePath="/creations-florales"
+          fallback={{
+            title: 'Créations Florales & Décoratives',
+            subtitle: 'Mon univers artisanal',
+            image: w1200(P.vaseInterior),
+          }}
         />
       </div>
 
@@ -36,6 +39,7 @@ export default function CreationsDecoratives() {
         intro={pa?.intro}
         items={pa?.items}
         pagePath="/creations-florales"
+        pageKey="creationsFlorales"
       />
 
       {/* CTA */}
