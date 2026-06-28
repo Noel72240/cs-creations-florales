@@ -2,8 +2,8 @@
  * En `npm run dev`, Vite ne sert pas /api — ce middleware réutilise la même logique que Vercel.
  * Prérequis dans .env : SUPABASE_SERVICE_ROLE_KEY (+ SUPABASE_URL ou VITE_SUPABASE_URL).
  */
-import { saveSiteContentCore } from '../api/lib/saveSiteContentCore.js'
-import { getAdminHealthStatus } from '../api/lib/adminHealthCore.js'
+import { saveSiteContentCore } from '../server/lib/saveSiteContentCore.js'
+import { getAdminHealthStatus } from '../server/lib/adminHealthCore.js'
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -56,6 +56,20 @@ export function createLocalAdminApiMiddleware() {
     if (url === '/api/upload-site-image') {
       try {
         const { default: handler } = await import('../api/upload-site-image.js')
+        await handler(req, res)
+      } catch (e) {
+        sendJson(res, 500, { ok: false, error: e?.message || 'Erreur serveur' })
+      }
+      return
+    }
+
+    if (
+      url === '/api/create-sumup-checkout' ||
+      url === '/api/validate-promo-code' ||
+      url === '/api/confirm-checkout-return'
+    ) {
+      try {
+        const { default: handler } = await import('../api/create-sumup-checkout.js')
         await handler(req, res)
       } catch (e) {
         sendJson(res, 500, { ok: false, error: e?.message || 'Erreur serveur' })

@@ -1,8 +1,8 @@
 /**
  * Diagnostic (sans secrets) : variables serveur pour l’admin Supabase.
  */
-import { getAdminHealthStatus } from './lib/adminHealthCore.js'
-import { corsHeaders, sendJson } from './lib/http.js'
+import { getAdminHealthStatus } from '../server/lib/adminHealthCore.js'
+import { corsHeaders, sendJson } from '../server/lib/http.js'
 
 export default async function handler(req, res) {
   const origin = req.headers.origin

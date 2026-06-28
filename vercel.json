@@ -5,6 +5,14 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/validate-promo-code",
+      "destination": "/api/create-sumup-checkout"
+    },
+    {
+      "source": "/api/confirm-checkout-return",
+      "destination": "/api/create-sumup-checkout"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

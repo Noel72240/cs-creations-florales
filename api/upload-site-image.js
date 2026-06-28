@@ -2,9 +2,9 @@
  * Upload Storage Supabase via service_role (mot de passe admin requis).
  * Corps JSON : { adminPassword, folder, fileName, contentType, dataBase64 }
  */
-import { readAdminPassword, verifyAdminPassword } from './lib/adminAuth.js'
-import { getSupabaseServiceClient } from './lib/supabaseService.js'
-import { corsHeaders, readJsonBody, sendJson } from './lib/http.js'
+import { readAdminPassword, verifyAdminPassword } from '../server/lib/adminAuth.js'
+import { getSupabaseServiceClient } from '../server/lib/supabaseService.js'
+import { corsHeaders, readJsonBody, sendJson } from '../server/lib/http.js'
 
 function safeFileExtension(fileName, contentType) {
   const fromName = (fileName || '').split('.').pop()

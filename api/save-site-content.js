@@ -1,9 +1,9 @@
 /**
  * Enregistre le JSON site_content via service_role (mot de passe admin requis).
  */
-import { readAdminPassword } from './lib/adminAuth.js'
-import { saveSiteContentCore } from './lib/saveSiteContentCore.js'
-import { corsHeaders, readJsonBody, sendJson } from './lib/http.js'
+import { readAdminPassword } from '../server/lib/adminAuth.js'
+import { saveSiteContentCore } from '../server/lib/saveSiteContentCore.js'
+import { corsHeaders, readJsonBody, sendJson } from '../server/lib/http.js'
 
 export default async function handler(req, res) {
   const origin = req.headers.origin
