@@ -27,7 +27,7 @@ function sortArticles(list, mode) {
 
 function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
   return (
-    <div className="article-shop-qty" role="group" aria-label="Quantité">
+    <div className="article-catalog-qty" role="group" aria-label="Quantité">
       <button type="button" onClick={() => onChange(Math.max(min, value - 1))} aria-label="Diminuer">
         −
       </button>
@@ -39,7 +39,7 @@ function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
   )
 }
 
-function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false }) {
+function ArticleCatalogCard({ item, pagePath, onPreview }) {
   const { addItem } = useCart()
   const customSrc = (item.src || '').trim()
   const customSrc2 = (item.src2 || '').trim()
@@ -55,7 +55,7 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
 
   const [slideIndex, setSlideIndex] = useState(0)
   const [imgSrc, setImgSrc] = useState(primary)
-  const [expanded, setExpanded] = useState(defaultExpanded)
+  const [expanded, setExpanded] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [selectedColor, setSelectedColor] = useState('')
   const [added, setAdded] = useState(false)
@@ -70,10 +70,10 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
   }, [customSrc, item.photoKey, primary])
 
   useEffect(() => {
-    const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
+    const colorList = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
     setSelectedColor((prev) => {
-      if (prev && colors.includes(prev)) return prev
-      return colors[0] || ''
+      if (prev && colorList.includes(prev)) return prev
+      return colorList[0] || ''
     })
   }, [item.colors])
 
@@ -106,23 +106,23 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
     .filter(Boolean)
 
   return (
-    <article className={`article-shop-card${expanded ? ' article-shop-card--open' : ''}`}>
-      <div className="article-shop-card__media">
+    <article className="article-catalog-card">
+      <div className="article-catalog-card__media">
         {isNew ? (
-          <span className="article-shop-badge" aria-label="Nouveauté">
+          <span className="article-catalog-badge" aria-label="Nouveauté">
             Nouveauté ✿
           </span>
         ) : null}
         <button
           type="button"
-          className="article-shop-card__image-btn"
+          className="article-catalog-card__zoom"
           onClick={() => onPreview?.({ src: imgSrc, title: item.title })}
           aria-label={`Agrandir : ${item.title}`}
         >
-          <img src={imgSrc} alt={item.title} loading="lazy" className="article-shop-card__image" onError={handleImgError} />
+          <img src={imgSrc} alt={item.title} loading="lazy" onError={handleImgError} />
         </button>
         {slides.length > 1 ? (
-          <div className="article-shop-dots" role="tablist" aria-label="Photos du produit">
+          <div className="article-catalog-dots" role="tablist" aria-label="Photos du produit">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -138,12 +138,16 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
         ) : null}
       </div>
 
-      <div className="article-shop-card__head">
-        <h3 className="article-shop-card__title">{item.title}</h3>
-        <p className="article-shop-card__price">{formatEuro(price)}</p>
+      <div className="article-catalog-card__summary">
+        <h3 className="font-heading text-lg sm:text-xl font-medium leading-snug mb-1" style={{ color: 'var(--violet)' }}>
+          {item.title}
+        </h3>
+        <p className="font-refined text-base font-semibold mb-3" style={{ color: 'var(--mauve)' }}>
+          {formatEuro(price)}
+        </p>
         <button
           type="button"
-          className="article-shop-card__toggle"
+          className="btn-outline text-sm py-2 px-4"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
         >
@@ -152,15 +156,16 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
       </div>
 
       {expanded ? (
-        <div className="article-shop-card__body">
+        <div className="article-catalog-card__detail">
           {colors.length > 0 ? (
-            <label className="article-shop-field">
-              <span className="article-shop-field__label">Couleur *</span>
+            <label className="block">
+              <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+                Couleur *
+              </span>
               <select
-                className="article-shop-select"
+                className="form-field w-full"
                 value={selectedColor}
                 onChange={(e) => setSelectedColor(e.target.value)}
-                required
               >
                 <option value="">Sélectionner</option>
                 {colors.map((c, i) => (
@@ -172,14 +177,16 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
             </label>
           ) : null}
 
-          <label className="article-shop-field">
-            <span className="article-shop-field__label">Quantité *</span>
+          <label className="block">
+            <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+              Quantité *
+            </span>
             <QuantityStepper value={quantity} onChange={setQuantity} />
           </label>
 
           <button
             type="button"
-            className="article-shop-btn"
+            className="btn-primary w-full text-center justify-center py-3"
             onClick={handleAddToCart}
             disabled={colors.length > 0 && !selectedColor}
           >
@@ -187,16 +194,12 @@ function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false })
           </button>
 
           {descriptionBlocks.length > 0 ? (
-            <div className="article-shop-desc">
+            <div className="text-refined text-sm leading-relaxed space-y-3" style={{ color: 'var(--text-elegant)' }}>
               {descriptionBlocks.map((block, i) => (
                 <p key={i}>{block}</p>
               ))}
             </div>
           ) : null}
-
-          <p className="article-shop-note">
-            Création artisanale — délai indicatif : environ <strong>1 semaine</strong> (confirmé au devis).
-          </p>
         </div>
       ) : null}
     </article>
@@ -255,7 +258,8 @@ function ImageLightbox({ open, onClose, src, title }) {
 }
 
 /**
- * Vitrine articles — style boutique (liste verticale, fond mauve, fiche détaillée).
+ * Vitrine articles — présentation type catalogue (liste, détail dépliable, options, panier).
+ * Charte graphique C&S (pas le style visuel du site de référence).
  */
 export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath }) {
   const list = Array.isArray(items) ? items.slice(0, MAX_PAGE_ARTICLES) : []
@@ -269,31 +273,40 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
 
   return (
     <>
-      <section className="article-shop-section py-12 sm:py-16 px-4 sm:px-6">
-        <div className="article-shop-wrap max-w-2xl mx-auto lg:max-w-4xl">
-          <header className="article-shop-header mb-8 sm:mb-10">
-            <p className="article-shop-eyebrow">Boutique</p>
-            <h2 className="article-shop-heading">{sectionTitle}</h2>
-            {intro ? <p className="article-shop-intro">{intro}</p> : null}
-            <div className="article-shop-toolbar">
-              <span className="article-shop-count">
-                {list.length} article{list.length > 1 ? 's' : ''}
-              </span>
-              <label className="article-shop-sort">
-                <span className="sr-only">Trier les articles</span>
-                <select value={sort} onChange={(e) => setSort(e.target.value)} className="article-shop-select article-shop-select--inline">
-                  <option value="default">Trier : par défaut</option>
-                  <option value="price-asc">Prix croissant</option>
-                  <option value="price-desc">Prix décroissant</option>
-                  <option value="title-asc">Nom A → Z</option>
-                </select>
-              </label>
-            </div>
-          </header>
+      <section className="py-16 px-4" style={{ background: 'var(--beige)' }}>
+        <div className="max-w-3xl mx-auto lg:max-w-4xl">
+          <h2 className="section-title mb-2">{sectionTitle}</h2>
+          <div className="floral-divider mb-6">
+            <span className="floral-icon">✿</span>
+          </div>
+          {intro ? <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p> : null}
 
-          <div className="article-shop-list">
+          <div className="article-catalog-toolbar mb-8">
+            <span className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
+              {list.length} article{list.length > 1 ? 's' : ''}
+            </span>
+            <label className="article-catalog-sort">
+              <span className="sr-only">Trier les articles</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value)} className="form-field text-sm py-2">
+                <option value="default">Trier : par défaut</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+                <option value="title-asc">Nom A → Z</option>
+              </select>
+            </label>
+          </div>
+
+          <p
+            className="font-refined text-sm text-center max-w-2xl mx-auto mb-10 px-4 py-3 rounded-xl border border-mauve-light/35"
+            style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
+          >
+            <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
+            réalisation en général sous <strong>1 semaine</strong>, selon disponibilité — confirmé au devis.
+          </p>
+
+          <div className="article-catalog-list">
             {sorted.map((item, index) => (
-              <ArticleShopCard
+              <ArticleCatalogCard
                 key={item.id || `article-${index}`}
                 item={item}
                 pagePath={pagePath}
