@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { resolvePhotoSrc } from '../data/photoResolver'
 import { formatEuro } from '../utils/formatEuro'
 import { resolveArticlePrice } from '../lib/articlePrices'
-import AddToCartButton from './AddToCartButton'
+import { useCart } from '../context/CartContext'
 
 function normalizeHexColor(value) {
   const s = String(value || '').trim()
@@ -17,22 +17,60 @@ function normalizeHexColor(value) {
   return ''
 }
 
-function ArticleCard({ item, pagePath, onPreview }) {
+function sortArticles(list, mode) {
+  const copy = [...list]
+  if (mode === 'price-asc') return copy.sort((a, b) => resolveArticlePrice(a.price) - resolveArticlePrice(b.price))
+  if (mode === 'price-desc') return copy.sort((a, b) => resolveArticlePrice(b.price) - resolveArticlePrice(a.price))
+  if (mode === 'title-asc') return copy.sort((a, b) => String(a.title).localeCompare(String(b.title), 'fr'))
+  return copy
+}
+
+function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
+  return (
+    <div className="article-shop-qty" role="group" aria-label="Quantité">
+      <button type="button" onClick={() => onChange(Math.max(min, value - 1))} aria-label="Diminuer">
+        −
+      </button>
+      <span aria-live="polite">{value}</span>
+      <button type="button" onClick={() => onChange(Math.min(max, value + 1))} aria-label="Augmenter">
+        +
+      </button>
+    </div>
+  )
+}
+
+function ArticleShopCard({ item, pagePath, onPreview, defaultExpanded = false }) {
+  const { addItem } = useCart()
   const customSrc = (item.src || '').trim()
   const customSrc2 = (item.src2 || '').trim()
   const primary = resolvePhotoSrc(customSrc || item.photoKey)
   const fallback = resolvePhotoSrc(item.photoKey)
-  const [imgSrc, setImgSrc] = useState(primary)
   const secondaryRaw = (customSrc2 || item.photoKey2 || '').trim()
   const secondarySrc = secondaryRaw ? resolvePhotoSrc(secondaryRaw) : ''
+  const slides = useMemo(() => {
+    const urls = [primary]
+    if (secondarySrc && secondarySrc !== primary) urls.push(secondarySrc)
+    return urls
+  }, [primary, secondarySrc])
+
+  const [slideIndex, setSlideIndex] = useState(0)
+  const [imgSrc, setImgSrc] = useState(primary)
+  const [expanded, setExpanded] = useState(defaultExpanded)
+  const [quantity, setQuantity] = useState(1)
   const [selectedColor, setSelectedColor] = useState('')
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
-    setImgSrc(resolvePhotoSrc(customSrc || item.photoKey))
-  }, [customSrc, item.photoKey])
+    setImgSrc(slides[slideIndex] || primary)
+  }, [slides, slideIndex, primary])
 
   useEffect(() => {
-    const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 3) : []
+    setSlideIndex(0)
+    setImgSrc(primary)
+  }, [customSrc, item.photoKey, primary])
+
+  useEffect(() => {
+    const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
     setSelectedColor((prev) => {
       if (prev && colors.includes(prev)) return prev
       return colors[0] || ''
@@ -40,112 +78,127 @@ function ArticleCard({ item, pagePath, onPreview }) {
   }, [item.colors])
 
   const price = resolveArticlePrice(item.price)
+  const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6) : []
+  const cartId = selectedColor ? `${item.id}::${selectedColor}` : item.id
+  const isNew = item.isNew === true || item.badge === 'nouveaute'
 
   const handleImgError = () => {
-    if (customSrc && imgSrc !== fallback) {
-      setImgSrc(fallback)
-    }
+    if (customSrc && imgSrc !== fallback) setImgSrc(fallback)
   }
 
-  const colors = Array.isArray(item.colors) ? item.colors.map(normalizeHexColor).filter(Boolean).slice(0, 3) : []
+  const handleAddToCart = () => {
+    addItem({
+      id: cartId,
+      title: item.title,
+      price,
+      imageUrl: imgSrc,
+      path: pagePath,
+      selectedColor,
+      quantity,
+    })
+    setAdded(true)
+    window.setTimeout(() => setAdded(false), 2200)
+  }
+
+  const descriptionBlocks = String(item.description || '')
+    .split(/\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
 
   return (
-    <article
-      className="flex flex-col rounded-2xl overflow-hidden bg-white border border-mauve-light/25 shadow-sm hover:shadow-md transition-shadow"
-      style={{ boxShadow: '0 4px 24px rgba(139, 75, 106, 0.08)' }}
-    >
-      <div className="aspect-[4/3] w-full overflow-hidden bg-mauve-pale relative group">
+    <article className={`article-shop-card${expanded ? ' article-shop-card--open' : ''}`}>
+      <div className="article-shop-card__media">
+        {isNew ? (
+          <span className="article-shop-badge" aria-label="Nouveauté">
+            Nouveauté ✿
+          </span>
+        ) : null}
         <button
           type="button"
-          className="absolute inset-0 z-[1] cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-mauve focus-visible:ring-inset"
+          className="article-shop-card__image-btn"
           onClick={() => onPreview?.({ src: imgSrc, title: item.title })}
-          aria-label={`Agrandir la photo : ${item.title}`}
-        />
-        <img
-          src={imgSrc}
-          alt={item.title}
-          loading="lazy"
-          className="w-full h-full object-cover pointer-events-none"
-          onError={handleImgError}
-        />
-        <span
-          className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-          aria-hidden
+          aria-label={`Agrandir : ${item.title}`}
         >
-          Agrandir
-        </span>
-      </div>
-      <div className="flex flex-col flex-1 p-5 sm:p-6">
-        <h3 className="font-heading text-lg font-medium mb-2 leading-snug" style={{ color: 'var(--violet)' }}>
-          {item.title}
-        </h3>
-        {secondarySrc ? (
-          <div className="flex items-center gap-3 mb-3">
-            <button
-              type="button"
-              className="rounded-xl overflow-hidden border border-mauve-light/30 hover:border-mauve transition-colors bg-white"
-              onClick={() => setImgSrc(secondarySrc)}
-              aria-label="Afficher la photo secondaire"
-              title="Cliquer pour afficher cette photo"
-            >
-              <img src={secondarySrc} alt="" className="h-12 w-16 object-cover" loading="lazy" />
-            </button>
-            <button
-              type="button"
-              className="text-[11px] underline"
-              style={{ color: 'var(--text-mid)' }}
-              onClick={() => setImgSrc(resolvePhotoSrc(customSrc || item.photoKey))}
-            >
-              Revenir à la photo principale
-            </button>
+          <img src={imgSrc} alt={item.title} loading="lazy" className="article-shop-card__image" onError={handleImgError} />
+        </button>
+        {slides.length > 1 ? (
+          <div className="article-shop-dots" role="tablist" aria-label="Photos du produit">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === slideIndex}
+                className={i === slideIndex ? 'is-active' : ''}
+                onClick={() => setSlideIndex(i)}
+                aria-label={`Photo ${i + 1}`}
+              />
+            ))}
           </div>
         ) : null}
-        <p className="text-refined text-sm flex-1 mb-4 leading-relaxed" style={{ color: 'var(--text-elegant)' }}>
-          {item.description}
-        </p>
-        <p className="font-refined text-lg font-semibold mb-3" style={{ color: 'var(--mauve-dark)' }}>
-          {formatEuro(price)}
-        </p>
-        {colors.length ? (
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2">
-              {colors.map((c) => {
-                const active = c === selectedColor
-                return (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setSelectedColor(c)}
-                    className={`h-6 w-6 rounded-full border ${active ? 'border-mauve' : 'border-mauve-light/50'} shadow-sm`}
-                    style={{
-                      background: c,
-                      outline: active ? '2px solid rgba(139, 75, 106, 0.35)' : 'none',
-                      outlineOffset: 2,
-                    }}
-                    aria-label={`Choisir la couleur ${c}`}
-                    title={c}
-                  />
-                )
-              })}
+      </div>
+
+      <div className="article-shop-card__head">
+        <h3 className="article-shop-card__title">{item.title}</h3>
+        <p className="article-shop-card__price">{formatEuro(price)}</p>
+        <button
+          type="button"
+          className="article-shop-card__toggle"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Masquer le détail' : 'Voir le détail'}
+        </button>
+      </div>
+
+      {expanded ? (
+        <div className="article-shop-card__body">
+          {colors.length > 0 ? (
+            <label className="article-shop-field">
+              <span className="article-shop-field__label">Couleur *</span>
+              <select
+                className="article-shop-select"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                required
+              >
+                <option value="">Sélectionner</option>
+                {colors.map((c, i) => (
+                  <option key={c} value={c}>
+                    {item.colorLabels?.[i] || `Teinte ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          <label className="article-shop-field">
+            <span className="article-shop-field__label">Quantité *</span>
+            <QuantityStepper value={quantity} onChange={setQuantity} />
+          </label>
+
+          <button
+            type="button"
+            className="article-shop-btn"
+            onClick={handleAddToCart}
+            disabled={colors.length > 0 && !selectedColor}
+          >
+            {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
+          </button>
+
+          {descriptionBlocks.length > 0 ? (
+            <div className="article-shop-desc">
+              {descriptionBlocks.map((block, i) => (
+                <p key={i}>{block}</p>
+              ))}
             </div>
-            <span className="text-[11px]" style={{ color: 'var(--text-mid)' }}>
-              {selectedColor ? `Couleur : ${selectedColor}` : ''}
-            </span>
-          </div>
-        ) : null}
-        <AddToCartButton
-          product={{
-            id: item.id,
-            title: item.title,
-            price,
-            imageUrl: imgSrc,
-            path: pagePath,
-            selectedColor,
-          }}
-          label="Ajouter au panier"
-          className="w-full text-center justify-center"
-        />
-      </div>
+          ) : null}
+
+          <p className="article-shop-note">
+            Création artisanale — délai indicatif : environ <strong>1 semaine</strong> (confirmé au devis).
+          </p>
+        </div>
+      ) : null}
     </article>
   )
 }
@@ -193,9 +246,7 @@ function ImageLightbox({ open, onClose, src, title }) {
           src={src}
           alt=""
           className="max-h-[min(85vh,820px)] w-auto max-w-full rounded-lg object-contain shadow-2xl"
-          style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.45)' }}
         />
-        <p className="mt-4 text-center text-xs text-white/70">Clic en dehors de l’image ou Échap pour fermer</p>
       </div>
     </div>
   )
@@ -204,37 +255,45 @@ function ImageLightbox({ open, onClose, src, title }) {
 }
 
 /**
- * Grille d’articles (photo, titre, description, prix) pour les pages rubrique.
- * @param {{ sectionTitle?: string, intro?: string, items?: Array<{ id: string, title: string, description: string, price: number, photoKey?: string, src?: string }>, pagePath: string }} props
+ * Vitrine articles — style boutique (liste verticale, fond mauve, fiche détaillée).
  */
 export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath }) {
   const list = Array.isArray(items) ? items.slice(0, MAX_PAGE_ARTICLES) : []
   const [preview, setPreview] = useState(null)
+  const [sort, setSort] = useState('default')
   const closePreview = useCallback(() => setPreview(null), [])
+
+  const sorted = useMemo(() => sortArticles(list, sort), [list, sort])
 
   if (!list.length) return null
 
   return (
     <>
-      <section className="py-16 px-4" style={{ background: 'var(--beige)' }}>
-        <div className="max-w-6xl mx-auto">
-          <h2 className="section-title mb-2">{sectionTitle}</h2>
-          <div className="floral-divider mb-6">
-            <span className="floral-icon">✿</span>
-          </div>
-          {intro ? (
-            <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p>
-          ) : null}
-          <p
-            className="font-refined text-sm text-center max-w-2xl mx-auto mb-10 px-4 py-3 rounded-xl border border-mauve-light/35"
-            style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
-          >
-            <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
-            réalisation en général sous <strong>1 semaine</strong>, selon disponibilité des fleurs et créneaux du planning — confirmé lors de votre commande ou devis.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {list.map((item, index) => (
-              <ArticleCard
+      <section className="article-shop-section py-12 sm:py-16 px-4 sm:px-6">
+        <div className="article-shop-wrap max-w-2xl mx-auto lg:max-w-4xl">
+          <header className="article-shop-header mb-8 sm:mb-10">
+            <p className="article-shop-eyebrow">Boutique</p>
+            <h2 className="article-shop-heading">{sectionTitle}</h2>
+            {intro ? <p className="article-shop-intro">{intro}</p> : null}
+            <div className="article-shop-toolbar">
+              <span className="article-shop-count">
+                {list.length} article{list.length > 1 ? 's' : ''}
+              </span>
+              <label className="article-shop-sort">
+                <span className="sr-only">Trier les articles</span>
+                <select value={sort} onChange={(e) => setSort(e.target.value)} className="article-shop-select article-shop-select--inline">
+                  <option value="default">Trier : par défaut</option>
+                  <option value="price-asc">Prix croissant</option>
+                  <option value="price-desc">Prix décroissant</option>
+                  <option value="title-asc">Nom A → Z</option>
+                </select>
+              </label>
+            </div>
+          </header>
+
+          <div className="article-shop-list">
+            {sorted.map((item, index) => (
+              <ArticleShopCard
                 key={item.id || `article-${index}`}
                 item={item}
                 pagePath={pagePath}
@@ -244,12 +303,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
           </div>
         </div>
       </section>
-      <ImageLightbox
-        open={Boolean(preview)}
-        onClose={closePreview}
-        src={preview?.src}
-        title={preview?.title}
-      />
+      <ImageLightbox open={Boolean(preview)} onClose={closePreview} src={preview?.src} title={preview?.title} />
     </>
   )
 }
