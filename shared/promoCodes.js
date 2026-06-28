@@ -108,7 +108,7 @@ export function validatePromoCode(rawCode, subtotal, opts = {}) {
   if (opts.checkFirstOrder !== false && def.firstOrderOnly && readUsedPromoCodes().has(key)) {
     return {
       valid: false,
-      message: 'Ce code a déjà été utilisé pour une commande sur ce navigateur.',
+      message: 'Ce code a déjà été utilisé sur cet appareil. Une seule utilisation par adresse e-mail est autorisée.',
     }
   }
 

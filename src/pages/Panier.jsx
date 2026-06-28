@@ -1,17 +1,21 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
+import CheckoutEmailField from '../components/CheckoutEmailField'
 import { buildCartPrefillMessage, useCart } from '../context/CartContext'
 import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
+import { loadCheckoutEmail, saveCheckoutEmail } from '../lib/promoCheckoutApi'
 import { formatEuro } from '../utils/formatEuro'
 import { P, w1200 } from '../data/flowerPhotos'
 
 export default function Panier() {
   const { items, itemCount, subtotal, total, appliedPromo, promoError, setQuantity, removeItem, clearCart } = useCart()
   const { pay, busy, error, paymentsBlocked } = useSumupCartCheckout()
+  const [checkoutEmail, setCheckoutEmail] = useState(() => loadCheckoutEmail())
+  const [emailError, setEmailError] = useState('')
 
   const contactState = useMemo(
     () => ({
@@ -22,7 +26,17 @@ export default function Panier() {
   )
 
   const startCheckout = () => {
-    pay(items, { promoCode: appliedPromo?.code })
+    setEmailError('')
+    const email = checkoutEmail.trim()
+    if (appliedPromo?.code && !email) {
+      setEmailError('Indiquez votre e-mail pour payer avec le code promo (une utilisation par client).')
+      return
+    }
+    saveCheckoutEmail(email)
+    pay(items, {
+      promoCode: appliedPromo?.code,
+      ...(email ? { customerEmail: email } : {}),
+    })
   }
 
   return (
@@ -124,6 +138,21 @@ export default function Panier() {
                   <div className="mt-6 mb-6">
                     <PromoCodeForm />
                   </div>
+                ) : null}
+                {appliedPromo && !paymentsBlocked ? (
+                  <div className="mb-4">
+                    <CheckoutEmailField
+                      value={checkoutEmail}
+                      onChange={setCheckoutEmail}
+                      required
+                      id="panier-checkout-email"
+                    />
+                  </div>
+                ) : null}
+                {emailError ? (
+                  <p className="text-xs mb-4 rounded-lg border border-red-200 bg-red-50/90 px-3 py-2" style={{ color: '#7f1d1d' }}>
+                    {emailError}
+                  </p>
                 ) : null}
                 <p className="font-body text-xs mb-6" style={{ color: 'var(--text-mid)', lineHeight: 1.65 }}>
                   Montant indicatif : la commande florale est souvent personnalisée (couleurs, taille, date). Ce total sera

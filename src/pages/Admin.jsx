@@ -902,6 +902,9 @@ export default function Admin() {
                 placeholder="Bienvenuecscreationflorale10"
               />
             </label>
+            <p className="text-[11px] leading-snug px-1" style={{ color: 'var(--text-mid)' }}>
+              Limité à <strong>une utilisation par adresse e-mail</strong> (contrôle en base au paiement SumUp).
+            </p>
             <label className="block text-sm">
               Taille du texte (1 = 100 %, un peu plus gros par défaut)
               <input

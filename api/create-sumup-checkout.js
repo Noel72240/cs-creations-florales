@@ -5,7 +5,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'node:crypto'
 import { fetchMaintenanceMode } from './lib/maintenanceMode.js'
-import { buildPromoCatalog, validatePromoCode } from '../shared/promoCodes.js'
+import { buildPromoCatalog, normalizePromoCode, validatePromoCode } from '../shared/promoCodes.js'
+import { isPromoBlockedForEmail, normalizeCustomerEmail } from './lib/promoRedemption.js'
 
 const SUMUP_API = 'https://api.sumup.com/v0.1'
 
@@ -186,12 +187,17 @@ export default async function handler(req, res) {
 
   const { items, total: subtotal } = parsed
   const checkoutReference = randomUUID()
-  const customerEmail = typeof body.customerEmail === 'string' ? body.customerEmail.trim().slice(0, 254) : null
+  const customerEmailRaw = typeof body.customerEmail === 'string' ? body.customerEmail.trim() : ''
+  const customerEmail = normalizeCustomerEmail(customerEmailRaw) || null
   const promoCodeRaw = typeof body.promoCode === 'string' ? body.promoCode.trim() : ''
 
   let total = subtotal
   let promoCode = null
   let discountEur = 0
+
+  const supabase = createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
 
   if (promoCodeRaw) {
     const catalog = buildPromoCatalog(getServerPromoCatalog())
@@ -199,6 +205,31 @@ export default async function handler(req, res) {
     if (!promo.valid) {
       sendJson(res, 400, { error: promo.message }, origin)
       return
+    }
+    const def = catalog.get(normalizePromoCode(promoCodeRaw))
+    if (def?.firstOrderOnly !== false) {
+      if (!customerEmail) {
+        sendJson(
+          res,
+          400,
+          {
+            error:
+              'Indiquez votre adresse e-mail pour utiliser ce code promo. Chaque code est limité à une utilisation par client.',
+          },
+          origin,
+        )
+        return
+      }
+      try {
+        const usage = await isPromoBlockedForEmail(supabase, promo.code, customerEmail)
+        if (usage.blocked) {
+          sendJson(res, 400, { error: usage.message }, origin)
+          return
+        }
+      } catch (e) {
+        sendJson(res, 503, { error: e.message || 'Vérification du code promo impossible' }, origin)
+        return
+      }
     }
     total = promo.total
     promoCode = promo.code
@@ -210,10 +241,6 @@ export default async function handler(req, res) {
   if (promoCode) {
     description = `${description} (-${promoCode})`.slice(0, 120)
   }
-
-  const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
 
   const orderBase = {
     checkout_reference: checkoutReference,

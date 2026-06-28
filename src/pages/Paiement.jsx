@@ -1,22 +1,37 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import PageHeader from '../components/PageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
+import CheckoutEmailField from '../components/CheckoutEmailField'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { getMaintenanceState } from '../lib/maintenance'
 import { useCart } from '../context/CartContext'
 import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
+import { loadCheckoutEmail, saveCheckoutEmail } from '../lib/promoCheckoutApi'
 import { P, w1200 } from '../data/flowerPhotos'
 
 export default function Paiement() {
   const { content, sumupUrl } = useSiteConfig()
   const { items, appliedPromo, promoError } = useCart()
   const { pay, busy, error, paymentsBlocked } = useSumupCartCheckout()
+  const [checkoutEmail, setCheckoutEmail] = useState(() => loadCheckoutEmail())
+  const [emailError, setEmailError] = useState('')
   const maintenance = getMaintenanceState(content)
 
   const startCheckout = () => {
-    pay(items, { promoCode: appliedPromo?.code })
+    setEmailError('')
+    const email = checkoutEmail.trim()
+    if (appliedPromo?.code && !email) {
+      setEmailError('Indiquez votre e-mail pour payer avec le code promo (une utilisation par client).')
+      return
+    }
+    saveCheckoutEmail(email)
+    pay(items, {
+      promoCode: appliedPromo?.code,
+      ...(email ? { customerEmail: email } : {}),
+    })
   }
   const SITE = content.site
   const hasSumUpLink = Boolean(sumupUrl)
@@ -64,6 +79,21 @@ export default function Paiement() {
                 <div className="mb-6">
                   <PromoCodeForm />
                 </div>
+              ) : null}
+              {appliedPromo && !paymentsBlocked ? (
+                <div className="mb-4">
+                  <CheckoutEmailField
+                    value={checkoutEmail}
+                    onChange={setCheckoutEmail}
+                    required
+                    id="paiement-checkout-email"
+                  />
+                </div>
+              ) : null}
+              {emailError ? (
+                <p className="text-xs mb-4 rounded-lg border border-red-200 bg-red-50/90 px-3 py-2" style={{ color: '#7f1d1d' }}>
+                  {emailError}
+                </p>
               ) : null}
               <p className="mb-4 text-xs" style={{ color: 'var(--text-mid)' }}>
                 Le montant envoyé à SumUp inclut la réduction si un code valide est appliqué. Aucune donnée de carte ne transite par ce site.

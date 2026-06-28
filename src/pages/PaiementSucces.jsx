@@ -3,12 +3,19 @@ import { Link, useSearchParams } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import { useCart } from '../context/CartContext'
 import { markPromoCodeUsed } from '../lib/promoCodes'
+import { confirmCheckoutReturn } from '../lib/promoCheckoutApi'
 import { P, w1200 } from '../data/flowerPhotos'
 
 export default function PaiementSucces() {
   const [params] = useSearchParams()
   const ref = params.get('ref')
   const { appliedPromo, removePromo } = useCart()
+
+  useEffect(() => {
+    if (ref) {
+      confirmCheckoutReturn(ref).catch(() => {})
+    }
+  }, [ref])
 
   useEffect(() => {
     if (appliedPromo?.code) {
