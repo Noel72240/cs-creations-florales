@@ -817,6 +817,24 @@ body::before {
   touch-action: pan-y;
 }
 
+.mobile-nav-backdrop {
+  background: rgba(35, 18, 28, 0.35);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-link,
+.mobile-nav-sublink {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 2.75rem;
+}
+
+a.card {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
 main.site-main {
   position: relative;
   z-index: 1;
@@ -1379,6 +1397,7 @@ h1, h2, h3, h4 {
   align-items: flex-end;
   padding: 1.5rem;
   z-index: 3;
+  pointer-events: none;
 }
 
 .img-overlay:hover .overlay {

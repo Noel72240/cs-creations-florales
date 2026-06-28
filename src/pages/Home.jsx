@@ -326,7 +326,7 @@ function CategoryPreviewSection({ prest }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {(prest.categories || []).map((cat) => (
-            <Link key={cat.path} to={cat.path} className="card group block overflow-hidden">
+            <Link key={cat.path} to={cat.path} className="card group block overflow-hidden touch-manipulation">
               <div className="img-overlay h-64 sm:h-72 rounded-2xl">
                 <img src={resolveItemPhoto(cat)} alt={cat.title} className="w-full h-full object-cover" />
                 <div className="overlay">

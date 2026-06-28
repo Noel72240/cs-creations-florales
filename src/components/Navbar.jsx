@@ -271,85 +271,78 @@ export default function Navbar() {
       </div>
       </div>
 
-      {/* Mobile menu — panneau fixe défilable sous la barre (téléphone) */}
+      {/* Mobile menu — sous-menus toujours visibles, pas d’accordéon */}
       {mobileOpen && (
-        <div
-          className="mobile-nav-panel lg:hidden fixed left-0 right-0 z-[60] bg-white border-t border-mauve-light/30 shadow-lg animate-fade-in overflow-y-auto overscroll-y-contain"
-          style={{
-            top: 'var(--site-header-offset, 7rem)',
-            maxHeight: 'calc(100dvh - var(--site-header-offset, 7rem))',
-          }}
-        >
-          <div className="max-w-7xl mx-auto px-4 py-4 pb-8 space-y-1">
-            {menuItems.map((item) => (
-              <div key={item.path}>
-                {item.children ? (
-                  <>
-                    <button
-                      type="button"
-                      className="w-full flex items-center justify-between gap-2 py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors text-left"
-                      style={{ color: 'var(--text-dark)' }}
-                      onClick={() => setOpenDropdown(openDropdown === item.path ? null : item.path)}
-                      aria-expanded={openDropdown === item.path}
-                    >
-                      <span>{item.label}</span>
-                      <svg
-                        className={`w-4 h-4 shrink-0 transition-transform ${openDropdown === item.path ? 'rotate-180' : ''}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden
+        <>
+          <button
+            type="button"
+            className="mobile-nav-backdrop lg:hidden fixed inset-0 z-[55] border-0 cursor-default"
+            style={{ top: 'var(--site-header-offset, 7rem)' }}
+            aria-label="Fermer le menu"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div
+            className="mobile-nav-panel lg:hidden fixed left-0 right-0 z-[60] bg-white border-t border-mauve-light/30 shadow-lg animate-fade-in overflow-y-auto overscroll-y-contain"
+            style={{
+              top: 'var(--site-header-offset, 7rem)',
+              maxHeight: 'calc(100dvh - var(--site-header-offset, 7rem))',
+            }}
+          >
+            <div className="max-w-7xl mx-auto px-4 py-4 pb-8 space-y-1">
+              {menuItems.map((item) => (
+                <div key={item.path}>
+                  {item.children ? (
+                    <div className="mb-2">
+                      <Link
+                        to={item.path}
+                        className="block py-3 px-3 rounded-lg text-[0.9375rem] font-heading font-medium hover:bg-mauve-pale transition-colors"
+                        style={{ color: 'var(--violet)' }}
+                        onClick={() => setMobileOpen(false)}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {openDropdown === item.path && (
-                      <div className="pl-3 sm:pl-6 space-y-1 mt-1 mb-2 border-l-2 border-mauve-light/40 ml-3">
-                        <Link
-                          to={item.path}
-                          className="block py-2 px-3 rounded-lg text-[0.875rem] font-body hover:bg-mauve-pale transition-colors"
-                          style={{ color: 'var(--violet)' }}
-                        >
-                          Voir tout
-                        </Link>
+                        {item.label}
+                      </Link>
+                      <div className="pl-3 sm:pl-4 space-y-0.5 mt-1 border-l-2 border-mauve-light/40 ml-3">
                         {item.children.map((child) => (
                           <Link
                             key={child.path}
                             to={child.path}
-                            className="block py-2 px-3 rounded-lg text-[0.875rem] font-body hover:bg-mauve-pale transition-colors"
-                            style={{ color: 'var(--text-mid)' }}
+                            className="mobile-nav-sublink block py-3 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
+                            style={{ color: 'var(--text-dark)' }}
+                            onClick={() => setMobileOpen(false)}
                           >
                             {child.label}
                           </Link>
                         ))}
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <Link
-                    to={item.path}
-                    className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
-                    style={{ color: 'var(--text-dark)' }}
-                  >
-                    {item.label}
-                  </Link>
-                )}
+                    </div>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      className="mobile-nav-link block py-3 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
+                      style={{ color: 'var(--text-dark)' }}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </div>
+              ))}
+              <div className="pt-3 border-t border-mauve-light/30 space-y-2">
+                <Link
+                  to="/panier"
+                  className="mobile-nav-link block py-3 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
+                  style={{ color: 'var(--text-dark)' }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Panier{itemCount > 0 ? ` (${itemCount})` : ''}
+                </Link>
+                <Link to="/contact" className="btn-primary block text-center text-xs py-3" onClick={() => setMobileOpen(false)}>
+                  Demander un devis
+                </Link>
               </div>
-            ))}
-            <div className="pt-3 border-t border-mauve-light/30 space-y-2">
-              <Link
-                to="/panier"
-                className="block py-2.5 px-3 rounded-lg text-[0.9375rem] font-body hover:bg-mauve-pale transition-colors"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Panier{itemCount > 0 ? ` (${itemCount})` : ''}
-              </Link>
-              <Link to="/contact" className="btn-primary block text-center text-xs py-2.5">
-                Demander un devis
-              </Link>
             </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   )

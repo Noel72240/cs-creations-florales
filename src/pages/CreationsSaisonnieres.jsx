@@ -71,7 +71,7 @@ export default function CreationsSaisonnieres() {
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SEASONS.map((season) => (
-              <Link key={season.path} to={season.path} className="card group block overflow-hidden">
+              <Link key={season.path} to={season.path} className="card group block overflow-hidden touch-manipulation">
                 <div className="img-overlay h-60">
                   <img src={season.img} alt={season.title} className="w-full h-full object-cover" />
                   <div className="overlay"><span>Découvrir →</span></div>

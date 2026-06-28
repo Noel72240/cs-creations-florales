@@ -52,10 +52,10 @@ export default function EvenementsFloraux() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {EVENTS.map((ev) => (
-              <Link key={ev.path} to={ev.path} className="card group block">
+              <Link key={ev.path} to={ev.path} className="card group block touch-manipulation">
                 <div className="img-overlay h-56">
                   <img src={ev.img} alt={ev.title} className="w-full h-full object-cover" />
-                  <div className="overlay"><span>Découvrir →</span></div>
+                  <div className="overlay" aria-hidden="true"><span>Découvrir →</span></div>
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">

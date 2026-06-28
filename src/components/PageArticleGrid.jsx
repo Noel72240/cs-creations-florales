@@ -42,7 +42,11 @@ function ArticleCatalogCard({ item, pageKey, onPreview }) {
             Nouveauté ✿
           </span>
         ) : null}
-        <Link to={productPath} className="article-catalog-card__zoom block" aria-label={`Voir la fiche : ${item.title}`}>
+        <Link
+          to={productPath}
+          className="article-catalog-card__zoom block touch-manipulation"
+          aria-label={`Voir la fiche : ${item.title}`}
+        >
           {imgSrc ? (
             <img src={imgSrc} alt={item.title} loading="lazy" draggable={false} />
           ) : (
