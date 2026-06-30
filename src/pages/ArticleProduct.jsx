@@ -11,6 +11,7 @@ import {
 } from '../data/pageCatalog'
 import { getArticlePhotoUrls } from '../lib/articlePhotos'
 import { resolveArticlePrice } from '../lib/articlePrices'
+import { ArticleDescriptionBlock, stripArticleDescriptionMarkup } from '../lib/articleDescription'
 import { formatEuro } from '../utils/formatEuro'
 import ArticleColorSwatches, { normalizeHexColor } from '../components/ArticleColorSwatches'
 import { useSwipeIndex } from '../hooks/useSwipeIndex'
@@ -102,7 +103,10 @@ export default function ArticleProduct() {
     <>
       <Seo
         title={article.title}
-        description={article.description?.slice(0, 155) || `${article.title} — C&S Créations Florales`}
+        description={
+          stripArticleDescriptionMarkup(article.description).slice(0, 155) ||
+          `${article.title} — C&S Créations Florales`
+        }
         path={articleProductPath(pageKey, article.id)}
         image={mainPhoto}
       />
@@ -208,7 +212,9 @@ export default function ArticleProduct() {
           {descriptionBlocks.length > 0 ? (
             <div className="text-refined text-sm leading-relaxed space-y-3 mb-8" style={{ color: 'var(--text-elegant)' }}>
               {descriptionBlocks.map((block, i) => (
-                <p key={i}>{block}</p>
+                <p key={i}>
+                  <ArticleDescriptionBlock text={block} />
+                </p>
               ))}
             </div>
           ) : null}

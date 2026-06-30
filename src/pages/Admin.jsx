@@ -13,9 +13,14 @@ import {
   fetchAdminServerHealth,
 } from '../lib/adminServerApi'
 import { messageAfterAdminSave } from '../lib/reportAdminSave'
+import { normalizeArticlePrice } from '../lib/articlePrices'
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 
 const AUTH_KEY = 'cs_admin_auth'
+
+function scrollAdminToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
 /** Réduit la taille pour le stockage local (localStorage). */
 function imageFileToCompressedDataUrl(file, maxW = 1400, quality = 0.82) {
@@ -210,6 +215,7 @@ export default function Admin() {
       const result = await save(patch)
       const { text } = messageAfterAdminSave(result, contentDriver)
       setMsg(text)
+      scrollAdminToTop()
       return result
     },
     [save, contentDriver],
@@ -433,6 +439,7 @@ export default function Admin() {
         ? ' Bandeau maintenance : activé (bandeau orange en haut du site).'
         : ' Bandeau maintenance : désactivé.'
       setMsg(ok ? `${text}${maintHint}` : text)
+      scrollAdminToTop()
       return result
     },
     [save, contentDriver],
@@ -1564,7 +1571,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       id: String(it.id || '').trim() || `id-${Date.now()}`,
       title: String(it.title || '').trim(),
       description: String(it.description || '').trim(),
-      price: Math.max(0, Math.round((Number(it.price) || 0) * 100) / 100),
+      price: normalizeArticlePrice(it.price),
       photoKey: String(it.photoKey || 'weddingBouquet').trim() || 'weddingBouquet',
       src: String(it.src || '').trim(),
       photoKey2: String(it.photoKey2 || '').trim(),
@@ -1593,6 +1600,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     const feedback = messageAfterAdminSave(result, contentDriver)
     setMsg(feedback.text)
     setSaveFeedback(feedback)
+    scrollAdminToTop()
   }
 
   return (
@@ -1771,6 +1779,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
               </label>
               <label className="block sm:col-span-2">
                 Description
+                <span className="block text-[11px] font-normal mt-0.5 opacity-80">
+                  Mettez un mot en gras avec <code className="text-[10px] bg-white/70 px-1 rounded">**comme ceci**</code>
+                </span>
                 <textarea className="form-field mt-1" rows={3} value={it.description || ''} onChange={(e) => setField(idx, 'description', e.target.value)} />
               </label>
               <label className="block">
@@ -1778,10 +1789,18 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                 <input
                   type="number"
                   min={0}
-                  step={0.5}
+                  step={0.01}
+                  inputMode="decimal"
                   className="form-field mt-1"
                   value={it.price === '' || it.price === undefined ? '' : it.price}
-                  onChange={(e) => setField(idx, 'price', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(',', '.')
+                    if (v === '') {
+                      setField(idx, 'price', '')
+                      return
+                    }
+                    if (/^\d*\.?\d{0,2}$/.test(v)) setField(idx, 'price', v)
+                  }}
                 />
               </label>
               <label className="block">
