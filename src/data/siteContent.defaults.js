@@ -4,6 +4,7 @@
  */
 import { SITE as SITE_BASE, WEB_DEV as WEB_DEV_BASE } from '../config/site'
 import { PAGE_ARTICLE_CATALOG } from './articleCatalog'
+import { EVENEMENTS_FLORAUX_HUB_DEFAULTS } from '../lib/eventHubCards'
 
 export const SITE_CONTENT_VERSION = 7
 
@@ -214,6 +215,8 @@ export const SITE_CONTENT_DEFAULTS = {
       sectionTitle: 'Nos créations événementielles',
       intro:
         'Aperçu de nos réalisations — consultez chaque rubrique (mariage, anniversaire, baptême) pour voir toutes les créations.',
+      hubIntro: EVENEMENTS_FLORAUX_HUB_DEFAULTS.hubIntro,
+      eventCards: EVENEMENTS_FLORAUX_HUB_DEFAULTS.eventCards.map((c) => ({ ...c })),
       items: [
         {
           id: 'evt-mariage-plateau',

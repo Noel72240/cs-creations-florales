@@ -14,6 +14,7 @@ import {
 } from '../lib/adminServerApi'
 import { messageAfterAdminSave } from '../lib/reportAdminSave'
 import { normalizeArticlePrice } from '../lib/articlePrices'
+import { EVENEMENTS_FLORAUX_HUB_DEFAULTS, mergeEventHubCards } from '../lib/eventHubCards'
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 
 const AUTH_KEY = 'cs_admin_auth'
@@ -1451,6 +1452,14 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
       })),
   )
+  const [localHubIntro, setLocalHubIntro] = useState(() =>
+    pageKey === 'evenementsFloraux'
+      ? current.hubIntro || EVENEMENTS_FLORAUX_HUB_DEFAULTS.hubIntro
+      : '',
+  )
+  const [localEventCards, setLocalEventCards] = useState(() =>
+    pageKey === 'evenementsFloraux' ? mergeEventHubCards(current.eventCards) : [],
+  )
 
   useEffect(() => {
     setSaveFeedback(null)
@@ -1481,6 +1490,10 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
         })),
     )
+    if (pageKey === 'evenementsFloraux') {
+      setLocalHubIntro(next.hubIntro || EVENEMENTS_FLORAUX_HUB_DEFAULTS.hubIntro)
+      setLocalEventCards(mergeEventHubCards(next.eventCards))
+    }
   }, [pageKey, pageArticles])
 
   const setField = (idx, key, value) => {
@@ -1566,6 +1579,32 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     }
   }
 
+  const setEventCardField = (idx, key, value) => {
+    setLocalEventCards((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
+  }
+
+  const setEventCardPhotoKey = (idx, photoKey) => {
+    setLocalEventCards((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, photoKey, src: '' } : it)),
+    )
+  }
+
+  const pickEventCardImage = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/evenements-floraux' })
+      if (url) {
+        setEventCardField(idx, 'src', url)
+        setMsg('')
+      } else {
+        setMsg('Image trop lourde. Essayez une image plus légère ou connectez-vous à Supabase.')
+      }
+    } catch {
+      setMsg('Impossible de lire cette image.')
+    }
+  }
+
   const savePage = async () => {
     const items = localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
@@ -1582,19 +1621,31 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
     }))
+    const pagePayload = {
+      sectionTitle: localTitle.trim(),
+      intro: localIntro.trim(),
+      banner: {
+        title: localBanner.title.trim(),
+        subtitle: localBanner.subtitle.trim(),
+        src: localBanner.src.trim(),
+        photoKey: localBanner.photoKey.trim(),
+      },
+      items,
+    }
+    if (pageKey === 'evenementsFloraux') {
+      pagePayload.hubIntro = localHubIntro.trim()
+      pagePayload.eventCards = localEventCards.map((c) => ({
+        title: String(c.title || '').trim(),
+        desc: String(c.desc || '').trim(),
+        icon: String(c.icon || '').trim(),
+        path: String(c.path || '').trim(),
+        photoKey: String(c.photoKey || 'weddingBouquet').trim() || 'weddingBouquet',
+        src: String(c.src || '').trim(),
+      }))
+    }
     const result = await save({
       pageArticles: {
-        [pageKey]: {
-          sectionTitle: localTitle.trim(),
-          intro: localIntro.trim(),
-          banner: {
-            title: localBanner.title.trim(),
-            subtitle: localBanner.subtitle.trim(),
-            src: localBanner.src.trim(),
-            photoKey: localBanner.photoKey.trim(),
-          },
-          items,
-        },
+        [pageKey]: pagePayload,
       },
     })
     const feedback = messageAfterAdminSave(result, contentDriver)
@@ -1726,6 +1777,118 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
             className="h-28 w-full rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
           />
         </fieldset>
+
+        {pageKey === 'evenementsFloraux' ? (
+          <fieldset className="rounded-xl border border-mauve-light/35 p-4 space-y-3">
+            <legend className="text-sm font-medium px-1" style={{ color: 'var(--violet)' }}>
+              Cartes événements (Anniversaire, Mariage, Baptême)
+            </legend>
+            <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+              Les 3 cartes avec photo et lien « En savoir plus » sous le bandeau de la page Événements floraux.
+            </p>
+            <label className="block">
+              Texte d’introduction (au-dessus des cartes)
+              <textarea
+                className="form-field mt-1"
+                rows={3}
+                value={localHubIntro}
+                onChange={(e) => setLocalHubIntro(e.target.value)}
+              />
+            </label>
+            <div className="space-y-4">
+              {localEventCards.map((card, i) => (
+                <div key={i} className="border border-mauve-light/30 rounded-xl p-3 space-y-2">
+                  <p className="text-xs font-medium" style={{ color: 'var(--violet)' }}>
+                    Carte {i + 1}
+                  </p>
+                  <input
+                    className="form-field"
+                    value={card.title}
+                    onChange={(e) => setEventCardField(i, 'title', e.target.value)}
+                    placeholder="Titre"
+                  />
+                  <textarea
+                    className="form-field"
+                    rows={2}
+                    value={card.desc}
+                    onChange={(e) => setEventCardField(i, 'desc', e.target.value)}
+                    placeholder="Description"
+                  />
+                  <input
+                    className="form-field"
+                    value={card.icon}
+                    onChange={(e) => setEventCardField(i, 'icon', e.target.value)}
+                    placeholder="Emoji (ex. 🎂)"
+                  />
+                  <label className="block">
+                    Lien de la carte
+                    <select
+                      className="form-field mt-1"
+                      value={card.path}
+                      onChange={(e) => setEventCardField(i, 'path', e.target.value)}
+                    >
+                      <option value="/evenements-floraux/anniversaire">Anniversaire</option>
+                      <option value="/evenements-floraux/mariage">Mariage</option>
+                      <option value="/evenements-floraux/bapteme-communion">Baptême & Communion</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    Clé photo (Unsplash)
+                    <select
+                      className="form-field mt-1"
+                      value={card.photoKey}
+                      onChange={(e) => setEventCardPhotoKey(i, e.target.value)}
+                    >
+                      {PHOTO_KEY_OPTIONS.map((k) => (
+                        <option key={k} value={k}>
+                          {k}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="btn-primary text-xs py-2 px-4 cursor-pointer">
+                      Choisir une photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={(e) => {
+                          pickEventCardImage(i, e.target.files)
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                    {adminSrcIsRemovable(card.src) ? (
+                      <button
+                        type="button"
+                        className="btn-outline text-xs py-2 px-4"
+                        onClick={() => setEventCardField(i, 'src', '')}
+                      >
+                        Retirer la photo
+                      </button>
+                    ) : null}
+                  </div>
+                  <label className="block">
+                    src (optionnel — prioritaire sur la clé)
+                    <input
+                      className="form-field mt-1"
+                      value={card.src || ''}
+                      onChange={(e) => setEventCardField(i, 'src', e.target.value)}
+                      placeholder="https://... ou /images/..."
+                    />
+                  </label>
+                  <img
+                    src={card.src?.trim() ? resolvePhotoSrc(card.src) : resolvePhotoSrc(card.photoKey)}
+                    alt=""
+                    className="h-24 w-full max-w-xs rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
+                  />
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+
         <label className="block">
           Titre de la section
           <input className="form-field mt-1" value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} placeholder="ex. Nos créations…" />
