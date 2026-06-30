@@ -31,12 +31,14 @@ import SeoRouteHandler from './components/SeoRouteHandler'
 import SeoHub from './pages/guides/SeoHub'
 import SeoLandingPage from './pages/guides/SeoLandingPage'
 import ArticleProduct from './pages/ArticleProduct'
+import ImageProtection from './components/ImageProtection'
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <ScrollReveal />
+      <ImageProtection />
       <SeoRouteHandler />
       <Navbar />
       <main className="site-main">

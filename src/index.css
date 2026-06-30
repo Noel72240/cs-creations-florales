@@ -2250,3 +2250,18 @@ button.nav-link.nav-link-header {
     display: none;
   }
 }
+
+/* ─── Protection photos (site public) ─── */
+.site-main img,
+.article-catalog-lightbox img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+.site-main .page-header--image,
+.site-main .hero-section--image-bg {
+  -webkit-touch-callout: none;
+}

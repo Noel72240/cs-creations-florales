@@ -116,7 +116,7 @@ function ImageLightbox({ open, onClose, src, title }) {
 
   const node = (
     <div
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 p-4 sm:p-8"
+      className="article-catalog-lightbox fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 p-4 sm:p-8"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -138,7 +138,8 @@ function ImageLightbox({ open, onClose, src, title }) {
         <img
           src={src}
           alt=""
-          className="max-h-[min(85vh,820px)] w-auto max-w-full rounded-lg object-contain shadow-2xl"
+          draggable={false}
+          className="max-h-[min(85vh,820px)] w-auto max-w-full rounded-lg object-contain shadow-2xl select-none"
         />
       </div>
     </div>

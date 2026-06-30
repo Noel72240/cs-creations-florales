@@ -18,7 +18,7 @@ function HeroSection({ site, hero }) {
 
   return (
     <section
-      className={`hero-section relative flex items-center justify-center overflow-hidden min-h-[calc(100svh-var(--site-header-offset,7rem))] ${!useImageBg ? 'hero-bg-soft' : ''}`}
+      className={`hero-section relative flex items-center justify-center overflow-hidden min-h-[calc(100svh-var(--site-header-offset,7rem))] ${useImageBg ? 'hero-section--image-bg' : 'hero-bg-soft'}`}
       style={
         useImageBg
           ? {
