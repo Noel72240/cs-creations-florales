@@ -16,13 +16,11 @@ export default {
         },
       },
       fontFamily: {
-        script: ['"Great Vibes"', 'cursive'],
-        body: ['"Great Vibes"', 'cursive'],
-        heading: ['"Great Vibes"', 'cursive'],
-        /** Même manuscrite élégante que le reste du site (Great Vibes) */
-        refined: ['"Great Vibes"', 'cursive'],
-        /** Nom de marque C&S Créations Florales */
-        brand: ['Cookie', 'cursive'],
+        script: ['Allura', 'cursive'],
+        body: ['Allura', 'cursive'],
+        heading: ['Allura', 'cursive'],
+        refined: ['Allura', 'cursive'],
+        brand: ['Pacifico', 'cursive'],
       },
       animation: {
         'fade-up': 'fadeUp 0.7s ease forwards',

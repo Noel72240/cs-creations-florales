@@ -3,8 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Great Vibes', cursive;
-  --font-brand: 'Cookie', cursive;
+  --font-script: 'Allura', cursive;
+  --font-brand: 'Pacifico', cursive;
+  --font-heading: 'Allura', cursive;
+  --font-body: 'Allura', cursive;
+  --font-refined: 'Allura', cursive;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */
@@ -1047,7 +1050,7 @@ h1, h2, h3, h4 {
 
 /* « Qui suis-je » : cartes valeurs + bouton en Cookie (pas Great Vibes) */
 .qui-suis-je-section .qui-value-label {
-  font-family: 'Cookie', cursive !important;
+  font-family: var(--font-brand) !important;
   font-weight: 400 !important;
   font-size: clamp(1.05rem, 2.6vw, 1.4rem) !important;
   letter-spacing: 0.03em;
@@ -1059,7 +1062,7 @@ h1, h2, h3, h4 {
 .qui-suis-je-section a.btn-primary,
 .qui-suis-je-section .btn-primary,
 .qui-suis-je-section .qui-cta-btn {
-  font-family: 'Cookie', cursive !important;
+  font-family: var(--font-brand) !important;
   font-weight: 400 !important;
   letter-spacing: 0.04em;
   text-transform: none !important;
@@ -1067,7 +1070,7 @@ h1, h2, h3, h4 {
 }
 
 .admin-page .font-brand {
-  font-family: 'Cookie', cursive !important;
+  font-family: var(--font-brand) !important;
 }
 
 /* « Qui suis-je » : manuscrite pour le titre + accents dans le texte */

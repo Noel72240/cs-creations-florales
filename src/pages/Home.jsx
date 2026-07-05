@@ -225,7 +225,7 @@ function QuiSuisJeSection({ site, qui }) {
                   <p className="text-2xl mb-1">{icon}</p>
                   <p
                     className="qui-value-label font-brand"
-                    style={{ color: 'var(--mauve)', fontFamily: "'Cookie', cursive" }}
+                    style={{ color: 'var(--mauve)', fontFamily: 'var(--font-brand)' }}
                   >
                     {label}
                   </p>
@@ -236,7 +236,7 @@ function QuiSuisJeSection({ site, qui }) {
             <Link
               to={q.ctaPath || '/contact'}
               className="btn-primary font-brand qui-cta-btn"
-              style={{ fontFamily: "'Cookie', cursive" }}
+              style={{ fontFamily: 'var(--font-brand)' }}
             >
               {q.ctaLabel || 'Me contacter'}
             </Link>

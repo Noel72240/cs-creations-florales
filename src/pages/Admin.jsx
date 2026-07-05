@@ -736,7 +736,7 @@ export default function Admin() {
             <label className="block text-xs">Paragraphes (séparés par une ligne vide). Utilisez {'{firstName}'} pour le prénom.</label>
             <textarea name="qs_paragraphs" rows={12} className="form-field" defaultValue={(h.quiSuisJe.paragraphs || []).join('\n\n')} />
             <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-              <strong>3 encarts</strong> (icône + texte) — police <strong>Cookie</strong> sur le site. Évitez les MAJUSCULES
+              <strong>3 encarts</strong> (icône + texte) — police <strong>Pacifico</strong> sur le site. Évitez les MAJUSCULES
               forcées : écrivez par ex. « Artisanat », « Passion », « Sur mesure ».
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
@@ -755,7 +755,7 @@ export default function Admin() {
                     />
                   </label>
                   <label className="block text-xs">
-                    Texte (Cookie)
+                    Texte (Pacifico)
                     <input
                       name={`qs_val${i}_label`}
                       defaultValue={v.label || ''}
@@ -892,7 +892,7 @@ export default function Admin() {
               <span className="text-sm">Afficher la bannière promotionnelle</span>
             </label>
             <label className="block text-xs" style={{ color: 'var(--text-mid)' }}>
-              Texte (manuscrite Great Vibes, fond fuchsia). Le code doit être identique au champ ci-dessous pour
+              Texte (manuscrite Allura, fond fuchsia). Le code doit être identique au champ ci-dessous pour
               être mis en avant.
             </label>
             <textarea
