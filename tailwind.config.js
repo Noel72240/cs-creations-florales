@@ -20,7 +20,7 @@ export default {
         body: ['Allura', 'cursive'],
         heading: ['Allura', 'cursive'],
         refined: ['Allura', 'cursive'],
-        brand: ['Pacifico', 'cursive'],
+        brand: ['Cookie', 'cursive'],
       },
       animation: {
         'fade-up': 'fadeUp 0.7s ease forwards',
