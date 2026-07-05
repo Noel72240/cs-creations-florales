@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Allura', 'cursive'],
-        body: ['Allura', 'cursive'],
-        heading: ['Allura', 'cursive'],
-        refined: ['Allura', 'cursive'],
+        script: ['Pacifico', 'cursive'],
+        body: ['Pacifico', 'cursive'],
+        heading: ['Pacifico', 'cursive'],
+        refined: ['Pacifico', 'cursive'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {

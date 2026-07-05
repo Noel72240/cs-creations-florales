@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Allura', cursive;
+  --font-script: 'Pacifico', cursive;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Allura', cursive;
-  --font-body: 'Allura', cursive;
-  --font-refined: 'Allura', cursive;
+  --font-heading: 'Pacifico', cursive;
+  --font-body: 'Pacifico', cursive;
+  --font-refined: 'Pacifico', cursive;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */
