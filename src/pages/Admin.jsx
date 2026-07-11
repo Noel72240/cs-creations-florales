@@ -21,6 +21,7 @@ import ArticleProductOptionsEditor from '../components/admin/ArticleProductOptio
 import PageIntroEditor from '../components/admin/PageIntroEditor'
 import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 import { normalizePageIntro } from '../lib/pageIntro'
+import { PARCEL_TIER_OPTIONS, normalizeParcelTier } from '../../shared/shipping.js'
 
 const AUTH_KEY = 'cs_admin_auth'
 
@@ -1532,6 +1533,7 @@ function emptyArticleItem() {
     photoKey3: '',
     src3: '',
     colors: ['', '', ''],
+    parcelTier: 'petit',
     personalizationMessageEnabled: false,
     productOptions: { active: false, templateId: '', enabledFields: [], fieldSettings: {} },
   }
@@ -1562,6 +1564,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         photoKey3: it.photoKey3 || '',
         src3: it.src3 || '',
         colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+        parcelTier: normalizeParcelTier(it.parcelTier),
         personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
         productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
       })),
@@ -1606,6 +1609,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           photoKey3: it.photoKey3 || '',
           src3: it.src3 || '',
           colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+          parcelTier: normalizeParcelTier(it.parcelTier),
           personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
           productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
         })),
@@ -1742,6 +1746,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       colors: Array.isArray(it.colors)
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
+      parcelTier: normalizeParcelTier(it.parcelTier),
       personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
       productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
     }))
@@ -2135,6 +2140,24 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                     if (/^\d*\.?\d{0,2}$/.test(v)) setField(idx, 'price', v)
                   }}
                 />
+              </label>
+              <label className="block">
+                Taille colis (livraison)
+                <select
+                  className="form-field mt-1"
+                  value={normalizeParcelTier(it.parcelTier)}
+                  onChange={(e) => setField(idx, 'parcelTier', e.target.value)}
+                >
+                  {PARCEL_TIER_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="block text-[11px] font-normal mt-1 opacity-80">
+                  {PARCEL_TIER_OPTIONS.find((o) => o.id === normalizeParcelTier(it.parcelTier))?.hint ||
+                    'Définit les frais de livraison Point Relais — le client ne choisit pas.'}
+                </span>
               </label>
               <label className="block">
                 Clé photo (Unsplash)

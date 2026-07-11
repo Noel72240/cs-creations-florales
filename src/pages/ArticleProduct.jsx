@@ -206,6 +206,7 @@ export default function ArticleProduct() {
       id: cartId,
       title: article.title,
       price: unitPrice,
+      parcelTier: article.parcelTier,
       imageUrl: mainPhoto,
       path: productPath,
       selectedColor: advancedOptionsActive ? undefined : selectedColor || undefined,

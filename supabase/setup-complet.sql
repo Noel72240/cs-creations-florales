@@ -41,6 +41,12 @@ create table if not exists public.orders (
   subtotal_eur numeric(12, 2),
   customer_name text,
   owner_notified_at timestamptz,
+  customer_phone text,
+  shipping_method text,
+  relay_point jsonb,
+  parcel_weight_grams integer default 1000,
+  mondial_relay_expedition_id text,
+  mondial_relay_label_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -2,6 +2,7 @@
  * E-mail de notification commande payée → propriétaire (facturation).
  * Envoi via Resend (https://resend.com) — fetch natif, sans dépendance npm.
  */
+import { formatShippingSummary } from '../../shared/shipping.js'
 
 function formatEuro(amount) {
   const n = Number(amount)
@@ -108,6 +109,8 @@ export function buildOrderNotificationContent(order) {
   const subtotal = order.subtotal_eur != null ? formatEuro(order.subtotal_eur) : null
   const discount = order.discount_eur != null ? formatEuro(order.discount_eur) : null
   const promo = order.promo_code ? String(order.promo_code) : null
+  const shippingSummary = formatShippingSummary(order)
+  const phone = order.customer_phone ? String(order.customer_phone) : ''
 
   const text = [
     'Nouvelle commande payée sur cscreationsflorales.com',
@@ -118,7 +121,11 @@ export function buildOrderNotificationContent(order) {
     '── Client ──',
     `Nom : ${customerName}`,
     `E-mail : ${customerEmail}`,
+    phone ? `Téléphone : ${phone}` : null,
     '',
+    shippingSummary ? '── Livraison ──' : null,
+    shippingSummary || null,
+    shippingSummary ? '' : null,
     '── Articles ──',
     buildLineItemsText(order.line_items),
     '',
@@ -154,7 +161,14 @@ export function buildOrderNotificationContent(order) {
       <table style="width:100%;font-size:13px;margin-bottom:20px;border-collapse:collapse;">
         <tr><td style="padding:4px 0;color:#777;width:90px;">Nom</td><td style="padding:4px 0;">${escapeHtml(customerName)}</td></tr>
         <tr><td style="padding:4px 0;color:#777;">E-mail</td><td style="padding:4px 0;"><a href="mailto:${escapeHtml(customerEmail)}" style="color:#6b4c6e;">${escapeHtml(customerEmail)}</a></td></tr>
+        ${phone ? `<tr><td style="padding:4px 0;color:#777;">Téléphone</td><td style="padding:4px 0;">${escapeHtml(phone)}</td></tr>` : ''}
       </table>
+      ${
+        shippingSummary
+          ? `<h2 style="font-size:15px;color:#6b4c6e;margin:0 0 8px;">Livraison</h2>
+      <p style="font-size:13px;line-height:1.55;margin:0 0 20px;white-space:pre-line;">${escapeHtml(shippingSummary)}</p>`
+          : ''
+      }
       <h2 style="font-size:15px;color:#6b4c6e;margin:0 0 8px;">Articles</h2>
       <table style="width:100%;font-size:13px;margin-bottom:20px;border-collapse:collapse;">
         <thead>

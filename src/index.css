@@ -2366,3 +2366,19 @@ button.nav-link.nav-link-header {
 .site-main .hero-section--image-bg {
   -webkit-touch-callout: none;
 }
+
+/* ─── Widget Mondial Relay (Point Relais) ─── */
+.mondial-relay-picker__zone {
+  min-height: 420px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(212, 180, 200, 0.35);
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .mondial-relay-picker__zone {
+    min-height: 360px;
+  }
+}

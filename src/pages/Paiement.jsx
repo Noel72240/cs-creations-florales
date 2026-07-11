@@ -1,16 +1,30 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import PageHeader from '../components/PageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
-import CheckoutCustomerFields from '../components/CheckoutCustomerFields'
+import CheckoutDeliverySection from '../components/CheckoutDeliverySection'
 import SecurePaymentNotice, { AcceptedPaymentMethodsList } from '../components/SecurePaymentNotice'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { getMaintenanceState } from '../lib/maintenance'
 import { useCart } from '../context/CartContext'
 import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
-import { loadCheckoutCustomerName, loadCheckoutEmail, saveCheckoutCustomerName, saveCheckoutEmail } from '../lib/promoCheckoutApi'
+import {
+  loadCheckoutPhone,
+  loadCheckoutRelayPoint,
+  loadCheckoutShippingMethod,
+  saveCheckoutPhone,
+  saveCheckoutRelayPoint,
+  saveCheckoutShippingMethod,
+} from '../lib/checkoutShipping'
+import {
+  loadCheckoutCustomerName,
+  loadCheckoutEmail,
+  saveCheckoutCustomerName,
+  saveCheckoutEmail,
+} from '../lib/promoCheckoutApi'
+import { Link } from 'react-router-dom'
+import { validateShippingCheckout, computeShippingFee, resolveCartParcelTier, parcelTierLabel, getRelayShippingFee } from '../../shared/shipping.js'
 import { P, w1200 } from '../data/flowerPhotos'
 
 export default function Paiement() {
@@ -19,27 +33,59 @@ export default function Paiement() {
   const { pay, busy, error, paymentsBlocked } = useSumupCartCheckout()
   const [checkoutEmail, setCheckoutEmail] = useState(() => loadCheckoutEmail())
   const [checkoutName, setCheckoutName] = useState(() => loadCheckoutCustomerName())
-  const [emailError, setEmailError] = useState('')
+  const [checkoutPhone, setCheckoutPhone] = useState(() => loadCheckoutPhone())
+  const [shippingMethod, setShippingMethod] = useState(() => loadCheckoutShippingMethod())
+  const [relayPoint, setRelayPoint] = useState(() => loadCheckoutRelayPoint())
+  const [checkoutError, setCheckoutError] = useState('')
   const maintenance = getMaintenanceState(content)
 
+  const cartParcelTier = useMemo(() => resolveCartParcelTier(items), [items])
+  const relayShippingFee = useMemo(() => getRelayShippingFee(cartParcelTier), [cartParcelTier])
+  const shippingFee = useMemo(
+    () => computeShippingFee(shippingMethod, items),
+    [shippingMethod, items],
+  )
+  const shippingNote =
+    shippingFee > 0 ? `Format colis : ${parcelTierLabel(cartParcelTier)} (selon vos articles)` : ''
+
   const startCheckout = () => {
-    setEmailError('')
+    setCheckoutError('')
     const email = checkoutEmail.trim()
     const name = checkoutName.trim()
     if (!name) {
-      setEmailError('Indiquez votre nom et prénom pour la facturation.')
+      setCheckoutError('Indiquez votre nom et prénom.')
       return
     }
     if (!email) {
-      setEmailError('Indiquez votre e-mail pour la facturation et le suivi de commande.')
+      setCheckoutError('Indiquez votre e-mail.')
+      return
+    }
+    const shipping = validateShippingCheckout({
+      shippingMethod,
+      customerPhone: checkoutPhone,
+      relayPoint,
+    })
+    if (!shipping.valid) {
+      setCheckoutError(
+        shipping.errors.relayPoint ||
+          shipping.errors.customerPhone ||
+          shipping.errors.shippingMethod ||
+          'Informations de livraison incomplètes.',
+      )
       return
     }
     saveCheckoutEmail(email)
     saveCheckoutCustomerName(name)
+    saveCheckoutPhone(checkoutPhone)
+    saveCheckoutShippingMethod(shipping.shippingMethod)
+    saveCheckoutRelayPoint(shipping.relayPoint)
     pay(items, {
       promoCode: appliedPromo?.code,
       customerEmail: email,
       customerName: name,
+      customerPhone: checkoutPhone,
+      shippingMethod: shipping.shippingMethod,
+      relayPoint: shipping.relayPoint,
     })
   }
   const SITE = content.site
@@ -83,7 +129,7 @@ export default function Paiement() {
                 Payer votre panier actuel
               </h3>
               <div className="mb-4">
-                <CartTotals />
+                <CartTotals shippingFee={shippingFee} shippingNote={shippingNote} />
               </div>
               {!paymentsBlocked ? (
                 <div className="mb-6">
@@ -92,18 +138,29 @@ export default function Paiement() {
               ) : null}
               {!paymentsBlocked ? (
                 <div className="mb-6">
-                  <CheckoutCustomerFields
+                  <CheckoutDeliverySection
                     name={checkoutName}
                     email={checkoutEmail}
+                    phone={checkoutPhone}
+                    shippingMethod={shippingMethod}
+                    relayPoint={relayPoint}
+                    parcelTier={cartParcelTier}
+                    relayShippingFee={relayShippingFee}
                     onNameChange={setCheckoutName}
                     onEmailChange={setCheckoutEmail}
+                    onPhoneChange={setCheckoutPhone}
+                    onShippingMethodChange={setShippingMethod}
+                    onRelayPointChange={(point) => {
+                      setRelayPoint(point)
+                      saveCheckoutRelayPoint(point)
+                    }}
                     idPrefix="paiement"
                   />
                 </div>
               ) : null}
-              {emailError ? (
+              {checkoutError ? (
                 <p className="text-xs mb-4 rounded-lg border border-red-200 bg-red-50/90 px-3 py-2" style={{ color: '#7f1d1d' }}>
-                  {emailError}
+                  {checkoutError}
                 </p>
               ) : null}
               <p className="mb-4 text-xs" style={{ color: 'var(--text-mid)' }}>

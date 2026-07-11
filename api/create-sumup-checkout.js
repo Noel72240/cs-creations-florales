@@ -9,6 +9,11 @@ import { corsHeaders, readJsonBody, sendJson } from '../server/lib/http.js'
 import { isPromoBlockedForEmail, normalizeCustomerEmail } from '../server/lib/promoRedemption.js'
 import { sendOrderNotificationEmail } from '../server/lib/orderNotificationEmail.js'
 import { buildPromoCatalog, normalizePromoCode, validatePromoCode } from '../shared/promoCodes.js'
+import {
+  buildShippingOrderFields,
+  normalizeParcelTier,
+  validateShippingCheckout,
+} from '../shared/shipping.js'
 
 const SUMUP_API = 'https://api.sumup.com/v0.1'
 
@@ -79,6 +84,7 @@ function normalizeLineItems(rawItems) {
             .filter((row) => row.label && row.value)
         : undefined,
       path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
+      parcelTier: normalizeParcelTier(raw?.parcelTier),
     })
   }
   if (!out.length) return null
@@ -368,6 +374,23 @@ async function handleCreateCheckout(req, res, origin) {
     return
   }
 
+  const shippingValidation = validateShippingCheckout({
+    shippingMethod: body.shippingMethod,
+    customerPhone: body.customerPhone,
+    relayPoint: body.relayPoint,
+  })
+  if (!shippingValidation.valid) {
+    const firstError =
+      shippingValidation.errors.relayPoint ||
+      shippingValidation.errors.customerPhone ||
+      shippingValidation.errors.shippingMethod ||
+      'Informations de livraison incomplètes.'
+    sendJson(res, 400, { error: firstError }, origin)
+    return
+  }
+  const shippingFields = buildShippingOrderFields(shippingValidation, items)
+  const shippingFee = shippingFields.shipping_fee_eur || 0
+
   let total = subtotal
   let promoCode = null
   let discountEur = 0
@@ -411,6 +434,13 @@ async function handleCreateCheckout(req, res, origin) {
     discountEur = promo.discount
   }
 
+  total += shippingFee
+  total = clampAmount(total)
+  if (total === null) {
+    sendJson(res, 400, { error: 'Montant total invalide après livraison' }, origin)
+    return
+  }
+
   const descriptionBase = items
     .map((i) => {
       const bits = [`${i.title}×${i.quantity}`]
@@ -427,6 +457,9 @@ async function handleCreateCheckout(req, res, origin) {
     })
     .join(', ')
   let description = descriptionBase.slice(0, 120) || 'Commande site'
+  if (shippingFee > 0) {
+    description = `${description} (+livraison)`.slice(0, 120)
+  }
   if (promoCode) {
     description = `${description} (-${promoCode})`.slice(0, 120)
   }
@@ -440,6 +473,7 @@ async function handleCreateCheckout(req, res, origin) {
     customer_email: customerEmail,
     customer_name: customerName,
     payee_email: payeeEmail || null,
+    ...shippingFields,
   }
   const orderWithPromo = {
     ...orderBase,
@@ -449,7 +483,12 @@ async function handleCreateCheckout(req, res, origin) {
   }
 
   let insertErr = (await supabase.from('orders').insert(orderWithPromo)).error
-  if (insertErr && /promo_code|discount_eur|subtotal_eur|customer_name|owner_notified_at/i.test(insertErr.message || '')) {
+  if (
+    insertErr &&
+    /promo_code|discount_eur|subtotal_eur|customer_name|owner_notified_at|shipping_method|relay_point|customer_phone|parcel_weight|parcel_tier|shipping_fee|mondial_relay/i.test(
+      insertErr.message || '',
+    )
+  ) {
     insertErr = (await supabase.from('orders').insert(orderBase)).error
   }
 

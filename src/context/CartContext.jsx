@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { formatEuro } from '../utils/formatEuro'
 import { validatePromoCode } from '../lib/promoCodes'
 import { resolveArticlePrice } from '../lib/articlePrices'
+import { normalizeParcelTier } from '../../shared/shipping.js'
 
 const STORAGE_KEY = 'cs_cart_v1'
 const PROMO_STORAGE_KEY = 'cs_cart_promo_v1'
@@ -39,6 +40,7 @@ function normalizeItem(raw) {
     title,
     price,
     quantity: qty,
+    parcelTier: normalizeParcelTier(raw?.parcelTier),
     imageUrl: raw?.imageUrl ? String(raw.imageUrl).slice(0, 500) : undefined,
     path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
     selectedColor,
