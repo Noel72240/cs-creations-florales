@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { SITE_CONTENT_DEFAULTS } from '../data/siteContent.defaults'
+import { normalizeAllPageArticleIds } from '../lib/articleIdNormalization'
 import { SUMUP_PAYMENT_URL as SUMUP_ENV } from '../config/site'
 import {
   clearLocalSiteOverrides,
@@ -49,6 +50,9 @@ export function getMergedContent(overrides) {
   }
   if (merged.home?.hero?.scrollLabel === 'Découvrir') {
     merged.home.hero.scrollLabel = ''
+  }
+  if (merged.pageArticles) {
+    merged.pageArticles = normalizeAllPageArticleIds(merged.pageArticles)
   }
   return merged
 }

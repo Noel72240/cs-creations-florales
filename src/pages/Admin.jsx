@@ -21,6 +21,7 @@ import ArticleProductOptionsEditor from '../components/admin/ArticleProductOptio
 import PageIntroEditor from '../components/admin/PageIntroEditor'
 import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 import { normalizePageIntro } from '../lib/pageIntro'
+import { normalizePageArticleIds } from '../lib/articleIdNormalization'
 import { PARCEL_TIER_OPTIONS, normalizeParcelTier } from '../../shared/shipping.js'
 
 const AUTH_KEY = 'cs_admin_auth'
@@ -1732,7 +1733,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
   }
 
   const savePage = async () => {
-    const items = localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
+    const items = normalizePageArticleIds(
+      pageKey,
+      localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
       title: String(it.title || '').trim(),
       description: String(it.description || '').trim(),
@@ -1749,7 +1752,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       parcelTier: normalizeParcelTier(it.parcelTier),
       personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
       productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
-    }))
+    })),
+    )
     const pagePayload = {
       sectionTitle: localTitle.trim(),
       intro: localIntro.trim(),

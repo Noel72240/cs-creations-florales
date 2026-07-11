@@ -70,7 +70,20 @@ export function getHubParentKey(pageKey) {
 
 function findInBucket(content, pageKey, articleId) {
   const raw = decodeURIComponent(articleId || '')
-  return bucketItems(content, pageKey).find((it) => String(it.id) === raw) || null
+  const items = bucketItems(content, pageKey)
+  const matches = items.filter((it) => String(it.id) === raw)
+  if (matches.length === 0) return null
+  return matches[0]
+}
+
+function findInAnyBucket(content, articleId) {
+  const pages = content?.pageArticles
+  if (!pages || typeof pages !== 'object') return null
+  for (const pageKey of Object.keys(pages)) {
+    const found = findInBucket(content, pageKey, articleId)
+    if (found) return { item: found, pageKey }
+  }
+  return null
 }
 
 /** Clé catalogue où l’article est réellement enregistré (sous-rubrique ou page courante). */
@@ -98,6 +111,9 @@ export function findCatalogArticle(content, pageKey, articleId) {
       if (found) return found
     }
   }
+
+  const global = findInAnyBucket(content, articleId)
+  if (global && global.pageKey !== pageKey) return global.item
 
   return null
 }
