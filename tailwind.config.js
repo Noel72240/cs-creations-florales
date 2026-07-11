@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Pristina', 'cursive'],
-        body: ['Pristina', 'cursive'],
-        heading: ['Pristina', 'cursive'],
-        refined: ['Pristina', 'cursive'],
+        script: ['Lora', 'Georgia', 'serif'],
+        body: ['Lora', 'Georgia', 'serif'],
+        heading: ['Lora', 'Georgia', 'serif'],
+        refined: ['Lora', 'Georgia', 'serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Pristina', cursive;
+  --font-script: 'Lora', Georgia, serif;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Pristina', cursive;
-  --font-body: 'Pristina', cursive;
-  --font-refined: 'Pristina', cursive;
+  --font-heading: 'Lora', Georgia, serif;
+  --font-body: 'Lora', Georgia, serif;
+  --font-refined: 'Lora', Georgia, serif;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */
