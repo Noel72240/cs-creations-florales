@@ -16,6 +16,7 @@ function sortArticles(list, mode) {
 }
 
 function ArticleCatalogCard({ item, pageKey, onPreview }) {
+  const catalogPageKey = item.sourcePageKey || pageKey
   const slides = useMemo(() => getArticlePhotoUrls(item), [item])
   const primary = slides[0] || ''
   const [slideIndex, setSlideIndex] = useState(0)
@@ -32,7 +33,7 @@ function ArticleCatalogCard({ item, pageKey, onPreview }) {
 
   const price = resolveArticlePrice(item.price)
   const isNew = item.isNew === true || item.badge === 'nouveaute'
-  const productPath = articleProductPath(pageKey, item.id)
+  const productPath = articleProductPath(catalogPageKey, item.id)
 
   return (
     <article className="article-catalog-card">
@@ -151,9 +152,16 @@ function ImageLightbox({ open, onClose, src, title }) {
 /**
  * Vitrine articles — clic vers fiche produit dédiée.
  */
-export default function PageArticleGrid({ sectionTitle = 'Articles', intro, items, pagePath, pageKey: pageKeyProp }) {
+export default function PageArticleGrid({
+  sectionTitle = 'Articles',
+  intro,
+  items,
+  pagePath,
+  pageKey: pageKeyProp,
+  maxItems = MAX_PAGE_ARTICLES,
+}) {
   const pageKey = pageKeyProp || pageKeyFromPath(pagePath)
-  const list = Array.isArray(items) ? items.slice(0, MAX_PAGE_ARTICLES) : []
+  const list = Array.isArray(items) ? items.slice(0, maxItems) : []
   const [preview, setPreview] = useState(null)
   const [sort, setSort] = useState('default')
   const closePreview = useCallback(() => setPreview(null), [])
@@ -198,7 +206,7 @@ export default function PageArticleGrid({ sectionTitle = 'Articles', intro, item
           <div className="article-catalog-list">
             {sorted.map((item, index) => (
               <ArticleCatalogCard
-                key={item.id || `article-${index}`}
+                key={`${item.sourcePageKey || pageKey}:${item.id || index}`}
                 item={item}
                 pageKey={pageKey}
                 onPreview={setPreview}

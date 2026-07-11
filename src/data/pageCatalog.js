@@ -91,9 +91,5 @@ export function articleProductPath(pageKey, articleId) {
   return `/produit/${encodeURIComponent(pageKey)}/${encodeURIComponent(articleId)}`
 }
 
-export function findCatalogArticle(content, pageKey, articleId) {
-  const raw = decodeURIComponent(articleId || '')
-  const items = content?.pageArticles?.[pageKey]?.items
-  if (!Array.isArray(items)) return null
-  return items.find((it) => String(it.id) === raw) || null
-}
+/** @deprecated Prefer findCatalogArticle from ../lib/articleHubAggregation.js */
+export { findCatalogArticle } from '../lib/articleHubAggregation'

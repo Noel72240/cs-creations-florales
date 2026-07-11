@@ -9,6 +9,7 @@ import {
   rubriquePath,
   ARTICLE_PAGE_META,
 } from '../data/pageCatalog'
+import { resolveCatalogPageKey } from '../lib/articleHubAggregation'
 import { getArticlePhotoUrls } from '../lib/articlePhotos'
 import { resolveArticlePrice } from '../lib/articlePrices'
 import { ArticleDescriptionBlock, stripArticleDescriptionMarkup } from '../lib/articleDescription'
@@ -34,6 +35,11 @@ export default function ArticleProduct() {
   const { pageKey, articleId } = useParams()
   const { content } = useSiteConfig()
   const { addItem } = useCart()
+
+  const catalogPageKey = useMemo(
+    () => resolveCatalogPageKey(content, pageKey, articleId),
+    [content, pageKey, articleId],
+  )
 
   const article = useMemo(
     () => findCatalogArticle(content, pageKey, articleId),
@@ -76,8 +82,9 @@ export default function ArticleProduct() {
 
   const price = resolveArticlePrice(article.price)
   const cartId = selectedColor ? `${article.id}::${selectedColor}` : article.id
-  const rubrique = rubriquePath(pageKey)
-  const rubriqueLabel = ARTICLE_PAGE_META[pageKey]?.label || 'Rubrique'
+  const rubrique = rubriquePath(catalogPageKey)
+  const rubriqueLabel = ARTICLE_PAGE_META[catalogPageKey]?.label || 'Rubrique'
+  const productPath = articleProductPath(catalogPageKey, article.id)
   const mainPhoto = photos[photoIndex] || photos[0]
 
   const handleAdd = () => {
@@ -86,7 +93,7 @@ export default function ArticleProduct() {
       title: article.title,
       price,
       imageUrl: mainPhoto,
-      path: articleProductPath(pageKey, article.id),
+      path: productPath,
       selectedColor,
       quantity,
     })
@@ -107,7 +114,7 @@ export default function ArticleProduct() {
           stripArticleDescriptionMarkup(article.description).slice(0, 155) ||
           `${article.title} — C&S Créations Florales`
         }
-        path={articleProductPath(pageKey, article.id)}
+        path={productPath}
         image={mainPhoto}
       />
 

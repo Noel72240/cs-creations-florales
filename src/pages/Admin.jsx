@@ -4,6 +4,7 @@ import { useSiteContent } from '../context/SiteContentContext'
 import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 import { ARTICLE_PAGE_META, PAGE_BANNER_FALLBACKS } from '../data/pageCatalog'
+import { getHubParentKey, isHubPageKey } from '../lib/articleHubAggregation'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
 import {
@@ -1765,6 +1766,18 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           Enregistrer cette page
         </button>
       </div>
+
+      {isHubPageKey(pageKey) ? (
+        <p className="text-xs leading-relaxed rounded-lg px-3 py-2 border border-mauve-light/40" style={{ color: 'var(--text-mid)', background: 'rgba(255,248,251,0.9)' }}>
+          Les fiches des sous-rubriques (Mariage, Pâques, etc.) s’affichent automatiquement sur cette page « Voir tout ».
+          Créez ou modifiez vos produits dans la sous-catégorie concernée — inutile de les recréer ici.
+        </p>
+      ) : getHubParentKey(pageKey) ? (
+        <p className="text-xs leading-relaxed rounded-lg px-3 py-2 border border-mauve-light/40" style={{ color: 'var(--text-mid)', background: 'rgba(255,248,251,0.9)' }}>
+          Les fiches enregistrées ici apparaissent aussi sur{' '}
+          <strong>{ARTICLE_PAGE_META[getHubParentKey(pageKey)]?.label || 'la page parent'}</strong> (menu « Voir tout »).
+        </p>
+      ) : null}
 
       {saveFeedback ? (
         <p

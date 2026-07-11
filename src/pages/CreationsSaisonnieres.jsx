@@ -3,6 +3,7 @@ import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import { useSiteConfig } from '../context/SiteContentContext'
+import { aggregateHubArticles } from '../lib/articleHubAggregation'
 import { P, w600, w1200 } from '../data/flowerPhotos'
 
 const SEASONS = [
@@ -43,6 +44,7 @@ const SEASONS = [
 export default function CreationsSaisonnieres() {
   const { content } = useSiteConfig()
   const pa = content.pageArticles?.creationsSaisonnieres
+  const hubItems = aggregateHubArticles('creationsSaisonnieres', content, { maxItems: 500 })
 
   return (
     <>
@@ -70,9 +72,10 @@ export default function CreationsSaisonnieres() {
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
         intro={pa?.intro}
-        items={pa?.items}
+        items={hubItems}
         pagePath="/creations-saisonnieres"
         pageKey="creationsSaisonnieres"
+        maxItems={500}
       />
 
       <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>

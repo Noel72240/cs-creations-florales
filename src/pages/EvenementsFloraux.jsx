@@ -5,10 +5,12 @@ import PageArticleGrid from '../components/PageArticleGrid'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { P, w1200 } from '../data/flowerPhotos'
 import { resolveEvenementsFlorauxHub } from '../lib/eventHubCards'
+import { aggregateHubArticles } from '../lib/articleHubAggregation'
 
 export default function EvenementsFloraux() {
   const { content } = useSiteConfig()
   const pa = content.pageArticles?.evenementsFloraux
+  const hubItems = aggregateHubArticles('evenementsFloraux', content, { maxItems: 500 })
   const { hubIntro, cards } = resolveEvenementsFlorauxHub(pa)
 
   return (
@@ -64,9 +66,10 @@ export default function EvenementsFloraux() {
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
         intro={pa?.intro}
-        items={pa?.items}
+        items={hubItems}
         pagePath="/evenements-floraux"
         pageKey="evenementsFloraux"
+        maxItems={500}
       />
 
       <ContactCTA message="Vous avez un événement à préparer ? Contactez-moi pour un devis personnalisé et gratuit." />
