@@ -1,3 +1,4 @@
+import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 import { getProductOptionTemplate, suggestTemplateIdFromTitle } from '../data/productOptionTemplates'
 
 /**
@@ -185,8 +186,27 @@ export function enrichPageArticlesObject(pageArticles) {
 }
 
 export function enrichArticleWithProductOptions(article) {
-  if (article?.productOptions?.active) return article
-  const productOptions = buildArticleProductOptions(article)
-  if (!productOptions) return article
-  return { ...article, productOptions }
+  const existing = article?.productOptions
+  if (existing?.active === false) return article
+  if (existing?.active === true && existing?.templateId) {
+    return {
+      ...article,
+      productOptions: normalizeArticleProductOptions(existing, article?.title),
+    }
+  }
+  const built = buildArticleProductOptions(article)
+  if (!built) return article
+  return { ...article, productOptions: built }
+}
+
+export function enrichPageArticlesProductOptions(pageArticles) {
+  if (!pageArticles || typeof pageArticles !== 'object') return pageArticles
+  const out = {}
+  for (const [pageKey, page] of Object.entries(pageArticles)) {
+    out[pageKey] = {
+      ...page,
+      items: (page.items || []).map(enrichArticleWithProductOptions),
+    }
+  }
+  return out
 }
