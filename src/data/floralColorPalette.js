@@ -31,6 +31,16 @@ export const FLORAL_COLOR_PALETTE = {
   marronFonce: { label: 'Camel', hex: '#b8895c' },
   dore: { label: 'Doré', hex: '#d4af37' },
   argente: { label: 'Argenté', hex: '#c0c0c0' },
+
+  // ─── Yeux (ourson et peluches) ───
+  yeuxBleu: { label: 'Bleu', hex: '#2563b8' },
+  yeuxBleuClair: { label: 'Bleu clair', hex: '#6eb5e8' },
+  yeuxMarron: { label: 'Marron', hex: '#6b4423' },
+  yeuxVert: { label: 'Vert', hex: '#3d7a3d' },
+  yeuxNoir: { label: 'Noir', hex: '#1a1a1a' },
+  yeuxGris: { label: 'Gris', hex: '#7a7a7a' },
+  yeuxDore: { label: 'Doré', hex: '#c9a227' },
+  yeuxAmbre: { label: 'Ambre', hex: '#b8860b' },
 }
 
 /** 16 couleurs de roses en mousse (référence atelier). */
@@ -53,9 +63,22 @@ export const ROSE_FOAM_COLOR_KEYS = [
   'fuchsia',
 ]
 
+/** Couleurs d’yeux pour oursons et peluches. */
+export const EYE_COLOR_KEYS = [
+  'yeuxBleu',
+  'yeuxBleuClair',
+  'yeuxMarron',
+  'yeuxVert',
+  'yeuxNoir',
+  'yeuxGris',
+  'yeuxDore',
+  'yeuxAmbre',
+]
+
 export const PALETTE_SETS = {
   roses: [...ROSE_FOAM_COLOR_KEYS],
   rosesExtended: [...ROSE_FOAM_COLOR_KEYS, 'dore', 'argente'],
+  eyes: [...EYE_COLOR_KEYS],
   text: [
     'blanc', 'creme', 'jaune', 'orange', 'rouge', 'bordeaux',
     'rosePale', 'rose', 'fuchsia', 'violet',

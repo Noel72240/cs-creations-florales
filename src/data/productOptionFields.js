@@ -45,6 +45,7 @@ export const PRODUCT_OPTION_FIELD_CATALOG = {
   supportColorRoseBlanc: { id: 'supportColorRoseBlanc', type: 'select', label: 'Couleur du support', options: [{ value: 'rose', label: 'Rose' }, { value: 'blanc', label: 'Blanc' }], required: true },
   guirlandePearlColor: { id: 'guirlandePearlColor', type: 'color', label: 'Couleur de la guirlande de perles', palette: 'text', required: true },
   blueEyesYesNo: { id: 'blueEyesYesNo', type: 'yesNo', label: 'Yeux bleus', required: true },
+  eyeColor: { id: 'eyeColor', type: 'color', label: 'Couleur des yeux', palette: 'eyes', required: true },
   decorationTypeSelect: { id: 'decorationTypeSelect', type: 'select', label: 'Décoration', options: [{ value: 'fleur', label: 'Fleur' }, { value: 'coeur-bois', label: 'Cœur en bois' }], required: true },
   flowerColorIfFleur: { id: 'flowerColorIfFleur', type: 'color', label: 'Couleur de la fleur', palette: 'roses', showWhen: { field: 'decorationTypeSelect', equals: 'fleur' }, required: true },
   coeurTextIfCoeur: { id: 'coeurTextIfCoeur', type: 'textarea', label: 'Texte du cœur', showWhen: { field: 'decorationTypeSelect', equals: 'coeur-bois' }, required: true },

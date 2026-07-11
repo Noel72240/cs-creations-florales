@@ -71,7 +71,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'ourson-floral': {
     id: 'ourson-floral',
     label: 'Ourson floral',
-    fields: ['roseColorMulti', 'blueEyesYesNo', 'decorationTypeSelect', 'flowerColorIfFleur', 'coeurTextIfCoeur', 'textColor', 'specialRequests'],
+    fields: ['roseColorMulti', 'eyeColor', 'decorationTypeSelect', 'flowerColorIfFleur', 'coeurTextIfCoeur', 'textColor', 'specialRequests'],
   },
   'cadre-naissance': {
     id: 'cadre-naissance',
