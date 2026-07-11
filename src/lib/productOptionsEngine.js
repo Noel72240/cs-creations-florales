@@ -40,13 +40,32 @@ export function isFieldVisible(fieldDef, values) {
   return String(current ?? '') === String(equals ?? '')
 }
 
-export function resolveProductOptionFields(templateId, enabledFieldIds) {
+/** Applique les réglages admin (ex. couleur unique → multi-couleurs). */
+export function applyFieldSettings(fieldDef, settings) {
+  if (!fieldDef) return null
+  const multi = Boolean(settings?.multi) || fieldDef.type === 'colorMulti'
+  if (fieldDef.type === 'color' && multi) {
+    const max = Number.isFinite(parseInt(settings?.max, 10))
+      ? Math.min(99, Math.max(1, parseInt(settings.max, 10)))
+      : 99
+    return { ...fieldDef, type: 'colorMulti', max }
+  }
+  if (fieldDef.type === 'colorMulti' && settings?.max) {
+    const max = Math.min(99, Math.max(1, parseInt(settings.max, 10) || fieldDef.max || 99))
+    return { ...fieldDef, max }
+  }
+  return fieldDef
+}
+
+export function resolveProductOptionFields(templateId, enabledFieldIds, fieldSettings = {}) {
   const template = getProductOptionTemplate(templateId)
   if (!template) return []
   const ids = Array.isArray(enabledFieldIds) && enabledFieldIds.length
     ? enabledFieldIds
     : template.fields
-  return ids.map((id) => getOptionFieldDef(id)).filter(Boolean)
+  return ids
+    .map((id) => applyFieldSettings(getOptionFieldDef(id), fieldSettings[id]))
+    .filter(Boolean)
 }
 
 export function computeOptionsUnitPrice({ templateId, values = {}, basePrice = 0 }) {

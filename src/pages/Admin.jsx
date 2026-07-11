@@ -1533,7 +1533,7 @@ function emptyArticleItem() {
     src3: '',
     colors: ['', '', ''],
     personalizationMessageEnabled: false,
-    productOptions: { active: false, templateId: '', enabledFields: [] },
+    productOptions: { active: false, templateId: '', enabledFields: [], fieldSettings: {} },
   }
 }
 

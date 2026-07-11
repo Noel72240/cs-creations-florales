@@ -10,14 +10,29 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
   const normalized = normalizeArticleProductOptions(config, title)
   const template = getProductOptionTemplate(normalized.templateId)
   const templateFields = template?.fields || []
+  const enabledSet = new Set(
+    normalized.enabledFields.length ? normalized.enabledFields : templateFields,
+  )
 
   const setPartial = (patch) => onChange({ ...normalized, ...patch })
 
   const toggleField = (fieldId) => {
-    const set = new Set(normalized.enabledFields.length ? normalized.enabledFields : templateFields)
+    const set = new Set(enabledSet)
     if (set.has(fieldId)) set.delete(fieldId)
     else set.add(fieldId)
     setPartial({ enabledFields: [...set] })
+  }
+
+  const setFieldSetting = (fieldId, patch) => {
+    const prev = normalized.fieldSettings?.[fieldId] || {}
+    const nextSettings = { ...normalized.fieldSettings }
+    const merged = { ...prev, ...patch }
+    if (!merged.multi) {
+      delete nextSettings[fieldId]
+    } else {
+      nextSettings[fieldId] = merged
+    }
+    setPartial({ fieldSettings: nextSettings })
   }
 
   const onTemplateChange = (templateId) => {
@@ -25,6 +40,7 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
     setPartial({
       templateId,
       enabledFields: next?.fields ? [...next.fields] : [],
+      fieldSettings: {},
     })
   }
 
@@ -34,8 +50,8 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
         Options de personnalisation (formulaire client)
       </p>
       <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-        Activez le modèle adapté à la création. Cochez les champs à afficher sur la fiche produit.
-        Le modèle est suggéré selon le titre — vous pouvez le changer.
+        Activez le modèle adapté à la création. Cochez les champs à afficher. Pour les pastilles couleur, vous pouvez
+        autoriser <strong>plusieurs couleurs</strong> sur certains articles (ex. couleur du texte + roses).
       </p>
 
       <label className="block">
@@ -51,6 +67,7 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
               active,
               templateId,
               enabledFields: tpl?.fields ? [...tpl.fields] : normalized.enabledFields,
+              fieldSettings: normalized.fieldSettings || {},
             })
           }}
         >
@@ -78,24 +95,74 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
           </label>
 
           {templateFields.length ? (
-            <fieldset className="space-y-2">
+            <fieldset className="space-y-3">
               <legend className="text-xs font-medium mb-1" style={{ color: 'var(--violet)' }}>
                 Champs affichés au client
               </legend>
-              <div className="grid sm:grid-cols-2 gap-1.5">
+              <div className="space-y-2">
                 {templateFields.map((fieldId) => {
                   const def = getOptionFieldDef(fieldId)
                   if (!def) return null
-                  const checked = (normalized.enabledFields.length ? normalized.enabledFields : templateFields).includes(fieldId)
+                  const checked = enabledSet.has(fieldId)
+                  const isColor = def.type === 'color' || def.type === 'colorMulti'
+                  const settings = normalized.fieldSettings?.[fieldId] || {}
+                  const multiActive = Boolean(settings.multi) || def.type === 'colorMulti'
+                  const maxVal = settings.max ?? def.max ?? 99
+
                   return (
-                    <label key={fieldId} className="flex items-center gap-2 text-xs cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleField(fieldId)}
-                      />
-                      <span>{def.label}</span>
-                    </label>
+                    <div
+                      key={fieldId}
+                      className="rounded-lg border border-mauve-light/25 px-3 py-2 space-y-2"
+                      style={{ background: 'rgba(255,255,255,0.55)' }}
+                    >
+                      <label className="flex items-center gap-2 text-xs cursor-pointer">
+                        <input type="checkbox" checked={checked} onChange={() => toggleField(fieldId)} />
+                        <span className="font-medium" style={{ color: 'var(--violet)' }}>
+                          {def.label}
+                        </span>
+                      </label>
+                      {checked && isColor ? (
+                        <div className="pl-6 space-y-2">
+                          {def.type === 'color' ? (
+                            <label className="flex items-center gap-2 text-[11px] cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(settings.multi)}
+                                onChange={(e) =>
+                                  setFieldSetting(fieldId, {
+                                    multi: e.target.checked,
+                                    max: maxVal,
+                                  })
+                                }
+                              />
+                              <span>Le client peut choisir plusieurs couleurs</span>
+                            </label>
+                          ) : (
+                            <p className="text-[10px]" style={{ color: 'var(--text-mid)' }}>
+                              Choix multiple (défini par le modèle)
+                            </p>
+                          )}
+                          {multiActive ? (
+                            <label className="block text-[11px]">
+                              Nombre max. de couleurs
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                className="form-field mt-1 w-24 py-1 text-xs"
+                                value={maxVal}
+                                onChange={(e) =>
+                                  setFieldSetting(fieldId, {
+                                    multi: true,
+                                    max: parseInt(e.target.value, 10) || 1,
+                                  })
+                                }
+                              />
+                            </label>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
                   )
                 })}
               </div>

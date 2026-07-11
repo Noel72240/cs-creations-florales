@@ -91,6 +91,7 @@ export default function ArticleProduct() {
     return resolveProductOptionFields(
       productOptionsConfig.templateId,
       productOptionsConfig.enabledFields,
+      productOptionsConfig.fieldSettings,
     )
   }, [advancedOptionsActive, productOptionsConfig])
 
