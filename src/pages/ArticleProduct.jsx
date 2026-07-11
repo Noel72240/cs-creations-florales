@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Seo from '../components/Seo'
+import ProductOptionsForm from '../components/ProductOptionsForm'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { useCart } from '../context/CartContext'
 import {
@@ -20,6 +21,18 @@ import {
   buildArticleCartLineId,
   isPersonalizationMessageEnabled,
 } from '../lib/articlePersonalization'
+import {
+  getArticleProductOptionsConfig,
+  isProductOptionsActive,
+} from '../lib/articleProductOptions'
+import {
+  computeOptionsCartQuantity,
+  computeOptionsUnitPrice,
+  formatProductOptionsSummary,
+  resolveProductOptionFields,
+  shouldHideCartQuantityStepper,
+  validateProductOptions,
+} from '../lib/productOptionsEngine'
 
 function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
   return (
@@ -33,6 +46,14 @@ function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
       </button>
     </div>
   )
+}
+
+function optionsCartKey(templateId, values) {
+  try {
+    return JSON.stringify({ t: templateId, v: values })
+  } catch {
+    return templateId
+  }
 }
 
 export default function ArticleProduct() {
@@ -56,17 +77,34 @@ export default function ArticleProduct() {
   const [quantity, setQuantity] = useState(1)
   const [selectedColor, setSelectedColor] = useState('')
   const [personalizationMessage, setPersonalizationMessage] = useState('')
+  const [optionValues, setOptionValues] = useState({})
+  const [optionErrors, setOptionErrors] = useState({})
   const [added, setAdded] = useState(false)
 
+  const productOptionsConfig = useMemo(
+    () => (article ? getArticleProductOptionsConfig(article) : null),
+    [article],
+  )
+  const advancedOptionsActive = article ? isProductOptionsActive(article) : false
+  const optionFields = useMemo(() => {
+    if (!advancedOptionsActive || !productOptionsConfig?.templateId) return []
+    return resolveProductOptionFields(
+      productOptionsConfig.templateId,
+      productOptionsConfig.enabledFields,
+    )
+  }, [advancedOptionsActive, productOptionsConfig])
+
   const colors = useMemo(() => {
-    if (!article?.colors) return []
+    if (!article?.colors || advancedOptionsActive) return []
     return article.colors.map(normalizeHexColor).filter(Boolean).slice(0, 6)
-  }, [article])
+  }, [article, advancedOptionsActive])
 
   useEffect(() => {
     if (colors.length === 1) setSelectedColor(colors[0])
     else setSelectedColor((prev) => (prev && colors.includes(prev) ? prev : ''))
     setPersonalizationMessage('')
+    setOptionValues({})
+    setOptionErrors({})
   }, [article?.id, colors])
 
   if (!ARTICLE_PAGE_META[pageKey]) {
@@ -86,32 +124,79 @@ export default function ArticleProduct() {
     )
   }
 
-  const price = resolveArticlePrice(article.price)
-  const personalizationEnabled = isPersonalizationMessageEnabled(article)
+  const basePrice = resolveArticlePrice(article.price)
+  const personalizationEnabled =
+    !advancedOptionsActive && isPersonalizationMessageEnabled(article)
   const trimmedPersonalizationMessage = personalizationMessage.trim()
+
+  const unitPrice = advancedOptionsActive
+    ? computeOptionsUnitPrice({
+        templateId: productOptionsConfig.templateId,
+        values: optionValues,
+        basePrice,
+      })
+    : basePrice
+
+  const hideQtyStepper = advancedOptionsActive && shouldHideCartQuantityStepper(productOptionsConfig.templateId)
+  const cartQuantity = advancedOptionsActive
+    ? computeOptionsCartQuantity({
+        templateId: productOptionsConfig.templateId,
+        values: optionValues,
+        fallbackQty: quantity,
+      }) * (hideQtyStepper ? 1 : quantity)
+    : quantity
+
+  const customOptionsKey = advancedOptionsActive
+    ? optionsCartKey(productOptionsConfig.templateId, optionValues)
+    : ''
+
   const cartId = buildArticleCartLineId(article.id, {
-    selectedColor,
-    personalizationMessage: trimmedPersonalizationMessage,
+    selectedColor: advancedOptionsActive ? '' : selectedColor,
+    personalizationMessage: advancedOptionsActive ? '' : trimmedPersonalizationMessage,
+    customOptionsKey,
   })
+
   const rubrique = rubriquePath(catalogPageKey)
   const rubriqueLabel = ARTICLE_PAGE_META[catalogPageKey]?.label || 'Rubrique'
   const productPath = articleProductPath(catalogPageKey, article.id)
   const mainPhoto = photos[photoIndex] || photos[0]
   const missingColor = colors.length > 0 && !selectedColor
   const missingPersonalizationMessage = personalizationEnabled && !trimmedPersonalizationMessage
-  const cannotAddToCart = missingColor || missingPersonalizationMessage
+
+  const optionsValidation = advancedOptionsActive
+    ? validateProductOptions(optionFields, optionValues)
+    : { valid: true, errors: {} }
+
+  const cannotAddToCart =
+    missingColor ||
+    missingPersonalizationMessage ||
+    (advancedOptionsActive && (!optionsValidation.valid || unitPrice <= 0))
 
   const handleAdd = () => {
+    if (advancedOptionsActive && !optionsValidation.valid) {
+      setOptionErrors(optionsValidation.errors)
+      return
+    }
     if (cannotAddToCart) return
+
+    const customOptions = advancedOptionsActive
+      ? {
+          templateId: productOptionsConfig.templateId,
+          values: { ...optionValues },
+          summary: formatProductOptionsSummary(optionFields, optionValues),
+        }
+      : undefined
+
     addItem({
       id: cartId,
       title: article.title,
-      price,
+      price: unitPrice,
       imageUrl: mainPhoto,
       path: productPath,
-      selectedColor,
-      personalizationMessage: trimmedPersonalizationMessage || undefined,
-      quantity,
+      selectedColor: advancedOptionsActive ? undefined : selectedColor || undefined,
+      personalizationMessage: advancedOptionsActive ? undefined : trimmedPersonalizationMessage || undefined,
+      customOptions,
+      quantity: cartQuantity,
     })
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2200)
@@ -121,6 +206,8 @@ export default function ArticleProduct() {
     .split(/\n+/)
     .map((s) => s.trim())
     .filter(Boolean)
+
+  const lineTotal = unitPrice * (hideQtyStepper ? cartQuantity : quantity)
 
   return (
     <>
@@ -197,10 +284,35 @@ export default function ArticleProduct() {
             {article.title}
           </h1>
           <p className="font-refined text-lg sm:text-xl font-semibold mb-5 sm:mb-6" style={{ color: 'var(--mauve)' }}>
-            {formatEuro(price)}
+            {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
+            {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
+              <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                selon taille et nombre de chiffres
+              </span>
+            ) : null}
+            {advancedOptionsActive &&
+            (productOptionsConfig.templateId === 'verres-personnalises' ||
+              productOptionsConfig.templateId === 'verre-communion') ? (
+              <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                à partir de 9,90 € / verre
+              </span>
+            ) : null}
           </p>
 
           <div className="article-product-options space-y-4 mb-8">
+            {advancedOptionsActive ? (
+              <ProductOptionsForm
+                fields={optionFields}
+                values={optionValues}
+                onChange={(next) => {
+                  setOptionValues(next)
+                  setOptionErrors({})
+                }}
+                errors={optionErrors}
+                templateId={productOptionsConfig.templateId}
+              />
+            ) : null}
+
             {colors.length > 0 ? (
               <div className="block">
                 <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--violet)' }}>
@@ -234,12 +346,14 @@ export default function ArticleProduct() {
               </label>
             ) : null}
 
-            <label className="block">
-              <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
-                Quantité *
-              </span>
-              <QuantityStepper value={quantity} onChange={setQuantity} />
-            </label>
+            {!hideQtyStepper ? (
+              <label className="block">
+                <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+                  Quantité *
+                </span>
+                <QuantityStepper value={quantity} onChange={setQuantity} />
+              </label>
+            ) : null}
 
             <button
               type="button"
@@ -271,7 +385,7 @@ export default function ArticleProduct() {
         <div className="article-product-sticky__inner">
           <div className="article-product-sticky__price">
             <span className="article-product-sticky__label">Total</span>
-            <strong>{formatEuro(price * quantity)}</strong>
+            <strong>{formatEuro(lineTotal)}</strong>
           </div>
           <button
             type="button"

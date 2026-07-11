@@ -100,6 +100,15 @@ export default function Panier() {
                           Message : « {line.personalizationMessage} »
                         </p>
                       ) : null}
+                      {line.customOptions?.summary?.length ? (
+                        <ul className="font-body text-xs mt-1.5 space-y-0.5 leading-snug" style={{ color: 'var(--text-mid)' }}>
+                          {line.customOptions.summary.map((row) => (
+                            <li key={`${line.id}-${row.label}`}>
+                              {row.label} : {row.value}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                       <p className="font-body text-sm mt-1" style={{ color: 'var(--text-mid)' }}>
                         {formatEuro(line.price)} <span className="opacity-75">/ unité</span>
                       </p>

@@ -20,6 +20,20 @@ function normalizeItem(raw) {
   const personalizationMessage = raw?.personalizationMessage
     ? String(raw.personalizationMessage).trim().slice(0, 500)
     : ''
+  let customOptions
+  if (raw?.customOptions && typeof raw.customOptions === 'object') {
+    const templateId = String(raw.customOptions.templateId || '').slice(0, 80)
+    const summary = Array.isArray(raw.customOptions.summary)
+      ? raw.customOptions.summary
+          .slice(0, 40)
+          .map((row) => ({
+            label: String(row?.label || '').slice(0, 120),
+            value: String(row?.value || '').slice(0, 300),
+          }))
+          .filter((row) => row.label && row.value)
+      : []
+    customOptions = templateId || summary.length ? { templateId, summary, values: raw.customOptions.values } : undefined
+  }
   return {
     id,
     title,
@@ -29,6 +43,7 @@ function normalizeItem(raw) {
     path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
     selectedColor,
     personalizationMessage: personalizationMessage || undefined,
+    customOptions,
   }
 }
 
@@ -73,9 +88,11 @@ function persistPromoCode(code) {
 export function buildCartPrefillMessage(items, appliedPromo = null, subtotal = 0, total = 0) {
   if (!items?.length) return ''
   const lines = items.map((i) => {
+    const optionLines = (i.customOptions?.summary || []).map((row) => `${row.label} : ${row.value}`)
     const extras = [
       i.selectedColor ? `couleur ${i.selectedColor}` : '',
       i.personalizationMessage ? `message : « ${i.personalizationMessage} »` : '',
+      ...optionLines,
     ].filter(Boolean)
     const suffix = extras.length ? ` (${extras.join(' · ')})` : ''
     return `• ${i.title}${suffix} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`

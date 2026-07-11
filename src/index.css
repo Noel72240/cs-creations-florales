@@ -2022,6 +2022,35 @@ button.nav-link.nav-link-header {
   transform: scale(1.1);
 }
 
+.floral-color-picker__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.floral-color-picker__swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(139, 75, 106, 0.35);
+  background: var(--swatch-color);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.floral-color-picker__swatch:hover {
+  transform: scale(1.06);
+}
+
+.floral-color-picker__swatch.is-active {
+  box-shadow:
+    0 0 0 2px var(--violet),
+    0 0 0 4px rgba(240, 210, 221, 0.85);
+  transform: scale(1.08);
+}
+
 .article-admin-color-pick {
   width: 2.5rem;
   height: 2.5rem;

@@ -68,6 +68,15 @@ function normalizeLineItems(rawItems) {
       personalizationMessage: raw?.personalizationMessage
         ? String(raw.personalizationMessage).trim().slice(0, 500)
         : undefined,
+      customOptionsSummary: Array.isArray(raw?.customOptions?.summary)
+        ? raw.customOptions.summary
+            .slice(0, 20)
+            .map((row) => ({
+              label: String(row?.label || '').slice(0, 80),
+              value: String(row?.value || '').slice(0, 120),
+            }))
+            .filter((row) => row.label && row.value)
+        : undefined,
       path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
     })
   }
@@ -302,6 +311,14 @@ async function handleCreateCheckout(req, res, origin) {
     .map((i) => {
       const bits = [`${i.title}×${i.quantity}`]
       if (i.personalizationMessage) bits.push(`msg: ${i.personalizationMessage}`)
+      if (i.customOptionsSummary?.length) {
+        bits.push(
+          i.customOptionsSummary
+            .slice(0, 4)
+            .map((row) => `${row.label}: ${row.value}`)
+            .join('; '),
+        )
+      }
       return bits.join(' — ')
     })
     .join(', ')

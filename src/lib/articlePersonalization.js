@@ -9,11 +9,16 @@ export function isPersonalizationMessageEnabled(article) {
   return false
 }
 
-export function buildArticleCartLineId(articleId, { selectedColor = '', personalizationMessage = '' } = {}) {
+export function buildArticleCartLineId(
+  articleId,
+  { selectedColor = '', personalizationMessage = '', customOptionsKey = '' } = {},
+) {
   let id = String(articleId || '').trim()
   const color = String(selectedColor || '').trim()
   const msg = String(personalizationMessage || '').trim()
+  const optKey = String(customOptionsKey || '').trim()
   if (color) id += `::${color}`
   if (msg) id += `::p:${encodeURIComponent(msg.slice(0, 500))}`
+  if (optKey) id += `::opt:${encodeURIComponent(optKey.slice(0, 400))}`
   return id
 }

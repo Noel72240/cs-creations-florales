@@ -17,6 +17,8 @@ import { messageAfterAdminSave } from '../lib/reportAdminSave'
 import { normalizeArticlePrice } from '../lib/articlePrices'
 import { EVENEMENTS_FLORAUX_HUB_DEFAULTS, mergeEventHubCards } from '../lib/eventHubCards'
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
+import ArticleProductOptionsEditor from '../components/admin/ArticleProductOptionsEditor'
+import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 
 const AUTH_KEY = 'cs_admin_auth'
 
@@ -1490,6 +1492,7 @@ function emptyArticleItem() {
     src3: '',
     colors: ['', '', ''],
     personalizationMessageEnabled: false,
+    productOptions: { active: false, templateId: '', enabledFields: [] },
   }
 }
 
@@ -1519,6 +1522,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         src3: it.src3 || '',
         colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
         personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
+        productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
       })),
   )
   const [localHubIntro, setLocalHubIntro] = useState(() =>
@@ -1558,6 +1562,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           src3: it.src3 || '',
           colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
           personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
+          productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
         })),
     )
     if (pageKey === 'evenementsFloraux') {
@@ -1691,6 +1696,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
       personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
+      productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
     }))
     const pagePayload = {
       sectionTitle: localTitle.trim(),
@@ -2230,16 +2236,34 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
               </div>
 
               <label className="block">
-                Message de la personnalisation
+                Message de la personnalisation (simple)
                 <select
                   className="form-field mt-1"
                   value={it.personalizationMessageEnabled ? 'yes' : 'no'}
                   onChange={(e) => setField(idx, 'personalizationMessageEnabled', e.target.value === 'yes')}
+                  disabled={Boolean(it.productOptions?.active)}
                 >
                   <option value="no">Non</option>
                   <option value="yes">Oui</option>
                 </select>
               </label>
+
+              <ArticleProductOptionsEditor
+                config={it.productOptions}
+                title={it.title}
+                onChange={(next) => {
+                  setLocalItems((prev) =>
+                    prev.map((item, i) => {
+                      if (i !== idx) return item
+                      return {
+                        ...item,
+                        productOptions: next,
+                        personalizationMessageEnabled: next.active ? false : item.personalizationMessageEnabled,
+                      }
+                    }),
+                  )
+                }}
+              />
 
               <div className="sm:col-span-2">
                 <p className="text-sm font-medium mb-2" style={{ color: 'var(--violet)' }}>
