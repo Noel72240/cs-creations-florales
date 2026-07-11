@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Montserrat', system-ui, sans-serif;
+  --font-script: 'Pristina', cursive;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Montserrat', system-ui, sans-serif;
-  --font-body: 'Montserrat', system-ui, sans-serif;
-  --font-refined: 'Montserrat', system-ui, sans-serif;
+  --font-heading: 'Pristina', cursive;
+  --font-body: 'Pristina', cursive;
+  --font-refined: 'Pristina', cursive;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */

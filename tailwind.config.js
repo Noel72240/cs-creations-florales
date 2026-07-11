@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Montserrat', 'system-ui', 'sans-serif'],
-        body: ['Montserrat', 'system-ui', 'sans-serif'],
-        heading: ['Montserrat', 'system-ui', 'sans-serif'],
-        refined: ['Montserrat', 'system-ui', 'sans-serif'],
+        script: ['Pristina', 'cursive'],
+        body: ['Pristina', 'cursive'],
+        heading: ['Pristina', 'cursive'],
+        refined: ['Pristina', 'cursive'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {
