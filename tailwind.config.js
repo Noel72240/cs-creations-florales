@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Pacifico', 'cursive'],
-        body: ['Pacifico', 'cursive'],
-        heading: ['Pacifico', 'cursive'],
-        refined: ['Pacifico', 'cursive'],
+        script: ['Comfortaa', 'system-ui', 'sans-serif'],
+        body: ['Comfortaa', 'system-ui', 'sans-serif'],
+        heading: ['Comfortaa', 'system-ui', 'sans-serif'],
+        refined: ['Comfortaa', 'system-ui', 'sans-serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {
