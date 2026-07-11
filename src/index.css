@@ -929,7 +929,22 @@ main.site-main {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
 }
 
-/* Sous-titre (ex. « Créations sur mesure ») — même lisibilité que « Prestation » sur cartes */
+/* Sous-titre bandeau — sous le titre, plus discret */
+.page-header__subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 2.1vw, 1.2rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.page-header--plain .page-header__subtitle {
+  color: var(--text-mid);
+  text-shadow: none;
+}
+
 .page-header--image .section-subtitle {
   font-family: var(--font-body);
   font-size: clamp(1.52rem, 3.55vw, 1.88rem);

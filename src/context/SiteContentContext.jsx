@@ -47,6 +47,9 @@ export function getMergedContent(overrides) {
   if (reviewsTitle === 'Avis Google') {
     merged.googleReviews.pageTitle = SITE_CONTENT_DEFAULTS.googleReviews.pageTitle
   }
+  if (merged.home?.hero?.scrollLabel === 'Découvrir') {
+    merged.home.hero.scrollLabel = ''
+  }
   return merged
 }
 

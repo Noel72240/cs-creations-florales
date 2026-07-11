@@ -109,7 +109,17 @@ export const SITE_CONTENT_DEFAULTS = {
       ctaPrimaryPath: '/evenements-floraux',
       ctaSecondaryLabel: 'Demander un devis',
       ctaSecondaryPath: '/contact',
-      scrollLabel: 'Découvrir',
+      scrollLabel: '',
+      ideaBox: {
+        enabled: true,
+        title: '💡 Une idée ? Je la crée !',
+        text: 'Vous ne trouvez pas le modèle idéal ? Je réalise également des créations florales 100 % sur mesure. Contactez-moi pour un devis gratuit.',
+      },
+    },
+    artisanBanner: {
+      enabled: true,
+      title: 'Créatrice florale artisanale en Sarthe',
+      subtitle: 'Des créations uniques, entièrement personnalisées et réalisées à la main.',
     },
     quiSuisJe: {
       sectionPretitle: 'À propos',
@@ -146,6 +156,7 @@ export const SITE_CONTENT_DEFAULTS = {
       tip: '',
       ctaPrimary: 'Demander un devis',
       ctaSecondary: 'Voir des inspirations',
+      ctaSecondaryPath: '/evenements-floraux',
     },
     coupsDeCoeur: {
       pretitle: 'Mes réalisations',
@@ -267,6 +278,7 @@ export const SITE_CONTENT_DEFAULTS = {
       sectionTitle: 'Créations de saison',
       intro:
         'Pâques, fêtes des mères, fête des grandes-mères et fêtes de fin d’année — découvrez nos créations dans chaque rubrique dédiée.',
+      seasonCardsSectionEnabled: false,
       items: [
         {
           id: 'sai-paques-lapin',

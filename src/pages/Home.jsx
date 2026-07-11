@@ -78,6 +78,28 @@ function HeroSection({ site, hero }) {
           <HeroSearch placeholder={hero.searchPlaceholder} hint={hero.searchHint} />
         </div>
 
+        {hero.ideaBox?.enabled !== false && (hero.ideaBox?.title || hero.ideaBox?.text) ? (
+          <div
+            className="max-w-xl mx-auto mt-8 px-5 py-4 rounded-2xl text-left border"
+            style={{
+              borderColor: 'rgba(192, 122, 151, 0.35)',
+              background: 'rgba(255, 255, 255, 0.88)',
+              boxShadow: '0 8px 28px rgba(139, 75, 106, 0.08)',
+            }}
+          >
+            {hero.ideaBox?.title ? (
+              <p className="font-heading text-base sm:text-lg font-medium mb-2" style={{ color: 'var(--violet)' }}>
+                {hero.ideaBox.title}
+              </p>
+            ) : null}
+            {hero.ideaBox?.text ? (
+              <p className="font-body text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+                {hero.ideaBox.text}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap gap-4 justify-center mt-10">
           <Link
             to={hero.ctaPrimaryPath}
@@ -95,6 +117,7 @@ function HeroSection({ site, hero }) {
           </Link>
         </div>
 
+        {hero.scrollLabel?.trim() ? (
         <div className="mt-12 md:mt-14 flex flex-col items-center gap-2 animate-float opacity-80 pb-6">
           <p
             className="hero-scroll-label text-lg sm:text-xl md:text-[1.35rem] font-refined font-medium leading-snug sm:leading-normal tracking-wide"
@@ -106,6 +129,7 @@ function HeroSection({ site, hero }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
+        ) : null}
       </div>
     </section>
   )
@@ -247,6 +271,31 @@ function QuiSuisJeSection({ site, qui }) {
   )
 }
 
+function ArtisanBannerSection({ banner }) {
+  if (banner?.enabled === false) return null
+  const title = banner?.title?.trim() || ''
+  const subtitle = banner?.subtitle?.trim() || ''
+  if (!title && !subtitle) return null
+
+  return (
+    <section className="py-14 md:py-16 px-4" style={{ background: 'var(--blanc)' }}>
+      <div className="max-w-3xl mx-auto text-center">
+        {title ? (
+          <h2
+            className="font-heading font-medium leading-snug mb-3"
+            style={{ fontSize: 'clamp(1.65rem, 4vw, 2.5rem)', color: 'var(--violet)' }}
+          >
+            {title}
+          </h2>
+        ) : null}
+        {subtitle ? (
+          <p className="text-refined max-w-[36rem] mx-auto">{subtitle}</p>
+        ) : null}
+      </div>
+    </section>
+  )
+}
+
 function CreationSurMesureSection({ moto }) {
   const [motoPhoto, setMotoPhoto] = useState(() => {
     const fromContent = String(moto?.src || '').trim()
@@ -310,7 +359,7 @@ function CreationSurMesureSection({ moto }) {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/contact" className="btn-primary">{moto.ctaPrimary}</Link>
-              <Link to="/evenements-floraux" className="btn-outline">{moto.ctaSecondary}</Link>
+              <Link to={moto.ctaSecondaryPath || '/evenements-floraux'} className="btn-outline">{moto.ctaSecondary}</Link>
             </div>
             {moto.tip?.trim() ? (
               <p className="mt-4 text-xs font-body" style={{ color: 'var(--text-mid)' }}>
@@ -351,7 +400,6 @@ function CategoryPreviewSection({ prest }) {
                     </p>
                     <p className="font-heading text-xl md:text-2xl italic text-white mb-2">{cat.title}</p>
                     <p className="text-[12px] text-white/85 font-body leading-relaxed max-w-[28ch]">{cat.desc}</p>
-                    <p className="mt-4 text-xs font-body text-white/80">Découvrir →</p>
                   </div>
                 </div>
               </div>
@@ -417,6 +465,7 @@ export default function Home() {
       <HeroSection site={site} hero={h.hero} />
       <QuiSuisJeSection site={site} qui={h.quiSuisJe} />
       <IntroSection intro={h.intro} />
+      <ArtisanBannerSection banner={h.artisanBanner} />
       <CreationSurMesureSection moto={h.moto} />
       <CategoryPreviewSection prest={h.prestations} />
       <ContactStrip site={site} strip={h.contactStrip} />

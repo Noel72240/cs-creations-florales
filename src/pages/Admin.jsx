@@ -18,7 +18,9 @@ import { normalizeArticlePrice } from '../lib/articlePrices'
 import { EVENEMENTS_FLORAUX_HUB_DEFAULTS, mergeEventHubCards } from '../lib/eventHubCards'
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 import ArticleProductOptionsEditor from '../components/admin/ArticleProductOptionsEditor'
+import PageIntroEditor from '../components/admin/PageIntroEditor'
 import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
+import { normalizePageIntro } from '../lib/pageIntro'
 
 const AUTH_KEY = 'cs_admin_auth'
 
@@ -356,6 +358,11 @@ export default function Admin() {
         ctaSecondaryLabel: fd.get('hero_cta2') || '',
         ctaSecondaryPath: fd.get('hero_cta2p') || '',
         scrollLabel: fd.get('hero_scroll') || '',
+        ideaBox: {
+          enabled: fd.get('ib_enabled') === 'yes',
+          title: String(fd.get('ib_title') || '').trim(),
+          text: String(fd.get('ib_text') || '').trim(),
+        },
         backgroundSrc: bgDraft.backgroundSrc ?? '',
         backgroundPhotoKey: bgDraft.backgroundPhotoKey ?? '',
       }
@@ -380,6 +387,7 @@ export default function Admin() {
         tip: fd.get('moto_tip') || '',
         ctaPrimary: fd.get('moto_cta1') || '',
         ctaSecondary: fd.get('moto_cta2') || '',
+        ctaSecondaryPath: fd.get('moto_cta2p') || '/evenements-floraux',
         src: String(motoPhoto.src ?? content.home.moto?.src ?? '/moto-florale.png').trim(),
         photoKey: String(motoPhoto.photoKey ?? content.home.moto?.photoKey ?? '').trim(),
         paragraphs: (fd.get('moto_paragraphs') || '')
@@ -396,10 +404,16 @@ export default function Admin() {
         ctaLabel: fd.get('cs_cta') || '',
         phoneCtaPrefix: fd.get('cs_phone') || '',
       }
+      const artisanBanner = {
+        enabled: fd.get('ab_enabled') === 'yes',
+        title: String(fd.get('ab_title') || '').trim(),
+        subtitle: String(fd.get('ab_sub') || '').trim(),
+      }
       await applySaveMsg({
         home: {
           intro,
           hero,
+          artisanBanner,
           quiSuisJe,
           moto,
           coupsDeCoeur,
@@ -707,7 +721,20 @@ export default function Admin() {
               <input name="hero_cta2" defaultValue={h.hero.ctaSecondaryLabel} className="form-field" />
               <input name="hero_cta2p" defaultValue={h.hero.ctaSecondaryPath} className="form-field" />
             </div>
-            <input name="hero_scroll" defaultValue={h.hero.scrollLabel} className="form-field" />
+            <input name="hero_scroll" defaultValue={h.hero.scrollLabel} className="form-field" placeholder="Laisser vide pour masquer la flèche « Découvrir »" />
+          </fieldset>
+
+          <fieldset className="space-y-2">
+            <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Encart « Une idée ? » (hero)</legend>
+            <label className="block">
+              Afficher l’encart
+              <select name="ib_enabled" className="form-field mt-1" defaultValue={h.hero.ideaBox?.enabled !== false ? 'yes' : 'no'}>
+                <option value="yes">Oui</option>
+                <option value="no">Non</option>
+              </select>
+            </label>
+            <input name="ib_title" defaultValue={h.hero.ideaBox?.title || ''} className="form-field" placeholder="Titre" />
+            <textarea name="ib_text" rows={3} className="form-field" defaultValue={h.hero.ideaBox?.text || ''} placeholder="Texte" />
           </fieldset>
 
           <HeroBackgroundEditor initial={h.hero} onDraftChange={handleHeroBackgroundDraft} />
@@ -725,6 +752,19 @@ export default function Admin() {
           <HomePrestationsEditor key={JSON.stringify(h.prestations)} initial={h.prestations} onDraftChange={handlePrestationsDraft} />
 
           <fieldset className="space-y-2">
+            <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Avant la moto florale</legend>
+            <label className="block">
+              Afficher le bandeau
+              <select name="ab_enabled" className="form-field mt-1" defaultValue={h.artisanBanner?.enabled !== false ? 'yes' : 'no'}>
+                <option value="yes">Oui</option>
+                <option value="no">Non</option>
+              </select>
+            </label>
+            <input name="ab_title" defaultValue={h.artisanBanner?.title || ''} className="form-field" placeholder="Titre" />
+            <input name="ab_sub" defaultValue={h.artisanBanner?.subtitle || ''} className="form-field" placeholder="Sous-titre" />
+          </fieldset>
+
+          <fieldset className="space-y-2">
             <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Moto florale</legend>
             <HomeMotoPhotoEditor key={`${h.moto?.src || ''}-${h.moto?.photoKey || ''}`} initial={h.moto} onDraftChange={handleMotoPhotoDraft} />
             <input name="moto_overlay" defaultValue={h.moto.overlayTitle} className="form-field" />
@@ -735,6 +775,7 @@ export default function Admin() {
             <div className="grid sm:grid-cols-2 gap-2">
               <input name="moto_cta1" defaultValue={h.moto.ctaPrimary} className="form-field" />
               <input name="moto_cta2" defaultValue={h.moto.ctaSecondary} className="form-field" />
+              <input name="moto_cta2p" defaultValue={h.moto.ctaSecondaryPath || '/evenements-floraux'} className="form-field sm:col-span-2" placeholder="Lien « Voir des inspirations »" />
             </div>
           </fieldset>
 
@@ -1533,6 +1574,10 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
   const [localEventCards, setLocalEventCards] = useState(() =>
     pageKey === 'evenementsFloraux' ? mergeEventHubCards(current.eventCards) : [],
   )
+  const [localPageIntro, setLocalPageIntro] = useState(() => normalizePageIntro(current.pageIntro, pageKey))
+  const [localSeasonCardsEnabled, setLocalSeasonCardsEnabled] = useState(() =>
+    Boolean(current.seasonCardsSectionEnabled),
+  )
 
   useEffect(() => {
     setSaveFeedback(null)
@@ -1569,6 +1614,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       setLocalHubIntro(next.hubIntro || EVENEMENTS_FLORAUX_HUB_DEFAULTS.hubIntro)
       setLocalEventCards(mergeEventHubCards(next.eventCards))
     }
+    setLocalPageIntro(normalizePageIntro(next.pageIntro, pageKey))
+    setLocalSeasonCardsEnabled(Boolean(next.seasonCardsSectionEnabled))
   }, [pageKey, pageArticles])
 
   const setField = (idx, key, value) => {
@@ -1708,6 +1755,10 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         photoKey: localBanner.photoKey.trim(),
       },
       items,
+      pageIntro: localPageIntro,
+    }
+    if (pageKey === 'creationsSaisonnieres') {
+      pagePayload.seasonCardsSectionEnabled = localSeasonCardsEnabled
     }
     if (pageKey === 'evenementsFloraux') {
       pagePayload.hubIntro = localHubIntro.trim()
@@ -1866,6 +1917,36 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
             className="h-28 w-full rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
           />
         </fieldset>
+
+        <PageIntroEditor
+          pageKey={pageKey}
+          value={localPageIntro}
+          onChange={setLocalPageIntro}
+          fileToSrc={fileToSrc}
+        />
+
+        {pageKey === 'creationsSaisonnieres' ? (
+          <fieldset className="rounded-xl border border-mauve-light/35 p-4 space-y-2">
+            <legend className="text-sm font-medium px-1" style={{ color: 'var(--violet)' }}>
+              Cartes en bas de page (Pâques, Noël…)
+            </legend>
+            <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+              Les 4 cartes avec photo en bas de « Créations saisonnières ». Désactivez tant que vos créations Noël ne sont
+              pas prêtes — vous pourrez les réactiver ici.
+            </p>
+            <label className="block">
+              Afficher les cartes saisonnières en bas
+              <select
+                className="form-field mt-1"
+                value={localSeasonCardsEnabled ? 'yes' : 'no'}
+                onChange={(e) => setLocalSeasonCardsEnabled(e.target.value === 'yes')}
+              >
+                <option value="no">Non (masquées)</option>
+                <option value="yes">Oui</option>
+              </select>
+            </label>
+          </fieldset>
+        ) : null}
 
         {pageKey === 'evenementsFloraux' ? (
           <fieldset className="rounded-xl border border-mauve-light/35 p-4 space-y-3">

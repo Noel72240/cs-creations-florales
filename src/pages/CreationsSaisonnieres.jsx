@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
 import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
+import PageIntroSection from '../components/PageIntroSection'
+import { Link } from 'react-router-dom'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { aggregateHubArticles } from '../lib/articleHubAggregation'
 import { P, w600, w1200 } from '../data/flowerPhotos'
@@ -13,7 +14,6 @@ const SEASONS = [
     desc: 'Des compositions florales printanières et colorées pour célébrer le renouveau du printemps.',
     img: w600(P.tulips),
     icon: '🐣',
-    color: '#a8d08d',
   },
   {
     title: 'Noël',
@@ -21,7 +21,6 @@ const SEASONS = [
     desc: 'Couronnes, compositions de table et décors enchanteurs pour illuminer les fêtes de fin d\'année.',
     img: w600(P.rosesPink),
     icon: '🎄',
-    color: '#c94f4f',
   },
   {
     title: 'Fêtes des Mères/Pères',
@@ -29,7 +28,6 @@ const SEASONS = [
     desc: 'Des bouquets et créations florales tendres et délicats pour honorer mamans et papas avec amour.',
     img: w600(P.bouquetSoft),
     icon: '💝',
-    color: '#d4759b',
   },
   {
     title: 'Fête des Grandes-Mères',
@@ -37,7 +35,6 @@ const SEASONS = [
     desc: 'Compositions florales et cadeaux personnalisés pour célébrer mamie avec tendresse.',
     img: w600(P.peonies),
     icon: '💐',
-    color: '#b86b8f',
   },
 ]
 
@@ -45,6 +42,7 @@ export default function CreationsSaisonnieres() {
   const { content } = useSiteConfig()
   const pa = content.pageArticles?.creationsSaisonnieres
   const hubItems = aggregateHubArticles('creationsSaisonnieres', content, { maxItems: 500 })
+  const showSeasonCards = pa?.seasonCardsSectionEnabled === true
 
   return (
     <>
@@ -59,15 +57,7 @@ export default function CreationsSaisonnieres() {
         />
       </div>
 
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-refined max-w-xl mx-auto">
-              Au fil des saisons, la nature offre ses plus belles parures. Je crée des compositions florales en accord avec chaque époque de l'année, pour que vous puissiez célébrer chaque moment avec des fleurs qui lui correspondent.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageIntroSection pageKey="creationsSaisonnieres" />
 
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
@@ -78,35 +68,31 @@ export default function CreationsSaisonnieres() {
         maxItems={500}
       />
 
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {SEASONS.map((season) => (
-              <Link key={season.path} to={season.path} className="card group block overflow-hidden touch-manipulation">
-                <div className="img-overlay h-60">
-                  <img src={season.img} alt={season.title} className="w-full h-full object-cover" />
-                  <div className="overlay"><span>Découvrir →</span></div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-3xl">{season.icon}</span>
-                    <h2 className="font-heading text-xl font-medium" style={{ color: 'var(--violet)' }}>
-                      {season.title}
-                    </h2>
+      {showSeasonCards ? (
+        <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {SEASONS.map((season) => (
+                <Link key={season.path} to={season.path} className="card group block overflow-hidden touch-manipulation">
+                  <div className="img-overlay h-60">
+                    <img src={season.img} alt={season.title} className="w-full h-full object-cover" />
+                    <div className="overlay"><span>Voir la collection →</span></div>
                   </div>
-                  <p className="text-body-soft">{season.desc}</p>
-                  <div className="mt-4 text-xs font-body flex items-center gap-1" style={{ color: 'var(--mauve)' }}>
-                    <span>Voir la collection</span>
-                    <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-3xl">{season.icon}</span>
+                      <h2 className="font-heading text-xl font-medium" style={{ color: 'var(--violet)' }}>
+                        {season.title}
+                      </h2>
+                    </div>
+                    <p className="text-body-soft">{season.desc}</p>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <ContactCTA message="Vous préparez une fête ou une célébration saisonnière ? Je crée pour vous des compositions florales adaptées." />
     </>

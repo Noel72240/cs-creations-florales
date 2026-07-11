@@ -2,12 +2,15 @@ import { Link } from 'react-router-dom'
 import ConfigurablePageHeader from './ConfigurablePageHeader'
 import ContactCTA from './ContactCTA'
 import PageArticleGrid from './PageArticleGrid'
+import PageIntroSection from './PageIntroSection'
 import { useSiteConfig } from '../context/SiteContentContext'
+import { resolvePageIntro } from '../lib/pageIntro'
 
 export default function SeasonPage({ title, subtitle, coverImg, intro, icon, items, articlePageKey, pagePath }) {
   const { content } = useSiteConfig()
   const pa = articlePageKey ? content.pageArticles?.[articlePageKey] : null
   const hasArticles = Array.isArray(pa?.items) && pa.items.length > 0
+  const pageIntro = articlePageKey ? resolvePageIntro(pa, articlePageKey) : { enabled: false }
 
   return (
     <>
@@ -18,15 +21,18 @@ export default function SeasonPage({ title, subtitle, coverImg, intro, icon, ite
         />
       </div>
 
-      {/* Intro */}
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-5xl mb-6">{icon}</p>
-          <p className="text-refined max-w-[36rem] mx-auto">{intro}</p>
-        </div>
-      </section>
+      {pageIntro.enabled ? (
+        <PageIntroSection pageKey={articlePageKey} />
+      ) : intro ? (
+        <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-5xl mb-6">{icon}</p>
+            <p className="text-refined max-w-[36rem] mx-auto">{intro}</p>
+          </div>
+        </section>
+      ) : null}
 
-      {hasArticles && pagePath && (
+      {hasArticles && pagePath ? (
         <PageArticleGrid
           sectionTitle={pa.sectionTitle}
           intro={pa.intro}
@@ -34,10 +40,9 @@ export default function SeasonPage({ title, subtitle, coverImg, intro, icon, ite
           pagePath={pagePath}
           pageKey={articlePageKey}
         />
-      )}
+      ) : null}
 
-      {/* Items (si pas d’articles catalogue) */}
-      {items && !hasArticles && (
+      {items && !hasArticles ? (
         <section className="py-12 px-4" style={{ background: 'var(--beige)' }}>
           <div className="max-w-4xl mx-auto">
             <h2 className="section-title mb-2">Mes créations</h2>
@@ -55,7 +60,7 @@ export default function SeasonPage({ title, subtitle, coverImg, intro, icon, ite
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       <div className="py-8 text-center">
         <Link to="/contact" className="btn-primary">Commander cette création</Link>
