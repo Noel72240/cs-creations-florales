@@ -5,7 +5,7 @@
 :root {
   --font-script: 'Cormorant Garamond', Georgia, serif;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-heading: 'Cookie', cursive;
   --font-body: 'Cormorant Garamond', Georgia, serif;
   --font-refined: 'Cormorant Garamond', Georgia, serif;
   --font-hero-title: var(--font-brand);
@@ -261,9 +261,9 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* Pages mentions légales, confidentialité, CGV — manuscrite */
+/* Pages mentions légales, confidentialité, CGV */
 .page-legal-doc {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-size: clamp(0.72rem, 0.88vw, 0.9rem);
   line-height: 1.65;
   color: var(--text-mid);
@@ -272,7 +272,7 @@
 }
 
 .page-legal-doc h2 {
-  font-family: var(--font-script);
+  font-family: var(--font-heading);
   font-size: clamp(0.9rem, 1vw, 1.05rem);
   font-weight: 400;
   line-height: 1.35;
@@ -295,7 +295,7 @@
 
 /* En-tête des pages légales (sous-titre + titre) */
 .page-legal-header__subtitle {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-size: clamp(0.625rem, 0.75vw, 0.75rem);
   font-weight: 500;
   line-height: 1.45;
@@ -306,7 +306,7 @@
 }
 
 .page-legal-header__title {
-  font-family: var(--font-script);
+  font-family: var(--font-heading);
   font-size: clamp(1.1rem, 2.6vw, 1.4rem);
   font-weight: 700;
   line-height: 1.25;
@@ -336,7 +336,7 @@
 }
 
 .hero-brand-subtitle {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0.06em;
@@ -359,7 +359,7 @@
 }
 
 .hero-brand-location-name {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0.03em;
@@ -372,12 +372,12 @@
 }
 
 .hero-brand-location-rest {
-  font-family: var(--font-script);
+  font-family: var(--font-brand);
   font-weight: 400;
   font-style: normal;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: none;
-  font-size: clamp(0.88rem, 1.75vw, 1.05rem);
+  font-size: clamp(1rem, 2vw, 1.35rem);
   line-height: 1.45;
   color: var(--violet);
   opacity: 0.88;
@@ -779,7 +779,7 @@ html {
 body {
   background-color: var(--blanc);
   color: var(--text-dark);
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-weight: 400;
   line-height: 1.85;
   overflow-x: hidden;
@@ -930,7 +930,7 @@ main.site-main {
 
 /* Sous-titre (ex. « Créations sur mesure ») — même lisibilité que « Prestation » sur cartes */
 .page-header--image .section-subtitle {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-size: clamp(1.52rem, 3.55vw, 1.88rem);
   font-weight: 400;
   letter-spacing: 0.025em;
@@ -1021,9 +1021,9 @@ main.site-main {
   50% { opacity: 1; transform: scale(1.03); }
 }
 
-/* Par défaut : manuscrite (titres avec .font-heading ou .section-title) */
+/* Titres : Cookie · textes : Cormorant Garamond */
 h1, h2, h3, h4 {
-  font-family: var(--font-script);
+  font-family: var(--font-heading);
   font-weight: 400;
   font-style: normal;
   color: var(--mauve);
@@ -1035,7 +1035,7 @@ h1, h2, h3, h4 {
 
 /* Paragraphes d’ambiance / intros */
 .text-refined {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-size: clamp(1.28rem, 1.75vw, 1.52rem);
   font-weight: 400;
   line-height: 1.95;
@@ -1075,7 +1075,7 @@ h1, h2, h3, h4 {
 
 /* « Qui suis-je » : manuscrite pour le titre + accents dans le texte */
 .qui-section-title {
-  font-family: var(--font-script);
+  font-family: var(--font-heading);
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0.04em;
@@ -1276,7 +1276,7 @@ h1, h2, h3, h4 {
 
 /* ─── Section titles ─── */
 .section-title {
-  font-family: var(--font-script);
+  font-family: var(--font-heading);
   font-size: clamp(2.25rem, 4.5vw, 3.6rem);
   font-weight: 400;
   color: var(--mauve);
@@ -1289,7 +1289,7 @@ h1, h2, h3, h4 {
 }
 
 .section-subtitle {
-  font-family: var(--font-script);
+  font-family: var(--font-body);
   font-size: clamp(1.12rem, 1.5vw, 1.3rem);
   color: var(--mauve);
   text-align: center;

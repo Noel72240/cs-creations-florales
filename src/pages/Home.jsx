@@ -68,7 +68,7 @@ function HeroSection({ site, hero }) {
           <p className="hero-brand-location-wrap">
             <span className="hero-brand-location-name">{site.ownerFirstName}</span>
             <span className="hero-brand-location-rest">
-              — {site.city} ({site.postalCode.slice(0, 2)})
+              — {site.city} {site.region} ({site.postalCode.slice(0, 2)})
             </span>
           </p>
           </div>

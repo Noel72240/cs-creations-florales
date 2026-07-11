@@ -42,7 +42,7 @@ export const SITE_CONTENT_DEFAULTS = {
       text:
         'Pour votre 1ère commande : 10% sur le site avec un minimum d’achat de 35€ avec le code Bienvenuecscreationflorale10',
     },
-    topBarMessage: '✿ Créations florales artisanales sur mesure — Écommoy (72) ✿',
+    topBarMessage: '✿ Créations florales artisanales sur mesure — Écommoy Sarthe (72) ✿',
   },
 
   footer: {
@@ -203,7 +203,7 @@ export const SITE_CONTENT_DEFAULTS = {
     contactStrip: {
       pretitle: 'Votre projet, ma passion',
       title: 'Créons quelque chose de beau ensemble',
-      subtitle: 'Devis gratuit · Réponse sous 24h · Écommoy et environs (72)',
+      subtitle: 'Devis gratuit · Réponse sous 24h · Écommoy Sarthe et environs (72)',
       ctaLabel: 'Demander un devis gratuit',
       phoneCtaPrefix: '📞 Appeler ',
     },

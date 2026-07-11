@@ -18,7 +18,7 @@ export default {
       fontFamily: {
         script: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         body: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        heading: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        heading: ['"Cookie"', 'cursive'],
         refined: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         brand: ['Cookie', 'cursive'],
       },
