@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Lora', Georgia, serif;
+  --font-script: 'Nunito Sans', system-ui, sans-serif;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Lora', Georgia, serif;
-  --font-body: 'Lora', Georgia, serif;
-  --font-refined: 'Lora', Georgia, serif;
+  --font-heading: 'Nunito Sans', system-ui, sans-serif;
+  --font-body: 'Nunito Sans', system-ui, sans-serif;
+  --font-refined: 'Nunito Sans', system-ui, sans-serif;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */

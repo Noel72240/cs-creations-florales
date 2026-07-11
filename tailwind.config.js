@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Lora', 'Georgia', 'serif'],
-        body: ['Lora', 'Georgia', 'serif'],
-        heading: ['Lora', 'Georgia', 'serif'],
-        refined: ['Lora', 'Georgia', 'serif'],
+        script: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        body: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        heading: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        refined: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {

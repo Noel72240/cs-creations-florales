@@ -900,7 +900,7 @@ export default function Admin() {
               <span className="text-sm">Afficher la bannière promotionnelle</span>
             </label>
             <label className="block text-xs" style={{ color: 'var(--text-mid)' }}>
-              Texte (Lora, fond fuchsia). Le code doit être identique au champ ci-dessous pour
+              Texte (Nunito Sans, fond fuchsia). Le code doit être identique au champ ci-dessous pour
               être mis en avant.
             </label>
             <textarea
