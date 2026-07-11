@@ -4,6 +4,7 @@
  */
 import { SITE as SITE_BASE, WEB_DEV as WEB_DEV_BASE } from '../config/site'
 import { PAGE_ARTICLE_CATALOG } from './articleCatalog'
+import { enrichPageArticlesObject } from '../lib/articleProductOptionsDefaults'
 import { EVENEMENTS_FLORAUX_HUB_DEFAULTS } from '../lib/eventHubCards'
 
 export const SITE_CONTENT_VERSION = 7
@@ -223,7 +224,7 @@ export const SITE_CONTENT_DEFAULTS = {
   /**
    * Articles vitrine (5 par page rubrique) : photo, description, prix — éditables via JSON / futur admin.
    */
-  pageArticles: {
+  pageArticles: enrichPageArticlesObject({
     evenementsFloraux: {
       sectionTitle: 'Nos créations événementielles',
       intro:
@@ -333,7 +334,7 @@ export const SITE_CONTENT_DEFAULTS = {
         { id: 'noe-cheminee', title: 'Composition manteau cheminée', description: 'Longueur au choix (devis).', price: 0, photoKey: 'vaseInterior', src: '' },
       ],
     },
-  },
+  }),
 
   /** Galeries par catégorie (pages) */
   galleries: {

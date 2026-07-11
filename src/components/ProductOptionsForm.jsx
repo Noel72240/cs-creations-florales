@@ -155,6 +155,42 @@ export default function ProductOptionsForm({
                   ))}
                 </select>
               ) : null}
+
+              {field.type === 'selectMulti' ? (
+                <div className="space-y-1.5" id={fieldId}>
+                  {(field.options || []).map((opt) => {
+                    const selected = Array.isArray(values[field.id]) ? values[field.id] : []
+                    const checked = selected.includes(opt.value)
+                    const max = field.max ?? 99
+                    const atMax = !checked && selected.length >= max
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex items-center gap-2 text-sm ${atMax ? 'opacity-50' : ''}`}
+                        style={{ color: 'var(--text-dark)' }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={atMax}
+                          onChange={() => {
+                            const next = checked
+                              ? selected.filter((v) => v !== opt.value)
+                              : [...selected, opt.value].slice(0, max)
+                            setValue(field.id, next)
+                          }}
+                        />
+                        {opt.label}
+                      </label>
+                    )
+                  })}
+                  {field.max && field.max < 99 ? (
+                    <p className="font-body text-[11px] mt-1" style={{ color: 'var(--text-mid)' }}>
+                      {(Array.isArray(values[field.id]) ? values[field.id].length : 0)} / {field.max} choix
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </label>
 
             <FieldHint field={field} values={values} templateId={templateId} />

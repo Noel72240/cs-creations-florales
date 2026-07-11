@@ -126,6 +126,10 @@ export function validateProductOptions(fields, values) {
       if (field.required && raw !== 'oui' && raw !== 'non') errors[field.id] = 'Choisissez Oui ou Non.'
     } else if (field.type === 'select') {
       if (field.required && !String(raw ?? '').trim()) errors[field.id] = 'Sélectionnez une option.'
+    } else if (field.type === 'selectMulti') {
+      const arr = Array.isArray(raw) ? raw : []
+      if (field.required && arr.length < 1) errors[field.id] = 'Sélectionnez au moins une option.'
+      if (field.max && arr.length > field.max) errors[field.id] = `Maximum ${field.max} choix.`
     } else if (field.type === 'number') {
       const n = parseInt(raw, 10)
       if (field.required && (!Number.isFinite(n) || n < (field.min ?? 1))) {
@@ -149,6 +153,13 @@ function formatFieldValue(field, raw) {
   if (field.type === 'select') {
     const opt = field.options?.find((o) => o.value === raw)
     return opt?.label || String(raw || '')
+  }
+  if (field.type === 'selectMulti') {
+    const arr = Array.isArray(raw) ? raw : []
+    return arr
+      .map((v) => field.options?.find((o) => o.value === v)?.label || v)
+      .filter(Boolean)
+      .join(', ')
   }
   return String(raw ?? '').trim()
 }

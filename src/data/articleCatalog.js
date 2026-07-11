@@ -2,6 +2,7 @@
  * Catalogue articles vitrine (photo + titre + description + prix).
  * Une entrée par image dans public/images/articles/{slug}/
  */
+import { enrichCatalogWithProductOptions } from '../lib/articleProductOptionsDefaults'
 
 function item(slug, num, { title, description, price: _price, photoKey = 'vaseInterior' }) {
   const n = String(num).padStart(3, '0')
@@ -18,7 +19,7 @@ function item(slug, num, { title, description, price: _price, photoKey = 'vaseIn
 const CF = 'creations-florales'
 const FUN = 'creations-funeraires'
 
-export const PAGE_ARTICLE_CATALOG = {
+export const PAGE_ARTICLE_CATALOG = enrichCatalogWithProductOptions({
   creationsFlorales: {
     sectionTitle: 'Nos créations florales',
     intro:
@@ -681,4 +682,4 @@ export const PAGE_ARTICLE_CATALOG = {
       }),
     ],
   },
-}
+})

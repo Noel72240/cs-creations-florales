@@ -86,7 +86,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'petit-sac-floral': {
     id: 'petit-sac-floral',
     label: 'Petit sac floral',
-    fields: ['bagColorPale', 'roseColorMax3', 'flowerSelect2', 'flowerDetailsLarge', 'specialRequests'],
+    fields: ['bagColorPale', 'roseColorMax3', 'flowerSelectMax2', 'flowerDetailsLarge', 'specialRequests'],
   },
   'panneau-bienvenue': {
     id: 'panneau-bienvenue',
@@ -106,7 +106,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'boite-mouchoirs': {
     id: 'boite-mouchoirs',
     label: 'Boîte à mouchoirs florale',
-    fields: ['largeFlowerColor', 'smallRoseColor', 'personalizationText', 'pearlYesNo', 'pearlColor', 'textColor', 'specialRequests'],
+    fields: ['largeFlowerColor', 'smallRoseColor', 'personalizationText', 'pearlYesNo', 'pearlColorIfYes', 'textColor', 'specialRequests'],
   },
   'camion-floral': {
     id: 'camion-floral',
@@ -121,7 +121,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'ecrin-floral': {
     id: 'ecrin-floral',
     label: 'Écrin floral',
-    fields: ['supportColorEcrin', 'pearlYesNo', 'pearlColor', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'flowerColor', 'ribbonColor', 'specialRequests'],
+    fields: ['supportColorEcrin', 'pearlYesNo', 'pearlColorIfYes', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'flowerColor', 'ribbonColor', 'specialRequests'],
   },
   'coeur-plexiglass': {
     id: 'coeur-plexiglass',
@@ -136,7 +136,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'communes-personnalisable': {
     id: 'communes-personnalisable',
     label: 'Options communes personnalisables',
-    fields: ['personalizationYesNo', 'personalizationTextIfYes', 'textColor', 'roseColor', 'specialRequests'],
+    fields: ['personalizationYesNo', 'personalizationTextIfYes', 'textColor', 'roseColorMulti', 'specialRequests'],
   },
   'plaque-funeraire': {
     id: 'plaque-funeraire',
@@ -176,7 +176,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'lapin-paques': {
     id: 'lapin-paques',
     label: 'Lapin de Pâques floral',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'paquesDecorationsText'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'paquesDecorationsText', 'specialRequests'],
   },
 }
 
@@ -184,6 +184,19 @@ export const PRODUCT_OPTION_TEMPLATE_LIST = Object.values(PRODUCT_OPTION_TEMPLAT
 
 /** Suggestion auto du modèle selon le titre de l’article (modifiable dans l’admin). */
 export const TITLE_TO_OPTION_TEMPLATE = [
+  { match: /ourson.*plaque|plaque.*ourson/i, templateId: 'ourson-sur-plaque' },
+  { match: /cœur.*sur plaque|cœur sur plaque/i, templateId: 'coeur-sur-plaque' },
+  { match: /plaque funéraire|hommage.*plaque/i, templateId: 'plaque-funeraire' },
+  { match: /couronne.*bougie|couronne.*deuil/i, templateId: 'couronne-deuil' },
+  { match: /jardin.*souvenir|arche souvenir|arche colombe|arche hommage|arche souvenir/i, templateId: 'jardin-souvenir' },
+  { match: /boîte.*mouchoir|boite.*mouchoir/i, templateId: 'boite-mouchoirs' },
+  { match: /plaque bienvenue|plaque « bienvenue/i, templateId: 'panneau-bienvenue' },
+  { match: /sac noir|grand sac/i, templateId: 'grand-sac-floral' },
+  { match: /sac matelassé|sac blanc|sac bleu|petit sac|écrin blanc roses/i, templateId: 'petit-sac-floral' },
+  { match: /lapin.*pâques|lapin pâques/i, templateId: 'lapin-paques' },
+  { match: /plaque.*bois|suspension bois|cœur bois message/i, templateId: 'coeur-plaque-bois' },
+  { match: /plexiglass|cœur plexiglass/i, templateId: 'coeur-plexiglass' },
+  { match: /cœur.*personnalis|médaillon|plaque acrylique/i, templateId: 'coeur-plaque-acrylique' },
   { match: /verre.*personnal|verre à vin|verre anniversaire/i, templateId: 'verres-personnalises' },
   { match: /chiffre floral/i, templateId: 'chiffres-floraux' },
   { match: /centre de table|alliances entrelac/i, templateId: 'centre-de-table' },
@@ -193,28 +206,19 @@ export const TITLE_TO_OPTION_TEMPLATE = [
   { match: /plaque baptême|panneau bapt/i, templateId: 'panneau-bapteme' },
   { match: /verre communion|gobelet.*communion|gobelet bapt/i, templateId: 'verre-communion' },
   { match: /cône|cone floral/i, templateId: 'cone-floral' },
-  { match: /plaque.*bois|suspension bois|cœur bois message/i, templateId: 'coeur-plaque-bois' },
   { match: /arche|grande composition/i, templateId: 'grande-composition-florale' },
   { match: /ourson/i, templateId: 'ourson-floral' },
   { match: /naissance|plaque naissance/i, templateId: 'cadre-naissance' },
   { match: /love/i, templateId: 'coeur-love' },
-  { match: /sac matelassé|sac blanc|sac bleu|petit sac/i, templateId: 'petit-sac-floral' },
   { match: /bienvenue/i, templateId: 'panneau-bienvenue' },
-  { match: /sac noir|grand sac|écrin blanc roses vertes/i, templateId: 'grand-sac-floral' },
   { match: /papillon/i, templateId: 'papillon-floral' },
   { match: /mouchoir/i, templateId: 'boite-mouchoirs' },
   { match: /camion/i, templateId: 'camion-floral' },
   { match: /moto/i, templateId: 'moto-florale' },
   { match: /écrin|coffret cœur/i, templateId: 'ecrin-floral' },
-  { match: /plexiglass|acrylique/i, templateId: 'coeur-plexiglass' },
   { match: /miroir/i, templateId: 'miroir-floral' },
-  { match: /plaque funéraire|hommage.*plaque/i, templateId: 'plaque-funeraire' },
   { match: /croix/i, templateId: 'croix-florale' },
   { match: /tracteur/i, templateId: 'tracteur-floral' },
-  { match: /couronne.*bougie|couronne.*deuil/i, templateId: 'couronne-deuil' },
-  { match: /jardin.*souvenir|arche souvenir/i, templateId: 'jardin-souvenir' },
-  { match: /lapin.*pâques|lapin pâques/i, templateId: 'lapin-paques' },
-  { match: /cœur.*personnalis|médaillon/i, templateId: 'coeur-plaque-acrylique' },
 ]
 
 export function suggestTemplateIdFromTitle(title) {
