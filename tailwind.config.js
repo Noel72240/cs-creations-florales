@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Poppins', 'system-ui', 'sans-serif'],
-        body: ['Poppins', 'system-ui', 'sans-serif'],
-        heading: ['Poppins', 'system-ui', 'sans-serif'],
-        refined: ['Poppins', 'system-ui', 'sans-serif'],
+        script: ['Montserrat', 'system-ui', 'sans-serif'],
+        body: ['Montserrat', 'system-ui', 'sans-serif'],
+        heading: ['Montserrat', 'system-ui', 'sans-serif'],
+        refined: ['Montserrat', 'system-ui', 'sans-serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {
