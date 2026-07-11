@@ -55,16 +55,14 @@ export default function CGV() {
 
           <div>
             <h2>5. Paiement</h2>
-            <p>Le paiement peut être effectué par les moyens suivants :</p>
+            <p>Les moyens de paiement acceptés sont les suivants :</p>
             <ul className="mt-3 space-y-1 pl-4 list-disc" style={{ color: 'var(--text-dark)' }}>
-              <li>Virement bancaire</li>
-              <li>Chèque à l&apos;ordre de {SITE.ownerFullName}</li>
-              <li>Espèces (remise en main propre, dans la limite des plafonds légaux)</li>
               <li>
-                <strong>Carte bancaire</strong> : paiement sécurisé via <strong>SumUp</strong> — sur place (terminal)
-                lors du retrait ou de la remise de la commande, ou <strong>en ligne</strong> via la page « Paiement » du site
-                (lien sécurisé SumUp ouvert dans un nouvel onglet, après validation du devis).
+                <strong>Carte bancaire (Carte Bleue / CB)</strong> — paiement sécurisé via <strong>SumUp</strong> : sur place
+                (terminal) lors du retrait ou de la remise de la commande, ou <strong>en ligne</strong> via la page « Paiement »
+                du site (page hébergée SumUp, cartes CB, Visa et Mastercard acceptées).
               </li>
+              <li>Espèces (remise en main propre, dans la limite des plafonds légaux)</li>
             </ul>
             <p className="mt-3">
               Les données de carte bancaire sont saisies uniquement sur l’interface de paiement SumUp ; elles ne transitent pas par

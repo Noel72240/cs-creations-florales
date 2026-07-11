@@ -5,6 +5,7 @@ import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
 import CheckoutEmailField from '../components/CheckoutEmailField'
+import SecurePaymentNotice, { AcceptedPaymentMethodsList } from '../components/SecurePaymentNotice'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { getMaintenanceState } from '../lib/maintenance'
 import { useCart } from '../context/CartContext'
@@ -41,7 +42,7 @@ export default function Paiement() {
     <>
       <PageHeader
         title="Paiement en ligne"
-        subtitle="Régler votre commande en toute sécurité avec SumUp"
+        subtitle="Paiement sécurisé en ligne — SumUp (CB, Visa, Mastercard)"
         image={w1200(P.bouquetSoft)}
       />
 
@@ -54,10 +55,11 @@ export default function Paiement() {
               Paiement sécurisé par carte bancaire
             </h2>
             <p>
-              Après validation de votre devis avec <strong style={{ color: 'var(--text-dark)' }}>{SITE.ownerFullName}</strong>, vous pouvez
-              régler par carte bancaire (CB, Visa, Mastercard) sur une page de paiement hébergée par{' '}
-              <strong>SumUp</strong>, conforme aux standards de sécurité (dont 3-D Secure lorsque votre banque l’exige).
+              Après validation de votre devis avec <strong style={{ color: 'var(--text-dark)' }}>{SITE.ownerFullName}</strong>, vous
+              pouvez régler en ligne sur une page de paiement hébergée par <strong>SumUp</strong>, conforme aux standards de
+              sécurité (dont 3-D Secure lorsque votre banque l’exige).
             </p>
+            <SecurePaymentNotice className="mt-4" />
             <p className="mt-4">
               Le montant affiché correspond au total de votre panier sur le site ou au lien de paiement manuel. En cas de doute,
               contactez-nous avant de valider.
@@ -165,7 +167,7 @@ export default function Paiement() {
 
           <div>
             <h3 className="font-heading text-xl mb-3" style={{ color: 'var(--violet)' }}>
-              Autres moyens de paiement
+              Moyens de paiement acceptés
             </h3>
             {hasCart && !paymentsBlocked ? (
               <div
@@ -179,12 +181,7 @@ export default function Paiement() {
                 <PromoCodeForm compact />
               </div>
             ) : null}
-            <ul className="space-y-2 pl-4 list-disc" style={{ color: 'var(--text-dark)' }}>
-              <li>Terminal SumUp (carte bancaire) lors d’un rendez-vous ou au retrait</li>
-              <li>Virement bancaire</li>
-              <li>Chèque à l’ordre de {SITE.ownerFullName}</li>
-              <li>Espèces (remise en main propre, dans la limite des plafonds légaux)</li>
-            </ul>
+            <AcceptedPaymentMethodsList />
             <p className="mt-4 text-xs">
               Détails contractuels :{' '}
               <Link to="/cgv" className="underline hover:text-mauve transition-colors">

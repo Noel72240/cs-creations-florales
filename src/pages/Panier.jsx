@@ -5,6 +5,7 @@ import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
 import CheckoutEmailField from '../components/CheckoutEmailField'
+import SecurePaymentNotice from '../components/SecurePaymentNotice'
 import { buildCartPrefillMessage, useCart } from '../context/CartContext'
 import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
 import { loadCheckoutEmail, saveCheckoutEmail } from '../lib/promoCheckoutApi'
@@ -181,6 +182,9 @@ export default function Panier() {
                     </span>
                   </p>
                 ) : null}
+                {!paymentsBlocked ? (
+                  <SecurePaymentNotice compact className="mb-4" />
+                ) : null}
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                   <Link
                     to="/contact"
@@ -200,7 +204,7 @@ export default function Panier() {
                       ? 'Paiement en ligne indisponible'
                       : busy
                         ? 'Redirection vers SumUp…'
-                        : 'Payer en ligne (carte bancaire)'}
+                        : 'Payer en ligne (paiement sécurisé)'}
                   </button>
                   {!paymentsBlocked ? (
                     <Link to="/paiement" className="btn-outline text-center text-sm py-3 px-6">

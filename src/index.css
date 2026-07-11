@@ -2022,6 +2022,54 @@ button.nav-link.nav-link-header {
   transform: scale(1.1);
 }
 
+.secure-payment-notice {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(139, 75, 106, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.85rem 1rem;
+}
+
+.secure-payment-notice--compact {
+  padding: 0.65rem 0.85rem;
+}
+
+.secure-payment-notice__title {
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--violet);
+  margin-bottom: 0.35rem;
+}
+
+.secure-payment-notice__text {
+  font-size: 0.6875rem;
+  line-height: 1.55;
+  color: var(--text-mid);
+  margin-bottom: 0.5rem;
+}
+
+.secure-payment-notice__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.secure-payment-notice__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(139, 75, 106, 0.28);
+  background: rgba(240, 210, 221, 0.35);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--violet);
+}
+
 .floral-color-picker__grid {
   display: flex;
   flex-wrap: wrap;

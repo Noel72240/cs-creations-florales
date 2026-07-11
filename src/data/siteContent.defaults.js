@@ -50,9 +50,9 @@ export const SITE_CONTENT_DEFAULTS = {
     brandLead:
       'Créatrice florale passionnée, je réalise des compositions artisanales uniques pour tous vos moments de vie, avec soin et élégance.',
     paymentWithSumup:
-      'carte bancaire en ligne (SumUp), sur place (terminal SumUp), virement, chèque et espèces selon modalités convenues.',
+      'paiement sécurisé en ligne (SumUp : CB, Visa, Mastercard) · sur place : carte bancaire (CB) et espèces.',
     paymentWithoutSumup:
-      'carte bancaire (terminal SumUp sur rendez-vous), virement, chèque et espèces selon modalités convenues.',
+      'sur place : carte bancaire (CB) et espèces.',
     facebookUrl: 'https://www.facebook.com',
     instagramUrl: 'https://www.instagram.com',
     tiktokUrl: 'https://www.tiktok.com',

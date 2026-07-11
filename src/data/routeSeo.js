@@ -69,7 +69,8 @@ export const ROUTE_SEO = {
   },
   '/paiement': {
     title: 'Paiement sécurisé',
-    description: 'Finalisez votre commande en ligne.',
+    description:
+      'Réglez votre commande en toute sécurité en ligne via SumUp (CB, Visa, Mastercard). Sur place : carte bancaire et espèces.',
     noindex: true,
   },
   '/paiement/succes': {

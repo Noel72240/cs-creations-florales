@@ -97,7 +97,8 @@ export default function Contact() {
               <div className="mt-8 p-4 rounded-xl border border-mauve-light/30" style={{ background: 'rgba(240,210,221,0.12)' }}>
                 <p className="font-heading text-sm mb-2" style={{ color: 'var(--violet)' }}>Paiement en ligne</p>
                 <p className="font-refined text-xs mb-3 leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-                  Après validation de votre devis, vous pouvez régler par carte sur la page sécurisée SumUp.
+                  Après validation de votre devis : paiement sécurisé en ligne (SumUp — CB, Visa, Mastercard). Sur place :
+                  carte bancaire (CB) et espèces.
                 </p>
                 <Link to="/paiement" className="btn-outline btn-contact-secondary inline-block text-xs py-2 px-4 w-full text-center">
                   Voir la page Paiement
