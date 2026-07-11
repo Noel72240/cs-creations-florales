@@ -342,10 +342,10 @@ function CategoryPreviewSection({ prest }) {
               <div className="img-overlay h-64 sm:h-72 rounded-2xl">
                 <img src={resolveItemPhoto(cat)} alt={cat.title} className="w-full h-full object-cover" />
                 <div className="overlay">
-                  <div>
+                  <div className="w-full">
                     <p
-                      className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95 mb-2"
-                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
+                      className="text-center w-full text-3xl sm:text-4xl mb-2 leading-none"
+                      aria-hidden="true"
                     >
                       {cat.icon}
                     </p>
