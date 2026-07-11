@@ -228,6 +228,7 @@ export default function Admin() {
   const [importText, setImportText] = useState('')
   const coupsDraftRef = useRef(null)
   const prestationsDraftRef = useRef(null)
+  const motoPhotoDraftRef = useRef(null)
   const googleReviewsDraftRef = useRef(null)
   const heroBackgroundDraftRef = useRef({
     backgroundSrc: '',
@@ -238,6 +239,9 @@ export default function Admin() {
   }, [])
   const handlePrestationsDraft = useCallback((next) => {
     prestationsDraftRef.current = next
+  }, [])
+  const handleMotoPhotoDraft = useCallback((next) => {
+    motoPhotoDraftRef.current = next
   }, [])
   const handleGoogleReviewsDraft = useCallback((next) => {
     googleReviewsDraftRef.current = next
@@ -365,6 +369,7 @@ export default function Admin() {
           .map((s) => s.trim())
           .filter(Boolean),
       }
+      const motoPhoto = motoPhotoDraftRef.current || {}
       const moto = {
         overlayTitle: fd.get('moto_overlay') || '',
         pretitle: fd.get('moto_pre') || '',
@@ -372,6 +377,8 @@ export default function Admin() {
         tip: fd.get('moto_tip') || '',
         ctaPrimary: fd.get('moto_cta1') || '',
         ctaSecondary: fd.get('moto_cta2') || '',
+        src: String(motoPhoto.src ?? content.home.moto?.src ?? '/moto-florale.png').trim(),
+        photoKey: String(motoPhoto.photoKey ?? content.home.moto?.photoKey ?? '').trim(),
         paragraphs: (fd.get('moto_paragraphs') || '')
           .split(/\n\n+/)
           .map((s) => s.trim())
@@ -398,7 +405,7 @@ export default function Admin() {
         },
       })
     },
-    [applySaveMsg, content.home.coupsDeCoeur, content.home.prestations, content.home.quiSuisJe?.values],
+    [applySaveMsg, content.home.coupsDeCoeur, content.home.moto?.photoKey, content.home.moto?.src, content.home.prestations, content.home.quiSuisJe?.values],
   )
 
   const handleSaveFooter = useCallback(
@@ -716,11 +723,12 @@ export default function Admin() {
 
           <fieldset className="space-y-2">
             <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Moto florale</legend>
+            <HomeMotoPhotoEditor key={`${h.moto?.src || ''}-${h.moto?.photoKey || ''}`} initial={h.moto} onDraftChange={handleMotoPhotoDraft} />
             <input name="moto_overlay" defaultValue={h.moto.overlayTitle} className="form-field" />
             <input name="moto_pre" defaultValue={h.moto.pretitle} className="form-field" />
             <input name="moto_title" defaultValue={h.moto.title} className="form-field" />
             <textarea name="moto_paragraphs" rows={5} className="form-field" defaultValue={(h.moto.paragraphs || []).join('\n\n')} />
-            <input name="moto_tip" defaultValue={h.moto.tip} className="form-field" />
+            <input name="moto_tip" defaultValue={h.moto.tip} className="form-field" placeholder="Note sous les boutons (laisser vide pour masquer)" />
             <div className="grid sm:grid-cols-2 gap-2">
               <input name="moto_cta1" defaultValue={h.moto.ctaPrimary} className="form-field" />
               <input name="moto_cta2" defaultValue={h.moto.ctaSecondary} className="form-field" />
@@ -1091,6 +1099,63 @@ function HeroBackgroundEditor({ initial, onDraftChange }) {
         </p>
       </div>
     </fieldset>
+  )
+}
+
+function HomeMotoPhotoEditor({ initial, onDraftChange }) {
+  const { fileToSrc } = useAdminMedia()
+  const [src, setSrc] = useState(initial?.src || '/moto-florale.png')
+  const [photoKey, setPhotoKey] = useState(initial?.photoKey || '')
+
+  const pickImage = async (fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/moto' })
+      if (url) {
+        setSrc(url)
+        setPhotoKey('')
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  useLayoutEffect(() => {
+    onDraftChange({ src: src.trim(), photoKey: photoKey.trim() })
+  }, [src, photoKey, onDraftChange])
+
+  const preview = src.trim() ? resolvePhotoSrc(src) : photoKey.trim() ? resolvePhotoSrc(photoKey) : resolvePhotoSrc('/moto-florale.png')
+
+  return (
+    <div className="rounded-xl border border-mauve-light/35 p-3 space-y-2 bg-white/50">
+      <p className="text-xs font-medium" style={{ color: 'var(--violet)' }}>Photo de la moto florale</p>
+      <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+        Parcourir pour envoyer une nouvelle photo, ou laissez <code className="text-[10px]">/moto-florale.png</code> pour le fichier dans le site.
+      </p>
+      <label className="btn-primary text-xs py-2 px-4 cursor-pointer inline-block">
+        Choisir une photo
+        <input
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => {
+            pickImage(e.target.files)
+            e.target.value = ''
+          }}
+        />
+      </label>
+      {adminSrcIsRemovable(src) ? (
+        <button type="button" className="btn-outline text-xs py-2 px-4 ml-2" onClick={() => setSrc('/moto-florale.png')}>
+          Photo par défaut
+        </button>
+      ) : null}
+      <label className="block">
+        src (URL ou /chemin/public)
+        <input className="form-field mt-1" value={src} onChange={(e) => setSrc(e.target.value)} placeholder="/moto-florale.png" />
+      </label>
+      <img src={preview} alt="" className="h-40 w-full max-w-md rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10" />
+    </div>
   )
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSearch from '../components/HeroSearch'
 import { useSiteConfig } from '../context/SiteContentContext'
-import { resolveItemPhoto } from '../data/photoResolver'
+import { resolveItemPhoto, resolvePhotoSrc } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
@@ -248,9 +248,19 @@ function QuiSuisJeSection({ site, qui }) {
 }
 
 function CreationSurMesureSection({ moto }) {
-  const [motoPhoto, setMotoPhoto] = useState(w600(P.floristShop))
+  const [motoPhoto, setMotoPhoto] = useState(() => {
+    const fromContent = String(moto?.src || '').trim()
+    if (fromContent) return resolvePhotoSrc(fromContent)
+    return w600(P.floristShop)
+  })
 
   useEffect(() => {
+    const fromContent = String(moto?.src || '').trim()
+    if (fromContent) {
+      setMotoPhoto(resolvePhotoSrc(fromContent))
+      return undefined
+    }
+
     let cancelled = false
     let i = 0
     const probe = () => {
@@ -270,7 +280,7 @@ function CreationSurMesureSection({ moto }) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [moto?.src])
 
   return (
     <section className="py-20 px-4" style={{ background: 'var(--blanc)' }}>
@@ -302,9 +312,11 @@ function CreationSurMesureSection({ moto }) {
               <Link to="/contact" className="btn-primary">{moto.ctaPrimary}</Link>
               <Link to="/evenements-floraux" className="btn-outline">{moto.ctaSecondary}</Link>
             </div>
-            <p className="mt-4 text-xs font-body" style={{ color: 'var(--text-mid)' }}>
-              {moto.tip}
-            </p>
+            {moto.tip?.trim() ? (
+              <p className="mt-4 text-xs font-body" style={{ color: 'var(--text-mid)' }}>
+                {moto.tip}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
