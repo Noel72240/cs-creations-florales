@@ -347,7 +347,7 @@ function CategoryPreviewSection({ prest }) {
                       className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95 mb-2"
                       style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
                     >
-                      {cat.icon} Prestation
+                      {cat.icon}
                     </p>
                     <p className="font-heading text-xl md:text-2xl italic text-white mb-2">{cat.title}</p>
                     <p className="text-[12px] text-white/85 font-body leading-relaxed max-w-[28ch]">{cat.desc}</p>
