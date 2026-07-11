@@ -58,7 +58,7 @@ function optionsCartKey(templateId, values) {
 
 export default function ArticleProduct() {
   const { pageKey, articleId } = useParams()
-  const { content } = useSiteConfig()
+  const { content, remoteLoaded } = useSiteConfig()
   const { addItem } = useCart()
 
   const catalogPageKey = useMemo(
@@ -112,9 +112,23 @@ export default function ArticleProduct() {
     return <Navigate to="/" replace />
   }
 
+  if (!remoteLoaded) {
+    return (
+      <section
+        className="article-product-page is-visible py-20 px-4 text-center"
+        style={{ background: 'var(--beige)' }}
+        aria-busy="true"
+      >
+        <p className="font-body text-sm" style={{ color: 'var(--text-mid)' }}>
+          Chargement de l’article…
+        </p>
+      </section>
+    )
+  }
+
   if (!article) {
     return (
-      <section className="py-20 px-4 text-center" style={{ background: 'var(--beige)' }}>
+      <section className="article-product-page is-visible py-20 px-4 text-center" style={{ background: 'var(--beige)' }}>
         <p className="font-heading text-xl mb-4" style={{ color: 'var(--violet)' }}>
           Article introuvable
         </p>
@@ -222,7 +236,7 @@ export default function ArticleProduct() {
         image={mainPhoto}
       />
 
-      <section className="article-product-page py-4 px-3 sm:py-10 sm:px-4" style={{ background: 'var(--beige)' }}>
+      <section className="article-product-page is-visible py-4 px-3 sm:py-10 sm:px-4" style={{ background: 'var(--beige)' }}>
         <div className="max-w-lg mx-auto">
           <nav className="article-product-breadcrumb text-xs mb-4 flex flex-wrap items-center gap-1" style={{ color: 'var(--text-mid)' }}>
             <Link to="/" className="hover:text-mauve transition-colors shrink-0">
