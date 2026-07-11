@@ -64,7 +64,7 @@ export const SITE_CONTENT_DEFAULTS = {
   },
 
   googleReviews: {
-    pageTitle: 'Avis Google',
+    pageTitle: 'Nos avis clients',
     pageSubtitle: 'Ce que nos clients disent',
     intro:
       'Merci pour votre confiance. Voici quelques témoignages partagés sur Google — n’hésitez pas à laisser le vôtre après votre commande.',

@@ -641,7 +641,7 @@ export default function Admin() {
             {t === 'identity' && 'Identité & légal'}
             {t === 'home' && 'Accueil'}
             {t === 'articles' && 'Articles (boutique)'}
-            {t === 'reviews' && 'Avis Google'}
+            {t === 'reviews' && 'Nos avis clients'}
             {t === 'footer' && 'Menu & pied de page'}
             {t === 'contact' && 'Contact (page)'}
             {t === 'import' && 'Import / export'}
@@ -831,7 +831,7 @@ export default function Admin() {
             onDraftChange={handleGoogleReviewsDraft}
           />
           <button type="submit" className="btn-primary">
-            Enregistrer les avis Google
+            Enregistrer les avis clients
           </button>
         </form>
       )}

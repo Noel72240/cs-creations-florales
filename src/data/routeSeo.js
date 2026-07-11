@@ -59,7 +59,7 @@ export const ROUTE_SEO = {
     description: 'Contactez Charlène pour un devis floral — réponse sous 24 h, Écommoy et Sarthe.',
   },
   '/avis-google': {
-    title: 'Avis clients Google',
+    title: 'Nos avis clients',
     description: 'Témoignages et avis sur C&S Créations Florales.',
   },
   '/panier': {

@@ -19,7 +19,7 @@ export const ARTICLE_PAGE_META = {
 const STATIC_PAGES = [
   { path: '/', label: 'Accueil', keywords: 'accueil créations florales charlène' },
   { path: '/contact', label: 'Contact', keywords: 'contact devis rendez-vous téléphone email' },
-  { path: '/avis-google', label: 'Avis Google', keywords: 'avis témoignages clients google' },
+  { path: '/avis-google', label: 'Nos avis clients', keywords: 'avis témoignages clients google' },
   { path: '/panier', label: 'Panier', keywords: 'panier commande achat' },
   { path: '/paiement', label: 'Paiement', keywords: 'paiement sumup carte' },
   { path: '/personnalisation', label: 'Personnalisations', keywords: 'sur mesure gravure prénom personnalisations' },

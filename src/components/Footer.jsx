@@ -51,7 +51,7 @@ export default function Footer() {
                 ['Créations funéraires', '/creations-funeraires'],
                 ['Créations saisonnières', '/creations-saisonnieres'],
                 ['Personnalisations', '/personnalisation'],
-                ['Avis Google', '/avis-google'],
+                ['Nos avis clients', '/avis-google'],
                 ['Paiement', '/paiement'],
                 ['Contact', '/contact'],
               ].map(([label, path]) => (

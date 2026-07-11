@@ -41,7 +41,7 @@ const menuItems = [
     ],
   },
   { label: 'Personnalisations', path: '/personnalisation' },
-  { label: 'Avis Google', path: '/avis-google' },
+  { label: 'Nos avis clients', path: '/avis-google' },
   { label: 'Paiement', path: '/paiement' },
   { label: 'Contact', path: '/contact' },
 ]

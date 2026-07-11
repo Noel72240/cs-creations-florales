@@ -16,7 +16,7 @@ export default function AvisGoogle() {
 
   return (
     <>
-      <PageHeader title={gr.pageTitle || 'Avis Google'} subtitle={gr.pageSubtitle || 'Témoignages clients'} />
+      <PageHeader title={gr.pageTitle || 'Nos avis clients'} subtitle={gr.pageSubtitle || 'Ce que nos clients disent'} />
 
       <section className="py-14 px-4" style={{ background: 'var(--blanc)' }}>
         <div className="max-w-3xl mx-auto">

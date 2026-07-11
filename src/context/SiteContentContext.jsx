@@ -43,6 +43,10 @@ export function getMergedContent(overrides) {
   if (titleLine2 === 'et Personnalisation' || titleLine2 === '& Personnalisation') {
     merged.home.hero.titleLine2 = SITE_CONTENT_DEFAULTS.home.hero.titleLine2
   }
+  const reviewsTitle = merged.googleReviews?.pageTitle
+  if (reviewsTitle === 'Avis Google') {
+    merged.googleReviews.pageTitle = SITE_CONTENT_DEFAULTS.googleReviews.pageTitle
+  }
   return merged
 }
 
