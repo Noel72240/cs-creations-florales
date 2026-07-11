@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['Comfortaa', 'system-ui', 'sans-serif'],
-        body: ['Comfortaa', 'system-ui', 'sans-serif'],
-        heading: ['Comfortaa', 'system-ui', 'sans-serif'],
-        refined: ['Comfortaa', 'system-ui', 'sans-serif'],
+        script: ['Poppins', 'system-ui', 'sans-serif'],
+        body: ['Poppins', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'system-ui', 'sans-serif'],
+        refined: ['Poppins', 'system-ui', 'sans-serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {

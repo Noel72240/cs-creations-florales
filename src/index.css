@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-script: 'Comfortaa', system-ui, sans-serif;
+  --font-script: 'Poppins', system-ui, sans-serif;
   --font-brand: 'Cookie', cursive;
-  --font-heading: 'Comfortaa', system-ui, sans-serif;
-  --font-body: 'Comfortaa', system-ui, sans-serif;
-  --font-refined: 'Comfortaa', system-ui, sans-serif;
+  --font-heading: 'Poppins', system-ui, sans-serif;
+  --font-body: 'Poppins', system-ui, sans-serif;
+  --font-refined: 'Poppins', system-ui, sans-serif;
   --font-hero-title: var(--font-brand);
   /* Palette rose poudré / vieux rose (raffinée, non agressive) */
   --mauve: #C07A97;    /* accent principal (poussière de rose) */
