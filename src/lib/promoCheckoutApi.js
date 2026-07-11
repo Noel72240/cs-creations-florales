@@ -1,4 +1,5 @@
 const CHECKOUT_EMAIL_KEY = 'cs_checkout_email_v1'
+const CHECKOUT_NAME_KEY = 'cs_checkout_name_v1'
 
 export function getCheckoutEmailStorageKey() {
   return CHECKOUT_EMAIL_KEY
@@ -17,6 +18,24 @@ export function saveCheckoutEmail(email) {
     const v = String(email || '').trim()
     if (v) sessionStorage.setItem(CHECKOUT_EMAIL_KEY, v)
     else sessionStorage.removeItem(CHECKOUT_EMAIL_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
+export function loadCheckoutCustomerName() {
+  try {
+    return sessionStorage.getItem(CHECKOUT_NAME_KEY) || ''
+  } catch {
+    return ''
+  }
+}
+
+export function saveCheckoutCustomerName(name) {
+  try {
+    const v = String(name || '').trim()
+    if (v) sessionStorage.setItem(CHECKOUT_NAME_KEY, v)
+    else sessionStorage.removeItem(CHECKOUT_NAME_KEY)
   } catch {
     /* ignore */
   }

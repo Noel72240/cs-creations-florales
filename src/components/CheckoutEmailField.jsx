@@ -3,12 +3,22 @@ import { loadCheckoutEmail, saveCheckoutEmail } from '../lib/promoCheckoutApi'
 /**
  * E-mail client pour le paiement / code promo (session navigateur).
  */
-export default function CheckoutEmailField({ value, onChange, required = false, id = 'checkout-email' }) {
+export default function CheckoutEmailField({
+  value,
+  onChange,
+  required = false,
+  id = 'checkout-email',
+  hint,
+}) {
   const handleChange = (e) => {
     const next = e.target.value
     onChange?.(next)
     saveCheckoutEmail(next)
   }
+
+  const defaultHint = required
+    ? 'Obligatoire pour le code promo : une seule utilisation par adresse e-mail.'
+    : 'Pour le suivi de commande et la confirmation SumUp.'
 
   return (
     <label className="block">
@@ -27,9 +37,7 @@ export default function CheckoutEmailField({ value, onChange, required = false, 
         required={required}
       />
       <p className="font-body text-[11px] mt-1.5 leading-snug" style={{ color: 'var(--text-mid)' }}>
-        {required
-          ? 'Obligatoire pour le code promo : une seule utilisation par adresse e-mail.'
-          : 'Pour le suivi de commande et la confirmation SumUp.'}
+        {hint || defaultHint}
       </p>
     </label>
   )

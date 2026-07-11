@@ -4,11 +4,11 @@ import PageHeader from '../components/PageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
-import CheckoutEmailField from '../components/CheckoutEmailField'
+import CheckoutCustomerFields from '../components/CheckoutCustomerFields'
 import SecurePaymentNotice from '../components/SecurePaymentNotice'
 import { buildCartPrefillMessage, useCart } from '../context/CartContext'
 import { useSumupCartCheckout } from '../hooks/useSumupCartCheckout'
-import { loadCheckoutEmail, saveCheckoutEmail } from '../lib/promoCheckoutApi'
+import { loadCheckoutCustomerName, loadCheckoutEmail, saveCheckoutCustomerName, saveCheckoutEmail } from '../lib/promoCheckoutApi'
 import { formatEuro } from '../utils/formatEuro'
 import { P, w1200 } from '../data/flowerPhotos'
 
@@ -16,6 +16,7 @@ export default function Panier() {
   const { items, itemCount, subtotal, total, appliedPromo, promoError, setQuantity, removeItem, clearCart } = useCart()
   const { pay, busy, error, paymentsBlocked } = useSumupCartCheckout()
   const [checkoutEmail, setCheckoutEmail] = useState(() => loadCheckoutEmail())
+  const [checkoutName, setCheckoutName] = useState(() => loadCheckoutCustomerName())
   const [emailError, setEmailError] = useState('')
 
   const contactState = useMemo(
@@ -29,14 +30,21 @@ export default function Panier() {
   const startCheckout = () => {
     setEmailError('')
     const email = checkoutEmail.trim()
-    if (appliedPromo?.code && !email) {
-      setEmailError('Indiquez votre e-mail pour payer avec le code promo (une utilisation par client).')
+    const name = checkoutName.trim()
+    if (!name) {
+      setEmailError('Indiquez votre nom et prénom pour la facturation.')
+      return
+    }
+    if (!email) {
+      setEmailError('Indiquez votre e-mail pour la facturation et le suivi de commande.')
       return
     }
     saveCheckoutEmail(email)
+    saveCheckoutCustomerName(name)
     pay(items, {
       promoCode: appliedPromo?.code,
-      ...(email ? { customerEmail: email } : {}),
+      customerEmail: email,
+      customerName: name,
     })
   }
 
@@ -154,13 +162,14 @@ export default function Panier() {
                     <PromoCodeForm />
                   </div>
                 ) : null}
-                {appliedPromo && !paymentsBlocked ? (
-                  <div className="mb-4">
-                    <CheckoutEmailField
-                      value={checkoutEmail}
-                      onChange={setCheckoutEmail}
-                      required
-                      id="panier-checkout-email"
+                {!paymentsBlocked ? (
+                  <div className="mb-6">
+                    <CheckoutCustomerFields
+                      name={checkoutName}
+                      email={checkoutEmail}
+                      onNameChange={setCheckoutName}
+                      onEmailChange={setCheckoutEmail}
+                      idPrefix="panier"
                     />
                   </div>
                 ) : null}

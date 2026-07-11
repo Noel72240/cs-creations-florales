@@ -9,7 +9,7 @@ export function useSumupCartCheckout() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
-  const pay = useCallback(async (items, { customerEmail, promoCode } = {}) => {
+  const pay = useCallback(async (items, { customerEmail, customerName, promoCode } = {}) => {
     const maintenance = getMaintenanceState(content)
     if (maintenance.active) {
       setError(maintenance.message || MAINTENANCE_PAYMENT_BLOCKED_MSG)
@@ -21,7 +21,8 @@ export function useSumupCartCheckout() {
     try {
       const { url } = await createSumupCheckout({
         items,
-        ...(customerEmail ? { customerEmail } : {}),
+        customerEmail,
+        customerName,
         ...(promoCode ? { promoCode } : {}),
       })
       window.location.assign(url)

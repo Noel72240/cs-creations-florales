@@ -39,6 +39,8 @@ create table if not exists public.orders (
   promo_code text,
   discount_eur numeric(12, 2),
   subtotal_eur numeric(12, 2),
+  customer_name text,
+  owner_notified_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto'
 import { fetchMaintenanceMode } from '../server/lib/maintenanceMode.js'
 import { corsHeaders, readJsonBody, sendJson } from '../server/lib/http.js'
 import { isPromoBlockedForEmail, normalizeCustomerEmail } from '../server/lib/promoRedemption.js'
+import { sendOrderNotificationEmail } from '../server/lib/orderNotificationEmail.js'
 import { buildPromoCatalog, normalizePromoCode, validatePromoCode } from '../shared/promoCodes.js'
 
 const SUMUP_API = 'https://api.sumup.com/v0.1'
@@ -171,6 +172,51 @@ async function handleValidatePromo(req, res, origin) {
   sendJson(res, 200, { valid: true, promo }, origin)
 }
 
+async function enrichOrderFromSumup(order) {
+  const apiKey = (process.env.SUMUP_API_KEY || '').trim()
+  const checkoutId = order?.sumup_checkout_id
+  if (!apiKey || !checkoutId) return order
+
+  try {
+    const r = await fetch(`${SUMUP_API}/checkouts/${checkoutId}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    })
+    if (!r.ok) return order
+    const data = await r.json()
+    const sumupEmail = normalizeCustomerEmail(
+      data?.customer_email || data?.customer?.email || data?.customer_details?.email || '',
+    )
+    return {
+      ...order,
+      customer_email: order.customer_email || sumupEmail || null,
+    }
+  } catch {
+    return order
+  }
+}
+
+async function notifyOwnerIfNeeded(supabase, order) {
+  if (!order || order.status !== 'paid' || order.owner_notified_at) {
+    return { sent: false, skipped: true }
+  }
+
+  const enriched = await enrichOrderFromSumup(order)
+  const result = await sendOrderNotificationEmail(enriched)
+
+  if (result.sent) {
+    const { error } = await supabase
+      .from('orders')
+      .update({ owner_notified_at: new Date().toISOString() })
+      .eq('id', order.id)
+      .is('owner_notified_at', null)
+    if (error && !/owner_notified_at/i.test(error.message || '')) {
+      console.error('[confirm-checkout-return] owner_notified_at', error)
+    }
+  }
+
+  return result
+}
+
 async function handleConfirmReturn(req, res, origin) {
   const { supabaseUrl, serviceKey } = getSupabaseConfig()
   if (!supabaseUrl || !serviceKey) {
@@ -194,21 +240,68 @@ async function handleConfirmReturn(req, res, origin) {
 
   const supabase = createServiceClient(supabaseUrl, serviceKey)
 
-  const { data, error } = await supabase
+  const { data: existing, error: fetchErr } = await supabase
     .from('orders')
-    .update({ status: 'paid', updated_at: new Date().toISOString() })
+    .select('*')
     .eq('checkout_reference', ref)
-    .eq('status', 'pending')
-    .select('id, promo_code')
     .maybeSingle()
 
-  if (error) {
-    console.error('[confirm-checkout-return]', error)
-    sendJson(res, 500, { error: 'Mise à jour impossible' }, origin)
+  if (fetchErr) {
+    console.error('[confirm-checkout-return] fetch', fetchErr)
+    sendJson(res, 500, { error: 'Lecture commande impossible' }, origin)
     return
   }
 
-  sendJson(res, 200, { ok: true, updated: Boolean(data), promoCode: data?.promo_code || null }, origin)
+  if (!existing) {
+    sendJson(res, 404, { error: 'Commande introuvable' }, origin)
+    return
+  }
+
+  let order = existing
+  let justPaid = false
+
+  if (existing.status === 'pending') {
+    const { data: updated, error } = await supabase
+      .from('orders')
+      .update({ status: 'paid', updated_at: new Date().toISOString() })
+      .eq('checkout_reference', ref)
+      .eq('status', 'pending')
+      .select('*')
+      .maybeSingle()
+
+    if (error) {
+      console.error('[confirm-checkout-return]', error)
+      sendJson(res, 500, { error: 'Mise à jour impossible' }, origin)
+      return
+    }
+
+    if (updated) {
+      order = updated
+      justPaid = true
+    }
+  }
+
+  let emailResult = { sent: false, skipped: true }
+  if (order.status === 'paid') {
+    try {
+      emailResult = await notifyOwnerIfNeeded(supabase, order)
+    } catch (e) {
+      console.error('[confirm-checkout-return] notification', e)
+      emailResult = { sent: false, reason: e?.message || 'notify_failed' }
+    }
+  }
+
+  sendJson(
+    res,
+    200,
+    {
+      ok: true,
+      updated: justPaid,
+      promoCode: order.promo_code || null,
+      ownerEmailSent: Boolean(emailResult.sent),
+    },
+    origin,
+  )
 }
 
 async function handleCreateCheckout(req, res, origin) {
@@ -262,7 +355,18 @@ async function handleCreateCheckout(req, res, origin) {
   const checkoutReference = randomUUID()
   const customerEmailRaw = typeof body.customerEmail === 'string' ? body.customerEmail.trim() : ''
   const customerEmail = normalizeCustomerEmail(customerEmailRaw) || null
+  const customerNameRaw = typeof body.customerName === 'string' ? body.customerName.trim() : ''
+  const customerName = customerNameRaw ? customerNameRaw.slice(0, 120) : null
   const promoCodeRaw = typeof body.promoCode === 'string' ? body.promoCode.trim() : ''
+
+  if (!customerEmail) {
+    sendJson(res, 400, { error: 'Indiquez votre adresse e-mail avant de payer.' }, origin)
+    return
+  }
+  if (!customerName) {
+    sendJson(res, 400, { error: 'Indiquez votre nom et prénom avant de payer.' }, origin)
+    return
+  }
 
   let total = subtotal
   let promoCode = null
@@ -334,6 +438,7 @@ async function handleCreateCheckout(req, res, origin) {
     currency: 'EUR',
     line_items: items,
     customer_email: customerEmail,
+    customer_name: customerName,
     payee_email: payeeEmail || null,
   }
   const orderWithPromo = {
@@ -344,7 +449,7 @@ async function handleCreateCheckout(req, res, origin) {
   }
 
   let insertErr = (await supabase.from('orders').insert(orderWithPromo)).error
-  if (insertErr && /promo_code|discount_eur|subtotal_eur/i.test(insertErr.message || '')) {
+  if (insertErr && /promo_code|discount_eur|subtotal_eur|customer_name|owner_notified_at/i.test(insertErr.message || '')) {
     insertErr = (await supabase.from('orders').insert(orderBase)).error
   }
 
