@@ -34,7 +34,7 @@ function HeroSection({ site, hero }) {
           <div className="hero-square-frame hero-square-frame--plain" data-animate="hero-frame">
 
           <p
-            className="hero-pretitle mb-3 text-lg sm:text-xl md:text-[1.35rem] font-refined font-medium leading-snug sm:leading-normal tracking-wide"
+            className="hero-pretitle mb-3 text-lg sm:text-xl md:text-[1.35rem] font-medium leading-snug sm:leading-normal tracking-wide"
             style={{ color: 'var(--mauve)' }}
           >
             {hero.pretitle}
