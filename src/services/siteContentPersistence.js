@@ -48,7 +48,7 @@ export function migrateStoredOverrides(stored) {
     titleLine1 = 'C&S Créations Florales'
     touched = true
   }
-  if (titleLine2 === '& Personnalisation') {
+  if (titleLine2 === '& Personnalisation' || titleLine2 === 'et Personnalisation') {
     titleLine2 = SITE_CONTENT_DEFAULTS.home.hero.titleLine2
     touched = true
   }

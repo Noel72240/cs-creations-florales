@@ -38,7 +38,12 @@ function deepMerge(base, patch) {
 
 export function getMergedContent(overrides) {
   const raw = JSON.parse(JSON.stringify(SITE_CONTENT_DEFAULTS))
-  return deepMerge(raw, overrides || {})
+  const merged = deepMerge(raw, overrides || {})
+  const titleLine2 = merged.home?.hero?.titleLine2
+  if (titleLine2 === 'et Personnalisation' || titleLine2 === '& Personnalisation') {
+    merged.home.hero.titleLine2 = SITE_CONTENT_DEFAULTS.home.hero.titleLine2
+  }
+  return merged
 }
 
 export function getSumupUrlFromContent(content) {

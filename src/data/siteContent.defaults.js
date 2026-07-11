@@ -102,7 +102,7 @@ export const SITE_CONTENT_DEFAULTS = {
       backgroundPhotoKey: '',
       pretitle: 'Créations artisanales',
       titleLine1: 'C&S Créations Florales',
-      titleLine2: 'et Personnalisation',
+      titleLine2: 'et Personnalisations',
       searchPlaceholder: 'Rechercher : mariage, bouquet, fête des mères…',
       searchHint: 'Mariage, anniversaire, deuil, fête des mères… — 2 lettres minimum.',
       ctaPrimaryLabel: 'Découvrir mes créations',
