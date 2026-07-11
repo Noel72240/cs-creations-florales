@@ -69,10 +69,10 @@ export default function GoogleReviewsEditor({ initial, onDraftChange }) {
     <div className="space-y-6">
       <fieldset className="space-y-2">
         <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>
-          Page Avis Google
+          Page Nos avis clients
         </legend>
         <p className="text-xs leading-relaxed">
-          Textes affichés en haut de la page <code>/avis-google</code>. Laissez l’URL Google vide pour masquer le bouton externe.
+          Textes affichés en haut de la page <code>/avis-google</code> (menu « Nos avis clients »). Laissez l’URL Google vide pour masquer le bouton externe.
         </p>
         <input className="form-field" value={pageTitle} onChange={(e) => setPageTitle(e.target.value)} placeholder="Titre de la page" />
         <input className="form-field" value={pageSubtitle} onChange={(e) => setPageSubtitle(e.target.value)} placeholder="Sous-titre" />
