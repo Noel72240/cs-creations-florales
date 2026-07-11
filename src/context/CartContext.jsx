@@ -17,6 +17,9 @@ function normalizeItem(raw) {
   if (!Number.isFinite(qty) || qty < 1) qty = 1
   if (qty > 99) qty = 99
   const selectedColor = raw?.selectedColor ? String(raw.selectedColor).slice(0, 32) : ''
+  const personalizationMessage = raw?.personalizationMessage
+    ? String(raw.personalizationMessage).trim().slice(0, 500)
+    : ''
   return {
     id,
     title,
@@ -25,6 +28,7 @@ function normalizeItem(raw) {
     imageUrl: raw?.imageUrl ? String(raw.imageUrl).slice(0, 500) : undefined,
     path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
     selectedColor,
+    personalizationMessage: personalizationMessage || undefined,
   }
 }
 
@@ -68,10 +72,14 @@ function persistPromoCode(code) {
 /** Texte prêt à coller dans le formulaire contact */
 export function buildCartPrefillMessage(items, appliedPromo = null, subtotal = 0, total = 0) {
   if (!items?.length) return ''
-  const lines = items.map(
-    (i) =>
-      `• ${i.title}${i.selectedColor ? ` (couleur ${i.selectedColor})` : ''} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`,
-  )
+  const lines = items.map((i) => {
+    const extras = [
+      i.selectedColor ? `couleur ${i.selectedColor}` : '',
+      i.personalizationMessage ? `message : « ${i.personalizationMessage} »` : '',
+    ].filter(Boolean)
+    const suffix = extras.length ? ` (${extras.join(' · ')})` : ''
+    return `• ${i.title}${suffix} × ${i.quantity} — ${formatEuro(i.price * i.quantity)} (${formatEuro(i.price)} / unité)`
+  })
   const sum = subtotal || items.reduce((s, i) => s + i.price * i.quantity, 0)
   const finalTotal = total || sum
   const parts = [

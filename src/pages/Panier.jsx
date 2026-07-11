@@ -95,6 +95,11 @@ export default function Panier() {
                           />
                         </p>
                       ) : null}
+                      {line.personalizationMessage ? (
+                        <p className="font-body text-xs mt-1 leading-snug" style={{ color: 'var(--text-mid)' }}>
+                          Message : « {line.personalizationMessage} »
+                        </p>
+                      ) : null}
                       <p className="font-body text-sm mt-1" style={{ color: 'var(--text-mid)' }}>
                         {formatEuro(line.price)} <span className="opacity-75">/ unité</span>
                       </p>

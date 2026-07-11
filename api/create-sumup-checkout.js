@@ -65,6 +65,9 @@ function normalizeLineItems(rawItems) {
       quantity: qty,
       lineTotal: Math.round(line * 100) / 100,
       selectedColor: raw?.selectedColor ? String(raw.selectedColor).slice(0, 32) : undefined,
+      personalizationMessage: raw?.personalizationMessage
+        ? String(raw.personalizationMessage).trim().slice(0, 500)
+        : undefined,
       path: raw?.path ? String(raw.path).slice(0, 300) : undefined,
     })
   }
@@ -295,7 +298,13 @@ async function handleCreateCheckout(req, res, origin) {
     discountEur = promo.discount
   }
 
-  const descriptionBase = items.map((i) => `${i.title}×${i.quantity}`).join(', ')
+  const descriptionBase = items
+    .map((i) => {
+      const bits = [`${i.title}×${i.quantity}`]
+      if (i.personalizationMessage) bits.push(`msg: ${i.personalizationMessage}`)
+      return bits.join(' — ')
+    })
+    .join(', ')
   let description = descriptionBase.slice(0, 120) || 'Commande site'
   if (promoCode) {
     description = `${description} (-${promoCode})`.slice(0, 120)

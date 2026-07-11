@@ -1489,6 +1489,7 @@ function emptyArticleItem() {
     photoKey3: '',
     src3: '',
     colors: ['', '', ''],
+    personalizationMessageEnabled: false,
   }
 }
 
@@ -1517,6 +1518,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         photoKey3: it.photoKey3 || '',
         src3: it.src3 || '',
         colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+        personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
       })),
   )
   const [localHubIntro, setLocalHubIntro] = useState(() =>
@@ -1555,6 +1557,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           photoKey3: it.photoKey3 || '',
           src3: it.src3 || '',
           colors: Array.isArray(it.colors) ? [...it.colors, '', '', ''].slice(0, 3) : ['', '', ''],
+          personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
         })),
     )
     if (pageKey === 'evenementsFloraux') {
@@ -1687,6 +1690,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       colors: Array.isArray(it.colors)
         ? it.colors.map((c) => String(c || '').trim()).slice(0, 3)
         : ['', '', ''],
+      personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
     }))
     const pagePayload = {
       sectionTitle: localTitle.trim(),
@@ -2224,6 +2228,18 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                   </p>
                 )}
               </div>
+
+              <label className="block">
+                Message de la personnalisation
+                <select
+                  className="form-field mt-1"
+                  value={it.personalizationMessageEnabled ? 'yes' : 'no'}
+                  onChange={(e) => setField(idx, 'personalizationMessageEnabled', e.target.value === 'yes')}
+                >
+                  <option value="no">Non</option>
+                  <option value="yes">Oui</option>
+                </select>
+              </label>
 
               <div className="sm:col-span-2">
                 <p className="text-sm font-medium mb-2" style={{ color: 'var(--violet)' }}>

@@ -16,6 +16,10 @@ import { ArticleDescriptionBlock, stripArticleDescriptionMarkup } from '../lib/a
 import { formatEuro } from '../utils/formatEuro'
 import ArticleColorSwatches, { normalizeHexColor } from '../components/ArticleColorSwatches'
 import { useSwipeIndex } from '../hooks/useSwipeIndex'
+import {
+  buildArticleCartLineId,
+  isPersonalizationMessageEnabled,
+} from '../lib/articlePersonalization'
 
 function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
   return (
@@ -51,6 +55,7 @@ export default function ArticleProduct() {
   const swipePhotos = useSwipeIndex(photos.length, setPhotoIndex)
   const [quantity, setQuantity] = useState(1)
   const [selectedColor, setSelectedColor] = useState('')
+  const [personalizationMessage, setPersonalizationMessage] = useState('')
   const [added, setAdded] = useState(false)
 
   const colors = useMemo(() => {
@@ -61,6 +66,7 @@ export default function ArticleProduct() {
   useEffect(() => {
     if (colors.length === 1) setSelectedColor(colors[0])
     else setSelectedColor((prev) => (prev && colors.includes(prev) ? prev : ''))
+    setPersonalizationMessage('')
   }, [article?.id, colors])
 
   if (!ARTICLE_PAGE_META[pageKey]) {
@@ -81,13 +87,22 @@ export default function ArticleProduct() {
   }
 
   const price = resolveArticlePrice(article.price)
-  const cartId = selectedColor ? `${article.id}::${selectedColor}` : article.id
+  const personalizationEnabled = isPersonalizationMessageEnabled(article)
+  const trimmedPersonalizationMessage = personalizationMessage.trim()
+  const cartId = buildArticleCartLineId(article.id, {
+    selectedColor,
+    personalizationMessage: trimmedPersonalizationMessage,
+  })
   const rubrique = rubriquePath(catalogPageKey)
   const rubriqueLabel = ARTICLE_PAGE_META[catalogPageKey]?.label || 'Rubrique'
   const productPath = articleProductPath(catalogPageKey, article.id)
   const mainPhoto = photos[photoIndex] || photos[0]
+  const missingColor = colors.length > 0 && !selectedColor
+  const missingPersonalizationMessage = personalizationEnabled && !trimmedPersonalizationMessage
+  const cannotAddToCart = missingColor || missingPersonalizationMessage
 
   const handleAdd = () => {
+    if (cannotAddToCart) return
     addItem({
       id: cartId,
       title: article.title,
@@ -95,6 +110,7 @@ export default function ArticleProduct() {
       imageUrl: mainPhoto,
       path: productPath,
       selectedColor,
+      personalizationMessage: trimmedPersonalizationMessage || undefined,
       quantity,
     })
     setAdded(true)
@@ -199,6 +215,25 @@ export default function ArticleProduct() {
               </div>
             ) : null}
 
+            {personalizationEnabled ? (
+              <label className="block">
+                <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+                  Votre message de personnalisation *
+                </span>
+                <textarea
+                  className="form-field w-full min-h-[6rem] resize-y text-sm"
+                  value={personalizationMessage}
+                  onChange={(e) => setPersonalizationMessage(e.target.value)}
+                  placeholder="Prénom, date, texte à graver, couleur souhaitée…"
+                  maxLength={500}
+                  required
+                />
+                <p className="font-body text-[11px] mt-1.5 leading-snug" style={{ color: 'var(--text-mid)' }}>
+                  Ce message sera transmis avec votre commande pour personnaliser la création.
+                </p>
+              </label>
+            ) : null}
+
             <label className="block">
               <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
                 Quantité *
@@ -210,7 +245,7 @@ export default function ArticleProduct() {
               type="button"
               className="btn-primary w-full text-center justify-center py-3.5 hidden sm:flex"
               onClick={handleAdd}
-              disabled={colors.length > 0 && !selectedColor}
+              disabled={cannotAddToCart}
             >
               {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
             </button>
@@ -242,7 +277,7 @@ export default function ArticleProduct() {
             type="button"
             className="btn-primary article-product-sticky__btn"
             onClick={handleAdd}
-            disabled={colors.length > 0 && !selectedColor}
+            disabled={cannotAddToCart}
           >
             {added ? 'Ajouté ✓' : 'Ajouter au panier'}
           </button>
