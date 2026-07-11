@@ -16,10 +16,10 @@ export default {
         },
       },
       fontFamily: {
-        script: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        body: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        heading: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        refined: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        script: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        body: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        heading: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+        refined: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
         brand: ['Cookie', 'cursive'],
       },
       animation: {
