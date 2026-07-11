@@ -50,7 +50,7 @@ export default function Footer() {
                 ['Créations florales', '/creations-florales'],
                 ['Créations funéraires', '/creations-funeraires'],
                 ['Créations saisonnières', '/creations-saisonnieres'],
-                ['Personnalisation', '/personnalisation'],
+                ['Personnalisations', '/personnalisation'],
                 ['Avis Google', '/avis-google'],
                 ['Paiement', '/paiement'],
                 ['Contact', '/contact'],

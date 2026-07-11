@@ -43,11 +43,15 @@ export const ROUTE_SEO = {
     description: 'Couronnes, centres de table et bouquets hivernaux.',
   },
   '/creations-saisonnieres/fete-des-meres': {
-    title: 'Cadeaux fête des Mères',
-    description: 'Cœurs gravés, oursons fleuris et compositions pour maman.',
+    title: 'Cadeaux fêtes des Mères et des Pères',
+    description: 'Cœurs gravés, oursons fleuris et compositions pour maman et papa.',
+  },
+  '/creations-saisonnieres/fete-des-grandes-meres': {
+    title: 'Cadeaux fête des Grandes-Mères',
+    description: 'Compositions florales et cadeaux personnalisés pour mamie en Sarthe.',
   },
   '/personnalisation': {
-    title: 'Personnalisation & gravure florale',
+    title: 'Personnalisations & gravure florale',
     description: 'Objets et compositions gravés sur mesure : prénoms, dates et messages.',
   },
   '/contact': {

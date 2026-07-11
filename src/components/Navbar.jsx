@@ -36,10 +36,11 @@ const menuItems = [
     children: [
       { label: 'Pâques', path: '/creations-saisonnieres/paques' },
       { label: 'Noël', path: '/creations-saisonnieres/noel' },
-      { label: 'Fête des Mères/Père', path: '/creations-saisonnieres/fete-des-meres' },
+      { label: 'Fêtes des Mères/Pères', path: '/creations-saisonnieres/fete-des-meres' },
+      { label: 'Fête des Grandes-Mères', path: '/creations-saisonnieres/fete-des-grandes-meres' },
     ],
   },
-  { label: 'Personnalisation', path: '/personnalisation' },
+  { label: 'Personnalisations', path: '/personnalisation' },
   { label: 'Avis Google', path: '/avis-google' },
   { label: 'Paiement', path: '/paiement' },
   { label: 'Contact', path: '/contact' },

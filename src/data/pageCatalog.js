@@ -4,13 +4,14 @@ export const ARTICLE_PAGE_META = {
   creationsFlorales: { path: '/creations-florales', label: 'Créations florales' },
   creationsFuneraires: { path: '/creations-funeraires', label: 'Créations funéraires' },
   creationsSaisonnieres: { path: '/creations-saisonnieres', label: 'Créations saisonnières' },
-  personnalisation: { path: '/personnalisation', label: 'Personnalisation' },
+  personnalisation: { path: '/personnalisation', label: 'Personnalisations' },
   mariage: { path: '/evenements-floraux/mariage', label: 'Mariage' },
   anniversaire: { path: '/evenements-floraux/anniversaire', label: 'Anniversaire' },
   baptemeCommunion: { path: '/evenements-floraux/bapteme-communion', label: 'Baptême & Communion' },
   paques: { path: '/creations-saisonnieres/paques', label: 'Pâques' },
   noel: { path: '/creations-saisonnieres/noel', label: 'Noël' },
-  feteDesMeres: { path: '/creations-saisonnieres/fete-des-meres', label: 'Fête des Mères' },
+  feteDesMeres: { path: '/creations-saisonnieres/fete-des-meres', label: 'Fêtes des Mères/Pères' },
+  feteDesGrandesMeres: { path: '/creations-saisonnieres/fete-des-grandes-meres', label: 'Fête des Grandes-Mères' },
 }
 
 /** Bandeaux par défaut (si non modifiés dans l’admin). */
@@ -61,12 +62,17 @@ export const PAGE_BANNER_FALLBACKS = {
     photoKey: 'rosesPink',
   },
   '/creations-saisonnieres/fete-des-meres': {
-    title: 'Fête des Mères',
+    title: 'Fêtes des Mères/Pères',
+    subtitle: 'Créations saisonnières',
+    photoKey: 'peonies',
+  },
+  '/creations-saisonnieres/fete-des-grandes-meres': {
+    title: 'Fête des Grandes-Mères',
     subtitle: 'Créations saisonnières',
     photoKey: 'peonies',
   },
   '/personnalisation': {
-    title: 'Personnalisation',
+    title: 'Personnalisations',
     subtitle: 'Créations sur mesure',
     photoKey: 'bouquetGift',
   },

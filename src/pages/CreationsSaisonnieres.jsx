@@ -23,12 +23,20 @@ const SEASONS = [
     color: '#c94f4f',
   },
   {
-    title: 'Fête des Mères/Père',
+    title: 'Fêtes des Mères/Pères',
     path: '/creations-saisonnieres/fete-des-meres',
     desc: 'Des bouquets et créations florales tendres et délicats pour honorer mamans et papas avec amour.',
     img: w600(P.bouquetSoft),
     icon: '💝',
     color: '#d4759b',
+  },
+  {
+    title: 'Fête des Grandes-Mères',
+    path: '/creations-saisonnieres/fete-des-grandes-meres',
+    desc: 'Compositions florales et cadeaux personnalisés pour célébrer mamie avec tendresse.',
+    img: w600(P.peonies),
+    icon: '💐',
+    color: '#b86b8f',
   },
 ]
 
@@ -69,7 +77,7 @@ export default function CreationsSaisonnieres() {
 
       <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {SEASONS.map((season) => (
               <Link key={season.path} to={season.path} className="card group block overflow-hidden touch-manipulation">
                 <div className="img-overlay h-60">

@@ -471,7 +471,7 @@ export const PAGE_ARTICLE_CATALOG = {
   },
 
   feteDesMeres: {
-    sectionTitle: 'Créations Fête des Mères/Père',
+    sectionTitle: 'Créations Fêtes des Mères/Pères',
     intro:
       'Pour dire merci à maman — créations artisanales en fleurs, bois gravé et messages tendres.',
     items: [
@@ -516,6 +516,42 @@ export const PAGE_ARTICLE_CATALOG = {
           'Cœur en bois naturel perlé, gravé « Bonne fête Maman » et « Je t’aime ». Création simple et pleine de cœur.',
         price: 32,
         photoKey: 'tulips',
+      }),
+    ],
+  },
+
+  feteDesGrandesMeres: {
+    sectionTitle: 'Créations Fête des Grandes-Mères',
+    intro:
+      'Pour mamie avec tendresse — bouquets, cœurs gravés et compositions durables pour la fête des grandes-mères.',
+    items: [
+      item('fete-des-grandes-meres', 1, {
+        title: 'Plaque cœur « Bonne fête Mamie »',
+        description:
+          'Cœur en bois gravé et roses séchées à suspendre. Message personnalisable pour la fête des grandes-mères.',
+        price: 32,
+        photoKey: 'rosesBouquet',
+      }),
+      item('fete-des-grandes-meres', 2, {
+        title: 'Cœur roses pour mamie',
+        description:
+          'Grand cœur de roses rouges et blanches avec médaillon gravé. Cadeau touchant pour votre grand-mère.',
+        price: 68,
+        photoKey: 'peonies',
+      }),
+      item('fete-des-grandes-meres', 3, {
+        title: 'Composition « Je t’aime Mamie »',
+        description:
+          'Cœur fleuri avec colombe et message d’amour sur socle. Création artisanale pour honorer mamie.',
+        price: 68,
+        photoKey: 'bouquetSoft',
+      }),
+      item('fete-des-grandes-meres', 4, {
+        title: 'Suspension bois grand-mère',
+        description:
+          'Cœur en bois naturel perlé, gravé « Bonne fête Mamie » et « Je t’aime ». Simple et plein de cœur.',
+        price: 32,
+        photoKey: 'wildflowers',
       }),
     ],
   },

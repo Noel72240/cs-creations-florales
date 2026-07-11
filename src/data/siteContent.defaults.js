@@ -184,14 +184,14 @@ export const SITE_CONTENT_DEFAULTS = {
         },
         {
           title: 'Créations saisonnières',
-          desc: 'Pâques, Noël, Fête des Mères/Père — des créations adaptées à chaque saison et tradition.',
+          desc: 'Pâques, Noël, Fêtes des Mères/Pères, Fête des Grandes-Mères — des créations adaptées à chaque saison et tradition.',
           icon: '🌿',
           path: '/creations-saisonnieres',
           photoKey: 'tulips',
           src: '',
         },
         {
-          title: 'Personnalisation',
+          title: 'Personnalisations',
           desc: 'Objets, accessoires, cadeaux personnalisés pour offrir quelque chose de vraiment unique.',
           icon: '✨',
           path: '/personnalisation',
@@ -266,7 +266,7 @@ export const SITE_CONTENT_DEFAULTS = {
     creationsSaisonnieres: {
       sectionTitle: 'Créations de saison',
       intro:
-        'Pâques, fête des mères et fêtes de fin d’année — découvrez nos créations dans chaque rubrique dédiée.',
+        'Pâques, fêtes des mères, fête des grandes-mères et fêtes de fin d’année — découvrez nos créations dans chaque rubrique dédiée.',
       items: [
         {
           id: 'sai-paques-lapin',

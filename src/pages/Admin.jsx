@@ -1465,13 +1465,14 @@ const ARTICLE_PAGE_OPTIONS = [
   { value: 'creationsFlorales', label: 'Créations florales (page)' },
   { value: 'creationsFuneraires', label: 'Créations funéraires (page)' },
   { value: 'creationsSaisonnieres', label: 'Créations saisonnières (page)' },
-  { value: 'personnalisation', label: 'Personnalisation (page)' },
+  { value: 'personnalisation', label: 'Personnalisations (page)' },
   { value: 'mariage', label: 'Mariage' },
   { value: 'anniversaire', label: 'Anniversaire' },
   { value: 'baptemeCommunion', label: 'Baptême & Communion' },
   { value: 'paques', label: 'Pâques' },
   { value: 'noel', label: 'Noël' },
-  { value: 'feteDesMeres', label: 'Fête des Mères/Père' },
+  { value: 'feteDesMeres', label: 'Fêtes des Mères/Pères' },
+  { value: 'feteDesGrandesMeres', label: 'Fête des Grandes-Mères' },
 ]
 
 function emptyArticleItem() {

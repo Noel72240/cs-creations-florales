@@ -66,7 +66,7 @@ export const SEO_PAGES = [
     shopPath: '/evenements-floraux/mariage',
     relatedLinks: [
       { label: 'Galerie mariage', path: '/evenements-floraux/mariage' },
-      { label: 'Personnalisation', path: '/personnalisation' },
+      { label: 'Personnalisations', path: '/personnalisation' },
     ],
     sections: [
       {

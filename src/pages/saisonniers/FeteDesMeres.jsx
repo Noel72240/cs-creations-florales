@@ -4,7 +4,7 @@ import { P, w1200 } from '../../data/flowerPhotos'
 export default function FeteDesMeres() {
   return (
     <SeasonPage
-      title="Fête des Mères/Père"
+      title="Fêtes des Mères/Pères"
       subtitle="Créations saisonnières"
       icon="💝"
       coverImg={w1200(P.bouquetSoft)}

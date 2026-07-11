@@ -15,7 +15,7 @@ export default function Personnalisation() {
         <ConfigurablePageHeader
           pagePath="/personnalisation"
           fallback={{
-            title: 'Personnalisation',
+            title: 'Personnalisations',
             subtitle: 'Créations sur mesure',
             image: w1200(P.bouquetGift),
           }}

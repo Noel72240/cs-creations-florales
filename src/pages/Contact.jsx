@@ -158,7 +158,7 @@ export default function Contact() {
                       <option>Demande de devis — Anniversaire</option>
                       <option>Demande de devis — Baptême / Communion</option>
                       <option>Demande de devis — Création funéraire</option>
-                      <option>Demande de devis — Personnalisation</option>
+                      <option>Demande de devis — Personnalisations</option>
                       <option>Renseignement général</option>
                       <option>Autre</option>
                     </select>

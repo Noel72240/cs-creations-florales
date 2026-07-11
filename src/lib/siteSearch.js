@@ -11,8 +11,9 @@ export const ARTICLE_PAGE_META = {
   creationsSaisonnieres: { path: '/creations-saisonnieres', label: 'Créations saisonnières' },
   paques: { path: '/creations-saisonnieres/paques', label: 'Pâques' },
   noel: { path: '/creations-saisonnieres/noel', label: 'Noël' },
-  feteDesMeres: { path: '/creations-saisonnieres/fete-des-meres', label: 'Fête des Mères' },
-  personnalisation: { path: '/personnalisation', label: 'Personnalisation' },
+  feteDesMeres: { path: '/creations-saisonnieres/fete-des-meres', label: 'Fêtes des Mères/Pères' },
+  feteDesGrandesMeres: { path: '/creations-saisonnieres/fete-des-grandes-meres', label: 'Fête des Grandes-Mères' },
+  personnalisation: { path: '/personnalisation', label: 'Personnalisations' },
 }
 
 const STATIC_PAGES = [
@@ -21,7 +22,8 @@ const STATIC_PAGES = [
   { path: '/avis-google', label: 'Avis Google', keywords: 'avis témoignages clients google' },
   { path: '/panier', label: 'Panier', keywords: 'panier commande achat' },
   { path: '/paiement', label: 'Paiement', keywords: 'paiement sumup carte' },
-  { path: '/personnalisation', label: 'Personnalisation', keywords: 'sur mesure gravure prénom' },
+  { path: '/personnalisation', label: 'Personnalisations', keywords: 'sur mesure gravure prénom personnalisations' },
+  { path: '/creations-saisonnieres/fete-des-grandes-meres', label: 'Fête des Grandes-Mères', keywords: 'mamie grand-mère cadeau' },
 ]
 
 export function normalizeSearchText(value) {
