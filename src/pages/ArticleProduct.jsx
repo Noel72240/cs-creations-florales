@@ -299,25 +299,48 @@ export default function ArticleProduct() {
               </div>
             </div>
 
-            <div className="article-product-layout__head order-2">
-              <h1 className="font-heading text-xl sm:text-2xl lg:text-3xl font-medium leading-snug mb-1 sm:mb-2 text-center sm:text-left" style={{ color: 'var(--violet)' }}>
-                {article.title}
-              </h1>
-              <p className="font-refined text-lg sm:text-xl font-semibold mb-0 text-center sm:text-left" style={{ color: 'var(--mauve)' }}>
-                {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
-                {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
-                  <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
-                    selon taille et nombre de chiffres
-                  </span>
+            <div className="article-product-layout__info">
+              <div className="article-product-layout__head order-2">
+                <h1 className="font-heading text-xl sm:text-2xl lg:text-3xl font-medium leading-snug mb-1 sm:mb-2 text-center sm:text-left" style={{ color: 'var(--violet)' }}>
+                  {article.title}
+                </h1>
+                <p className="font-refined text-lg sm:text-xl font-semibold mb-0 text-center sm:text-left" style={{ color: 'var(--mauve)' }}>
+                  {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
+                  {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
+                    <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                      selon taille et nombre de chiffres
+                    </span>
+                  ) : null}
+                  {advancedOptionsActive &&
+                  (productOptionsConfig.templateId === 'verres-personnalises' ||
+                    productOptionsConfig.templateId === 'verre-communion') ? (
+                    <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                      à partir de 9,90 € / verre
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+
+              <div className="article-product-layout__desc order-4">
+                {descriptionBlocks.length > 0 ? (
+                  <div
+                    className="article-product-description text-refined text-sm leading-relaxed space-y-3"
+                    style={{ color: 'var(--text-elegant)' }}
+                  >
+                    {descriptionBlocks.map((block, i) => (
+                      <p key={i}>
+                        <ArticleDescriptionBlock text={block} />
+                      </p>
+                    ))}
+                  </div>
                 ) : null}
-                {advancedOptionsActive &&
-                (productOptionsConfig.templateId === 'verres-personnalises' ||
-                  productOptionsConfig.templateId === 'verre-communion') ? (
-                  <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
-                    à partir de 9,90 € / verre
-                  </span>
-                ) : null}
-              </p>
+              </div>
+
+              <div className="article-product-layout__back order-5">
+                <Link to={rubrique} className="btn-outline text-sm inline-block w-full sm:w-auto text-center mt-4 sm:mt-6">
+                  ← Retour à {rubriqueLabel}
+                </Link>
+              </div>
             </div>
 
             <div className="article-product-layout__shop order-3">
@@ -386,27 +409,6 @@ export default function ArticleProduct() {
                   {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
                 </button>
               </div>
-            </div>
-
-            <div className="article-product-layout__desc order-4">
-              {descriptionBlocks.length > 0 ? (
-                <div
-                  className="article-product-description text-refined text-sm leading-relaxed space-y-3"
-                  style={{ color: 'var(--text-elegant)' }}
-                >
-                  {descriptionBlocks.map((block, i) => (
-                    <p key={i}>
-                      <ArticleDescriptionBlock text={block} />
-                    </p>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            <div className="article-product-layout__back order-5">
-              <Link to={rubrique} className="btn-outline text-sm inline-block w-full sm:w-auto text-center mt-4 sm:mt-6">
-                ← Retour à {rubriqueLabel}
-              </Link>
             </div>
           </div>
         </div>
