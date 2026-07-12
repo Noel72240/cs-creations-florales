@@ -464,16 +464,25 @@ async function handleCreateCheckout(req, res, origin) {
     description = `${description} (-${promoCode})`.slice(0, 120)
   }
 
-  const orderBase = {
+  const orderMinimal = {
     checkout_reference: checkoutReference,
     status: 'pending',
     amount_eur: total,
     currency: 'EUR',
     line_items: items,
     customer_email: customerEmail,
-    customer_name: customerName,
     payee_email: payeeEmail || null,
+  }
+  const orderWithCustomer = {
+    ...orderMinimal,
+    customer_name: customerName,
+  }
+  const orderWithShipping = {
+    ...orderWithCustomer,
     ...shippingFields,
+  }
+  const orderBase = {
+    ...orderWithShipping,
   }
   const orderWithPromo = {
     ...orderBase,
@@ -482,19 +491,35 @@ async function handleCreateCheckout(req, res, origin) {
     subtotal_eur: promoCode ? subtotal : null,
   }
 
-  let insertErr = (await supabase.from('orders').insert(orderWithPromo)).error
-  if (
-    insertErr &&
-    /promo_code|discount_eur|subtotal_eur|customer_name|owner_notified_at|shipping_method|relay_point|customer_phone|parcel_weight|parcel_tier|shipping_fee|mondial_relay/i.test(
-      insertErr.message || '',
-    )
-  ) {
-    insertErr = (await supabase.from('orders').insert(orderBase)).error
+  const insertAttempts = [orderWithPromo, orderWithShipping, orderWithCustomer, orderMinimal]
+  let insertErr = null
+  for (const row of insertAttempts) {
+    const { error } = await supabase.from('orders').insert(row)
+    if (!error) {
+      insertErr = null
+      break
+    }
+    insertErr = error
+    const msg = error.message || ''
+    if (!/column|schema cache|Could not find the/i.test(msg)) {
+      break
+    }
   }
 
   if (insertErr) {
     console.error('[create-sumup-checkout] Supabase insert', insertErr)
-    sendJson(res, 500, { error: 'Enregistrement commande impossible', details: insertErr.message }, origin)
+    const missingColumn = /column|schema cache|Could not find the/i.test(insertErr.message || '')
+    sendJson(
+      res,
+      500,
+      {
+        error: missingColumn
+          ? 'Enregistrement commande impossible — exécutez les migrations Supabase « orders » (voir supabase/migrations).'
+          : 'Enregistrement commande impossible',
+        details: insertErr.message,
+      },
+      origin,
+    )
     return
   }
 
