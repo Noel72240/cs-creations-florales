@@ -332,14 +332,8 @@ export const SITE_CONTENT_DEFAULTS = {
     },
     noel: {
       sectionTitle: 'Créations Noël',
-      intro: 'Ambiance hivernale et chaleureuse — rouge, or, vert ou blanc.',
-      items: [
-        { id: 'noe-couronne-porte', title: 'Couronne de porte', description: 'Couronne fraîche ou stabilisée, diamètre standard.', price: 0, photoKey: 'rosesPink', src: '' },
-        { id: 'noe-table', title: 'Centre de table de fête', description: 'Bougies et végétaux de saison.', price: 0, photoKey: 'weddingBouquet', src: '' },
-        { id: 'noe-sapin', title: 'Décoration pied de sapin', description: 'Composition pour base d’arbre.', price: 0, photoKey: 'wildflowers', src: '' },
-        { id: 'noe-cadeau', title: 'Bouquet cadeau hivernal', description: 'Roses, baies et conifères.', price: 0, photoKey: 'rosesPink', src: '' },
-        { id: 'noe-cheminee', title: 'Composition manteau cheminée', description: 'Longueur au choix (devis).', price: 0, photoKey: 'vaseInterior', src: '' },
-      ],
+      intro: '',
+      items: [],
     },
   }),
 
