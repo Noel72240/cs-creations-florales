@@ -40,5 +40,6 @@ export const WEB_DEV = {
   phoneHref: 'tel:+33613893967',
   email: 'contact@allotech72.fr',
   siret: '99006097200017',
+  websiteUrl: 'https://www.allotech72.fr/',
 }
 

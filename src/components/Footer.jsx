@@ -100,9 +100,13 @@ export default function Footer() {
         </div>
 
         {/* Réalisation site — Arial / sans-serif (lisible, type mentions légales) */}
-        <div
-          className="footer-webdev-credits border-t border-mauve-light/30 pt-4 mb-4 rounded-xl px-3 py-2.5 sm:py-3 text-center max-w-xl mx-auto"
+        <a
+          href={WEB_DEV.websiteUrl || 'https://www.allotech72.fr/'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer-webdev-credits footer-webdev-credits--link border-t border-mauve-light/30 pt-4 mb-4 rounded-xl px-3 py-2.5 sm:py-3 text-center max-w-xl mx-auto block"
           style={{ background: 'rgba(240,210,221,0.12)', color: 'var(--text-mid)' }}
+          aria-label={`Visiter le site de ${WEB_DEV.company}`}
         >
           <p className="footer-webdev-title">Conception & réalisation du site</p>
           <p className="footer-webdev-line">
@@ -113,12 +117,9 @@ export default function Footer() {
             {WEB_DEV.addressLine}, {WEB_DEV.postalCode} {WEB_DEV.city}
           </p>
           <p className="footer-webdev-line footer-webdev-line--meta">
-            SIRET {WEB_DEV.siret} ·{' '}
-            <a href={WEB_DEV.phoneHref} className="hover:text-mauve transition-colors">{WEB_DEV.phoneDisplay}</a>
-            {' · '}
-            <a href={`mailto:${WEB_DEV.email}`} className="hover:text-mauve transition-colors">{WEB_DEV.email}</a>
+            SIRET {WEB_DEV.siret} · {WEB_DEV.phoneDisplay} · {WEB_DEV.email}
           </p>
-        </div>
+        </a>
 
         {/* Bottom bar — manuscrite (corps légal relevé dans index.css) */}
         <div

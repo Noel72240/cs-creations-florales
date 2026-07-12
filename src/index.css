@@ -225,6 +225,26 @@
   -webkit-font-smoothing: antialiased;
 }
 
+.footer-webdev-credits--link {
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.footer-webdev-credits--link:hover,
+.footer-webdev-credits--link:focus-visible {
+  background: rgba(240, 210, 221, 0.28);
+  box-shadow: 0 4px 18px rgba(139, 75, 106, 0.12);
+  transform: translateY(-1px);
+}
+
+.footer-webdev-credits--link:focus-visible {
+  outline: 2px solid var(--mauve);
+  outline-offset: 2px;
+}
+
 .footer-webdev-credits .footer-webdev-title {
   margin: 0 0 0.35rem;
   font-size: clamp(0.65rem, 0.72vw, 0.75rem);
