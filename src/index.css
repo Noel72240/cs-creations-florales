@@ -2134,6 +2134,40 @@ button.nav-link.nav-link-header {
   padding: 0.65rem 0.85rem;
 }
 
+.secure-payment-notice__layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.secure-payment-notice--compact .secure-payment-notice__layout {
+  gap: 0.6rem;
+}
+
+.secure-payment-notice__logo {
+  width: 4.25rem;
+  height: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.secure-payment-notice--compact .secure-payment-notice__logo {
+  width: 3.25rem;
+}
+
+.secure-payment-notice__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.secure-payment-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .secure-payment-notice__head {
   display: flex;
   align-items: center;

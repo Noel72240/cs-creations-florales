@@ -1,4 +1,6 @@
-/** Bandeau « paiement sécurisé SumUp » + cartes acceptées sur la page hébergée. */
+/** Bandeau « paiement sécurisé » + cartes acceptées (SumUp). */
+const SECURE_PAYMENT_LOGO = '/images/paiement-securise.png'
+
 export default function SecurePaymentNotice({ compact = false, className = '' }) {
   return (
     <div
@@ -6,26 +8,33 @@ export default function SecurePaymentNotice({ compact = false, className = '' })
       role="note"
       aria-label="Paiement sécurisé"
     >
-      <div className="secure-payment-notice__head">
-        <span className="secure-payment-notice__lock" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="secure-payment-notice__lock-icon">
-            <path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V11a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z" />
-          </svg>
-        </span>
-        <p className="secure-payment-notice__title">
-          {compact ? 'Paiement sécurisé SumUp' : 'Paiement sécurisé sur le site'}
-        </p>
+      <div className="secure-payment-notice__layout">
+        <img
+          src={SECURE_PAYMENT_LOGO}
+          alt=""
+          className="secure-payment-notice__logo"
+          width={72}
+          height={72}
+          loading="lazy"
+          decoding="async"
+          aria-hidden="true"
+        />
+        <div className="secure-payment-notice__body">
+          <p className="secure-payment-notice__title">
+            {compact ? 'Paiement sécurisé SumUp' : 'Paiement sécurisé sur le site'}
+          </p>
+          <p className="secure-payment-notice__text">
+            {compact
+              ? 'Redirection vers la page sécurisée SumUp (3-D Secure si votre banque l’exige).'
+              : 'Le règlement en ligne s’effectue sur une page hébergée par SumUp — vos données de carte ne transitent pas par ce site.'}
+          </p>
+          <p className="secure-payment-notice__cards" aria-label="Cartes acceptées sur SumUp">
+            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">CB</span>
+            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Visa</span>
+            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Mastercard</span>
+          </p>
+        </div>
       </div>
-      <p className="secure-payment-notice__text">
-        {compact
-          ? 'Redirection vers la page sécurisée SumUp (3-D Secure si votre banque l’exige).'
-          : 'Le règlement en ligne s’effectue sur une page hébergée par SumUp — vos données de carte ne transitent pas par ce site.'}
-      </p>
-      <p className="secure-payment-notice__cards" aria-label="Cartes acceptées sur SumUp">
-        <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">CB</span>
-        <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Visa</span>
-        <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Mastercard</span>
-      </p>
     </div>
   )
 }
@@ -42,5 +51,21 @@ export function AcceptedPaymentMethodsList({ className = '' }) {
         <strong>Espèces</strong> — remise en main propre, dans la limite des plafonds légaux
       </li>
     </ul>
+  )
+}
+
+/** Logo seul — pied de page, page paiement. */
+export function SecurePaymentLogo({ className = '', size = 'md' }) {
+  const dim = size === 'sm' ? 56 : size === 'lg' ? 88 : 72
+  return (
+    <img
+      src={SECURE_PAYMENT_LOGO}
+      alt="Paiement sécurisé — carte bancaire protégée"
+      className={`secure-payment-logo${className ? ` ${className}` : ''}`}
+      width={dim}
+      height={dim}
+      loading="lazy"
+      decoding="async"
+    />
   )
 }
