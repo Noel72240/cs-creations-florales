@@ -238,7 +238,7 @@ export default function ArticleProduct() {
       />
 
       <section className="article-product-page is-visible py-4 px-3 sm:py-10 sm:px-4" style={{ background: 'var(--beige)' }}>
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-5xl mx-auto">
           <nav className="article-product-breadcrumb text-xs mb-4 flex flex-wrap items-center gap-1" style={{ color: 'var(--text-mid)' }}>
             <Link to="/" className="hover:text-mauve transition-colors shrink-0">
               Accueil
@@ -253,147 +253,156 @@ export default function ArticleProduct() {
             </span>
           </nav>
 
-          <div
-            className="article-product-gallery mb-4 sm:mb-5"
-            {...(photos.length > 1 ? swipePhotos : {})}
-          >
-            {mainPhoto ? (
-              <img src={mainPhoto} alt={article.title} className="article-product-gallery__main" draggable={false} />
-            ) : null}
-            {photos.length > 1 ? (
-              <p className="article-product-swipe-hint" aria-hidden="true">
-                Glissez pour voir les photos
-              </p>
-            ) : null}
-            {photos.length > 1 ? (
-              <div className="article-product-dots article-catalog-dots mt-3" role="tablist" aria-label="Photos du produit">
-                {photos.map((url, i) => (
-                  <button
-                    key={url}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === photoIndex}
-                    className={i === photoIndex ? 'is-active' : ''}
-                    onClick={() => setPhotoIndex(i)}
-                    aria-label={`Photo ${i + 1}`}
-                  />
-                ))}
-              </div>
-            ) : null}
-            {photos.length > 1 ? (
-              <div className="article-product-thumbs flex gap-2 mt-3 overflow-x-auto pb-1">
-                {photos.map((url, i) => (
-                  <button
-                    key={`thumb-${url}`}
-                    type="button"
-                    onClick={() => setPhotoIndex(i)}
-                    className={`article-product-thumb shrink-0${i === photoIndex ? ' is-active' : ''}`}
-                  >
-                    <img src={url} alt="" draggable={false} />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          <h1 className="font-heading text-xl sm:text-3xl font-medium leading-snug mb-1 sm:mb-2" style={{ color: 'var(--violet)' }}>
-            {article.title}
-          </h1>
-          <p className="font-refined text-lg sm:text-xl font-semibold mb-5 sm:mb-6" style={{ color: 'var(--mauve)' }}>
-            {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
-            {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
-              <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
-                selon taille et nombre de chiffres
-              </span>
-            ) : null}
-            {advancedOptionsActive &&
-            (productOptionsConfig.templateId === 'verres-personnalises' ||
-              productOptionsConfig.templateId === 'verre-communion') ? (
-              <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
-                à partir de 9,90 € / verre
-              </span>
-            ) : null}
-          </p>
-
-          <div className="article-product-options space-y-4 mb-8">
-            {advancedOptionsActive ? (
-              <ProductOptionsForm
-                fields={optionFields}
-                values={optionValues}
-                onChange={(next) => {
-                  setOptionValues(next)
-                  setOptionErrors({})
-                }}
-                errors={optionErrors}
-                templateId={productOptionsConfig.templateId}
-              />
-            ) : null}
-
-            {colors.length > 0 ? (
-              <div className="block">
-                <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--violet)' }}>
-                  Couleur *
-                </span>
-                <ArticleColorSwatches
-                  colors={colors}
-                  labels={article.colorLabels}
-                  value={selectedColor}
-                  onChange={setSelectedColor}
-                />
-              </div>
-            ) : null}
-
-            {personalizationEnabled ? (
-              <label className="block">
-                <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
-                  Votre message de personnalisation *
-                </span>
-                <textarea
-                  className="form-field w-full min-h-[6rem] resize-y text-sm"
-                  value={personalizationMessage}
-                  onChange={(e) => setPersonalizationMessage(e.target.value)}
-                  placeholder="Prénom, date, texte à graver, couleur souhaitée…"
-                  maxLength={500}
-                  required
-                />
-                <p className="font-body text-[11px] mt-1.5 leading-snug" style={{ color: 'var(--text-mid)' }}>
-                  Ce message sera transmis avec votre commande pour personnaliser la création.
-                </p>
-              </label>
-            ) : null}
-
-            {!hideQtyStepper ? (
-              <label className="block">
-                <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
-                  Quantité *
-                </span>
-                <QuantityStepper value={quantity} onChange={setQuantity} />
-              </label>
-            ) : null}
-
-            <button
-              type="button"
-              className="btn-primary w-full text-center justify-center py-3.5 hidden sm:flex"
-              onClick={handleAdd}
-              disabled={cannotAddToCart}
+          <div className="article-product-layout">
+            <div
+              className="article-product-layout__media"
+              {...(photos.length > 1 ? swipePhotos : {})}
             >
-              {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
-            </button>
-          </div>
-
-          {descriptionBlocks.length > 0 ? (
-            <div className="text-refined text-sm leading-relaxed space-y-3 mb-8" style={{ color: 'var(--text-elegant)' }}>
-              {descriptionBlocks.map((block, i) => (
-                <p key={i}>
-                  <ArticleDescriptionBlock text={block} />
-                </p>
-              ))}
+              <div className="article-product-gallery">
+                {mainPhoto ? (
+                  <img src={mainPhoto} alt={article.title} className="article-product-gallery__main" draggable={false} />
+                ) : null}
+                {photos.length > 1 ? (
+                  <p className="article-product-swipe-hint" aria-hidden="true">
+                    Glissez pour voir les photos
+                  </p>
+                ) : null}
+                {photos.length > 1 ? (
+                  <div className="article-product-dots article-catalog-dots mt-3" role="tablist" aria-label="Photos du produit">
+                    {photos.map((url, i) => (
+                      <button
+                        key={url}
+                        type="button"
+                        role="tab"
+                        aria-selected={i === photoIndex}
+                        className={i === photoIndex ? 'is-active' : ''}
+                        onClick={() => setPhotoIndex(i)}
+                        aria-label={`Photo ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+                {photos.length > 1 ? (
+                  <div className="article-product-thumbs flex gap-2 mt-3 overflow-x-auto pb-1">
+                    {photos.map((url, i) => (
+                      <button
+                        key={`thumb-${url}`}
+                        type="button"
+                        onClick={() => setPhotoIndex(i)}
+                        className={`article-product-thumb shrink-0${i === photoIndex ? ' is-active' : ''}`}
+                      >
+                        <img src={url} alt="" draggable={false} />
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
-          ) : null}
 
-          <Link to={rubrique} className="btn-outline text-sm inline-block w-full sm:w-auto text-center">
-            ← Retour à {rubriqueLabel}
-          </Link>
+            <div className="article-product-layout__main">
+              <h1 className="font-heading text-xl sm:text-3xl font-medium leading-snug mb-1 sm:mb-2" style={{ color: 'var(--violet)' }}>
+                {article.title}
+              </h1>
+              <p className="font-refined text-lg sm:text-xl font-semibold mb-4 sm:mb-5" style={{ color: 'var(--mauve)' }}>
+                {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
+                {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
+                  <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                    selon taille et nombre de chiffres
+                  </span>
+                ) : null}
+                {advancedOptionsActive &&
+                (productOptionsConfig.templateId === 'verres-personnalises' ||
+                  productOptionsConfig.templateId === 'verre-communion') ? (
+                  <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                    à partir de 9,90 € / verre
+                  </span>
+                ) : null}
+              </p>
+
+              {descriptionBlocks.length > 0 ? (
+                <div
+                  className="article-product-description text-refined text-sm leading-relaxed space-y-3 mb-5 sm:mb-6"
+                  style={{ color: 'var(--text-elegant)' }}
+                >
+                  {descriptionBlocks.map((block, i) => (
+                    <p key={i}>
+                      <ArticleDescriptionBlock text={block} />
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className="article-product-options space-y-4 mb-6 sm:mb-8">
+                {advancedOptionsActive ? (
+                  <ProductOptionsForm
+                    fields={optionFields}
+                    values={optionValues}
+                    onChange={(next) => {
+                      setOptionValues(next)
+                      setOptionErrors({})
+                    }}
+                    errors={optionErrors}
+                    templateId={productOptionsConfig.templateId}
+                  />
+                ) : null}
+
+                {colors.length > 0 ? (
+                  <div className="block">
+                    <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--violet)' }}>
+                      Couleur *
+                    </span>
+                    <ArticleColorSwatches
+                      colors={colors}
+                      labels={article.colorLabels}
+                      value={selectedColor}
+                      onChange={setSelectedColor}
+                    />
+                  </div>
+                ) : null}
+
+                {personalizationEnabled ? (
+                  <label className="block">
+                    <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+                      Votre message de personnalisation *
+                    </span>
+                    <textarea
+                      className="form-field w-full min-h-[6rem] resize-y text-sm"
+                      value={personalizationMessage}
+                      onChange={(e) => setPersonalizationMessage(e.target.value)}
+                      placeholder="Prénom, date, texte à graver, couleur souhaitée…"
+                      maxLength={500}
+                      required
+                    />
+                    <p className="font-body text-[11px] mt-1.5 leading-snug" style={{ color: 'var(--text-mid)' }}>
+                      Ce message sera transmis avec votre commande pour personnaliser la création.
+                    </p>
+                  </label>
+                ) : null}
+
+                {!hideQtyStepper ? (
+                  <label className="block">
+                    <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+                      Quantité *
+                    </span>
+                    <QuantityStepper value={quantity} onChange={setQuantity} />
+                  </label>
+                ) : null}
+
+                <button
+                  type="button"
+                  className="btn-primary w-full text-center justify-center py-3.5 hidden sm:flex"
+                  onClick={handleAdd}
+                  disabled={cannotAddToCart}
+                >
+                  {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
+                </button>
+              </div>
+
+              <Link to={rubrique} className="btn-outline text-sm inline-block w-full sm:w-auto text-center">
+                ← Retour à {rubriqueLabel}
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
