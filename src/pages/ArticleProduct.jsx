@@ -323,10 +323,7 @@ export default function ArticleProduct() {
 
               <div className="article-product-layout__desc order-4">
                 {descriptionBlocks.length > 0 ? (
-                  <div
-                    className="article-product-description text-refined text-sm leading-relaxed space-y-3"
-                    style={{ color: 'var(--text-elegant)' }}
-                  >
+                  <div className="article-product-description">
                     {descriptionBlocks.map((block, i) => (
                       <p key={i}>
                         <ArticleDescriptionBlock text={block} />

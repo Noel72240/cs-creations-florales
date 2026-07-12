@@ -2106,6 +2106,19 @@ button.nav-link.nav-link-header {
 
 .article-product-description {
   text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: var(--text-elegant);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.article-product-description strong {
+  font-weight: 600;
+  color: var(--violet);
 }
 
 @media (min-width: 640px) {
