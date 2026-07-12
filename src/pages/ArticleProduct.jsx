@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Seo from '../components/Seo'
+import ProductOptionsForm from '../components/ProductOptionsForm'
 import ProductOptionsSectionHeading from '../components/ProductOptionsSectionHeading'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { useCart } from '../context/CartContext'
@@ -156,14 +157,15 @@ export default function ArticleProduct() {
   const hideQtyStepper = advancedOptionsActive && shouldHideCartQuantityStepper(productOptionsConfig.templateId)
   const hasShopSection =
     advancedOptionsActive || colors.length > 0 || personalizationEnabled || !hideQtyStepper
-  const optionsSectionTitle = useMemo(() => {
-    if (!hasShopSection) return ''
+  let optionsSectionTitle = ''
+  if (hasShopSection) {
     if (advancedOptionsActive && productOptionsConfig) {
-      return resolveProductOptionsSectionTitle(productOptionsConfig, article?.title)
+      optionsSectionTitle = resolveProductOptionsSectionTitle(productOptionsConfig, article.title)
+    } else {
+      const custom = String(article.productOptions?.sectionTitle || '').trim()
+      optionsSectionTitle = custom || 'Personnalisez votre création'
     }
-    const custom = String(article?.productOptions?.sectionTitle || '').trim()
-    return custom || 'Personnalisez votre création'
-  }, [hasShopSection, advancedOptionsActive, productOptionsConfig, article?.title, article?.productOptions?.sectionTitle])
+  }
   const cartQuantity = advancedOptionsActive
     ? computeOptionsCartQuantity({
         templateId: productOptionsConfig.templateId,
