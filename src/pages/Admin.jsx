@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
 import GoogleReviewsEditor from '../components/admin/GoogleReviewsEditor'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
-import { ARTICLE_PAGE_META, PAGE_BANNER_FALLBACKS } from '../data/pageCatalog'
+import { ARTICLE_PAGE_META, PAGE_BANNER_FALLBACKS, UTILITY_PAGE_BANNERS } from '../data/pageCatalog'
 import { getHubParentKey, isHubPageKey } from '../lib/articleHubAggregation'
 import { PHOTO_KEY_OPTIONS } from '../data/homePhotos'
 import { resolveBackgroundSrc, resolvePhotoSrc, resolveItemPhoto } from '../data/photoResolver'
@@ -237,6 +237,7 @@ export default function Admin() {
   const prestationsDraftRef = useRef(null)
   const motoPhotoDraftRef = useRef(null)
   const googleReviewsDraftRef = useRef(null)
+  const pageBannersDraftRef = useRef(null)
   const heroBackgroundDraftRef = useRef({
     backgroundSrc: '',
     backgroundPhotoKey: '',
@@ -476,15 +477,23 @@ export default function Admin() {
     async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
-      await applySaveMsg({
+      const patch = {
         contact: {
           addressLine: fd.get('addr') || '',
           availability: fd.get('avail') || '',
         },
-      })
+      }
+      if (pageBannersDraftRef.current) {
+        patch.pageBanners = pageBannersDraftRef.current
+      }
+      await applySaveMsg(patch)
     },
     [applySaveMsg],
   )
+
+  const handlePageBannersDraft = useCallback((next) => {
+    pageBannersDraftRef.current = next
+  }, [])
 
   const handleSaveGoogleReviews = useCallback(
     async (e) => {
@@ -661,7 +670,7 @@ export default function Admin() {
             {t === 'articles' && 'Articles (boutique)'}
             {t === 'reviews' && 'Nos avis clients'}
             {t === 'footer' && 'Menu & pied de page'}
-            {t === 'contact' && 'Contact (page)'}
+            {t === 'contact' && 'Contact & bandeaux'}
             {t === 'import' && 'Import / export'}
           </button>
         ))}
@@ -1012,17 +1021,34 @@ export default function Admin() {
       )}
 
       {tab === 'contact' && (
-        <form onSubmit={handleSaveContact} className="space-y-3">
-          <label className="block">Adresse (ligne affichée)
-            <input name="addr" defaultValue={c.contact.addressLine} className="form-field mt-1" />
-          </label>
-          <label className="block">Disponibilités
-            <input name="avail" defaultValue={c.contact.availability} className="form-field mt-1" />
-          </label>
-          <button type="submit" className="btn-primary">Enregistrer</button>
-          <p className="text-xs mt-4">
-            Les emails / téléphone du bloc contact et le texte RGPD du formulaire sont liés à l’onglet Identité (nom, email, téléphone).
-          </p>
+        <form onSubmit={handleSaveContact} className="space-y-6">
+          <fieldset className="space-y-3">
+            <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>
+              Coordonnées (page contact)
+            </legend>
+            <label className="block">
+              Adresse (ligne affichée)
+              <input name="addr" defaultValue={c.contact.addressLine} className="form-field mt-1" />
+            </label>
+            <label className="block">
+              Disponibilités
+              <input name="avail" defaultValue={c.contact.availability} className="form-field mt-1" />
+            </label>
+            <p className="text-xs">
+              Les emails / téléphone du bloc contact et le texte RGPD du formulaire sont liés à l’onglet Identité (nom, email, téléphone).
+            </p>
+          </fieldset>
+
+          <UtilityPageBannersEditor
+            key={JSON.stringify(c.pageBanners)}
+            initial={c.pageBanners}
+            onDraftChange={handlePageBannersDraft}
+            setMsg={setMsg}
+          />
+
+          <button type="submit" className="btn-primary">
+            Enregistrer contact & bandeaux
+          </button>
         </form>
       )}
 
@@ -2426,5 +2452,146 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         Enregistrer cette page
       </button>
     </div>
+  )
+}
+
+function normalizeUtilityPageBanners(initial = {}) {
+  const out = {}
+  for (const { path } of UTILITY_PAGE_BANNERS) {
+    const row = initial?.[path] || {}
+    out[path] = {
+      title: String(row.title || '').trim(),
+      subtitle: String(row.subtitle || '').trim(),
+      src: String(row.src || '').trim(),
+      photoKey: String(row.photoKey || '').trim(),
+    }
+  }
+  return out
+}
+
+function UtilityPageBannersEditor({ initial, onDraftChange, setMsg }) {
+  const { fileToSrc } = useAdminMedia()
+  const [banners, setBanners] = useState(() => normalizeUtilityPageBanners(initial))
+
+  useEffect(() => {
+    setBanners(normalizeUtilityPageBanners(initial))
+  }, [initial])
+
+  useEffect(() => {
+    onDraftChange(banners)
+  }, [banners, onDraftChange])
+
+  const updateBanner = (path, patch) => {
+    setBanners((prev) => ({
+      ...prev,
+      [path]: { ...prev[path], ...patch },
+    }))
+  }
+
+  const pickBannerImage = async (path, files) => {
+    const file = files?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'banners' })
+      updateBanner(path, { src: url, photoKey: '' })
+    } catch (e) {
+      setMsg?.(e?.message || 'Upload impossible')
+    }
+  }
+
+  return (
+    <fieldset className="space-y-4">
+      <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>
+        Bandeaux (Panier, Contact, Paiement)
+      </legend>
+      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+        Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez titre et sous-titre vides pour garder le texte par défaut
+        (sur le panier, le sous-titre affiche le nombre d’articles si vous ne le remplissez pas).
+      </p>
+      {UTILITY_PAGE_BANNERS.map(({ path, label }) => {
+        const row = banners[path] || {}
+        const defaultBanner = PAGE_BANNER_FALLBACKS[path] || {}
+        const previewSrc = row.src?.trim()
+          ? resolvePhotoSrc(row.src)
+          : row.photoKey?.trim()
+            ? resolvePhotoSrc(row.photoKey)
+            : defaultBanner.photoKey
+              ? resolvePhotoSrc(defaultBanner.photoKey)
+              : ''
+
+        return (
+          <div key={path} className="rounded-xl border border-mauve-light/35 p-4 space-y-3">
+            <h3 className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
+              {label}
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-2">
+              <label className="block text-xs">
+                Titre
+                <input
+                  className="form-field mt-1"
+                  value={row.title}
+                  onChange={(e) => updateBanner(path, { title: e.target.value })}
+                  placeholder={defaultBanner.title || label}
+                />
+              </label>
+              <label className="block text-xs">
+                Sous-titre
+                <input
+                  className="form-field mt-1"
+                  value={row.subtitle}
+                  onChange={(e) => updateBanner(path, { subtitle: e.target.value })}
+                  placeholder={defaultBanner.subtitle || ''}
+                />
+              </label>
+            </div>
+            <label className="block text-xs">
+              Photo par défaut (catalogue)
+              <select
+                className="form-field mt-1"
+                value={row.photoKey || ''}
+                onChange={(e) => updateBanner(path, { photoKey: e.target.value, src: '' })}
+              >
+                <option value="">— image du site par défaut —</option>
+                {PHOTO_KEY_OPTIONS.map((k) => (
+                  <option key={k} value={k}>
+                    {k}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="btn-primary text-xs py-2 px-4 cursor-pointer">
+                Choisir une photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => {
+                    pickBannerImage(path, e.target.files)
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+              {row.src?.trim() ? (
+                <button
+                  type="button"
+                  className="btn-outline text-xs py-2 px-4"
+                  onClick={() => updateBanner(path, { src: '', photoKey: '' })}
+                >
+                  Photo par défaut
+                </button>
+              ) : null}
+            </div>
+            {previewSrc ? (
+              <img
+                src={previewSrc}
+                alt={`Aperçu bandeau ${label}`}
+                className="h-28 w-full rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
+              />
+            ) : null}
+          </div>
+        )
+      })}
+    </fieldset>
   )
 }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
@@ -96,10 +96,14 @@ export default function Panier() {
 
   return (
     <>
-      <PageHeader
-        title="Panier"
-        subtitle={itemCount > 0 ? `${itemCount} article${itemCount > 1 ? 's' : ''}` : 'Votre sélection'}
-        image={w1200(P.bouquetSoft)}
+      <ConfigurablePageHeader
+        pagePath="/panier"
+        fallback={{
+          title: 'Panier',
+          subtitle: itemCount > 0 ? `${itemCount} article${itemCount > 1 ? 's' : ''}` : 'Votre sélection',
+          photoKey: 'bouquetSoft',
+          image: w1200(P.bouquetSoft),
+        }}
       />
 
       <section className="py-14 px-4" style={{ background: 'var(--blanc)' }}>

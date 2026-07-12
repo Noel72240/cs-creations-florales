@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import BrandName from '../components/BrandName'
-import PageHeader from '../components/PageHeader'
 import SocialIconLinks from '../components/SocialIconLinks'
 import { resolveSocialUrls } from '../lib/socialUrls'
 import { useSiteConfig } from '../context/SiteContentContext'
@@ -61,10 +61,14 @@ export default function Contact() {
   return (
     <>
       <div>
-        <PageHeader
-          title="Nous contacter"
-          subtitle="Parlons de votre projet"
-          image={w1200(P.peonies)}
+        <ConfigurablePageHeader
+          pagePath="/contact"
+          fallback={{
+            title: 'Nous contacter',
+            subtitle: 'Parlons de votre projet',
+            photoKey: 'peonies',
+            image: w1200(P.peonies),
+          }}
         />
       </div>
 

@@ -82,7 +82,29 @@ export const PAGE_BANNER_FALLBACKS = {
     subtitle: 'Créations sur mesure',
     photoKey: 'bouquetGift',
   },
+  '/panier': {
+    title: 'Panier',
+    subtitle: 'Votre sélection',
+    photoKey: 'bouquetSoft',
+  },
+  '/contact': {
+    title: 'Nous contacter',
+    subtitle: 'Parlons de votre projet',
+    photoKey: 'peonies',
+  },
+  '/paiement': {
+    title: 'Paiement en ligne',
+    subtitle: 'Paiement sécurisé en ligne — SumUp (CB, Visa, Mastercard)',
+    photoKey: 'bouquetSoft',
+  },
 }
+
+/** Pages utilitaires — bandeau modifiable dans l’admin (onglet Contact). */
+export const UTILITY_PAGE_BANNERS = [
+  { path: '/panier', label: 'Panier' },
+  { path: '/contact', label: 'Contact' },
+  { path: '/paiement', label: 'Paiement' },
+]
 
 export function pageKeyFromPath(pagePath) {
   const entry = Object.entries(ARTICLE_PAGE_META).find(([, m]) => m.path === pagePath)

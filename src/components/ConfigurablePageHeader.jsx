@@ -13,7 +13,9 @@ export default function ConfigurablePageHeader({ pagePath, fallback = {} }) {
 
   const { title, subtitle, image } = useMemo(() => {
     const pageKey = pageKeyFromPath(pagePath)
-    const fromAdmin = pageKey ? content.pageArticles?.[pageKey]?.banner : null
+    const fromArticles = pageKey ? content.pageArticles?.[pageKey]?.banner : null
+    const fromUtility = content.pageBanners?.[pagePath] || null
+    const fromAdmin = fromArticles || fromUtility
     const fromDefaults = PAGE_BANNER_FALLBACKS[pagePath] || {}
 
     const title = (fromAdmin?.title || '').trim() || fallback.title || fromDefaults.title || ''
@@ -26,7 +28,7 @@ export default function ConfigurablePageHeader({ pagePath, fallback = {} }) {
     else if (photoKey) image = resolvePhotoSrc(photoKey)
 
     return { title, subtitle, image }
-  }, [content.pageArticles, fallback.image, fallback.photoKey, fallback.subtitle, fallback.title, pagePath])
+  }, [content.pageArticles, content.pageBanners, fallback.image, fallback.photoKey, fallback.subtitle, fallback.title, pagePath])
 
   return <PageHeader title={title} subtitle={subtitle} image={image} />
 }

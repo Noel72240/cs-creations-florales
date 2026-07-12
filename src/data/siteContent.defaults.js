@@ -64,6 +64,13 @@ export const SITE_CONTENT_DEFAULTS = {
     availability: 'Lun–Sam · 9h–18h',
   },
 
+  /** Bandeaux Panier, Contact, Paiement (admin → onglet Contact). */
+  pageBanners: {
+    '/panier': { title: '', subtitle: '', src: '', photoKey: '' },
+    '/contact': { title: '', subtitle: '', src: '', photoKey: '' },
+    '/paiement': { title: '', subtitle: '', src: '', photoKey: '' },
+  },
+
   googleReviews: {
     pageTitle: 'Nos avis clients',
     pageSubtitle: 'Ce que nos clients disent',

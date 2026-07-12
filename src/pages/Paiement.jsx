@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import PageHeader from '../components/PageHeader'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
@@ -94,10 +94,14 @@ export default function Paiement() {
 
   return (
     <>
-      <PageHeader
-        title="Paiement en ligne"
-        subtitle="Paiement sécurisé en ligne — SumUp (CB, Visa, Mastercard)"
-        image={w1200(P.bouquetSoft)}
+      <ConfigurablePageHeader
+        pagePath="/paiement"
+        fallback={{
+          title: 'Paiement en ligne',
+          subtitle: 'Paiement sécurisé en ligne — SumUp (CB, Visa, Mastercard)',
+          photoKey: 'bouquetSoft',
+          image: w1200(P.bouquetSoft),
+        }}
       />
 
       <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
