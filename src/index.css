@@ -2130,8 +2130,6 @@ button.nav-link.nav-link-header {
   .article-product-layout__gallery {
     grid-column: 1;
     grid-row: 1;
-    position: sticky;
-    top: calc(var(--site-header-offset, 7rem) + 0.75rem);
   }
 
   .article-product-layout__shop {
