@@ -49,7 +49,7 @@ export default function CreationsSaisonnieres() {
   const { content } = useSiteConfig()
   const pa = content.pageArticles?.creationsSaisonnieres
   const hubItems = aggregateHubArticles('creationsSaisonnieres', content, { maxItems: 500 })
-  const showSeasonCards = pa?.seasonCardsSectionEnabled === true
+  const showSeasonCards = pa?.seasonCardsSectionEnabled !== false
 
   return (
     <>

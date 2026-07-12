@@ -50,6 +50,10 @@ export const ROUTE_SEO = {
     title: 'Cadeaux fête des Grandes-Mères',
     description: 'Compositions florales et cadeaux personnalisés pour mamie en Sarthe.',
   },
+  '/creations-saisonnieres/saint-valentin': {
+    title: 'Créations florales Saint-Valentin',
+    description: 'Cœurs, roses et compositions romantiques pour la Saint-Valentin en Sarthe.',
+  },
   '/personnalisation': {
     title: 'Personnalisations & gravure florale',
     description: 'Objets et compositions gravés sur mesure : prénoms, dates et messages.',

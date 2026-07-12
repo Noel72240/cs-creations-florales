@@ -38,6 +38,7 @@ const menuItems = [
       { label: 'Noël', path: '/creations-saisonnieres/noel' },
       { label: 'Fêtes des Mères/Pères', path: '/creations-saisonnieres/fete-des-meres' },
       { label: 'Fête des Grandes-Mères', path: '/creations-saisonnieres/fete-des-grandes-meres' },
+      { label: 'Saint-Valentin', path: '/creations-saisonnieres/saint-valentin' },
     ],
   },
   { label: 'Personnalisations', path: '/personnalisation' },
