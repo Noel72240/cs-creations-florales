@@ -22,7 +22,10 @@ export async function createSumupCheckout(payload) {
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = typeof data.error === 'string' ? data.error : `Erreur ${res.status}`
+    let msg = typeof data.error === 'string' ? data.error : `Erreur ${res.status}`
+    if (import.meta.env.DEV && typeof data.details === 'string' && data.details.trim()) {
+      msg += ` — ${data.details.trim()}`
+    }
     throw new Error(msg)
   }
   if (!data.url || typeof data.url !== 'string') {
