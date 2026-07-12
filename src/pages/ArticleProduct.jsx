@@ -319,20 +319,7 @@ export default function ArticleProduct() {
                 ) : null}
               </p>
 
-              {descriptionBlocks.length > 0 ? (
-                <div
-                  className="article-product-description text-refined text-sm leading-relaxed space-y-3 mb-5 sm:mb-6"
-                  style={{ color: 'var(--text-elegant)' }}
-                >
-                  {descriptionBlocks.map((block, i) => (
-                    <p key={i}>
-                      <ArticleDescriptionBlock text={block} />
-                    </p>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="article-product-options space-y-4 mb-6 sm:mb-8">
+              <div className="article-product-options space-y-4 mb-5 sm:mb-6">
                 {advancedOptionsActive ? (
                   <ProductOptionsForm
                     fields={optionFields}
@@ -397,6 +384,19 @@ export default function ArticleProduct() {
                   {added ? 'Ajouté au panier ✓' : 'Ajouter au panier'}
                 </button>
               </div>
+
+              {descriptionBlocks.length > 0 ? (
+                <div
+                  className="article-product-description text-refined text-sm leading-relaxed space-y-3 mb-6 sm:mb-8"
+                  style={{ color: 'var(--text-elegant)' }}
+                >
+                  {descriptionBlocks.map((block, i) => (
+                    <p key={i}>
+                      <ArticleDescriptionBlock text={block} />
+                    </p>
+                  ))}
+                </div>
+              ) : null}
 
               <Link to={rubrique} className="btn-outline text-sm inline-block w-full sm:w-auto text-center">
                 ← Retour à {rubriqueLabel}

@@ -2104,15 +2104,22 @@ button.nav-link.nav-link-header {
   margin: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .article-product-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 1.75rem;
   }
 
   .article-product-layout__media {
     position: sticky;
     top: calc(var(--site-header-offset, 7rem) + 0.75rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .article-product-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 2rem;
   }
 }
 
