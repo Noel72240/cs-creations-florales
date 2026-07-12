@@ -2092,6 +2092,50 @@ button.nav-link.nav-link-header {
   color: var(--violet);
 }
 
+.article-product-options-heading {
+  text-align: center;
+  margin-bottom: 0.25rem;
+  padding: 1rem 1.15rem 0.95rem;
+  border: 1px solid rgba(192, 122, 151, 0.32);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 248, 251, 0.55) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 6px 20px rgba(139, 75, 106, 0.06);
+}
+
+.article-product-options-heading__title {
+  margin: 0;
+  font-family: var(--font-refined);
+  font-size: clamp(1.05rem, 2.5vw, 1.28rem);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+  color: var(--violet);
+}
+
+.article-product-options-heading__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+  color: var(--mauve);
+}
+
+.article-product-options-heading__divider::before,
+.article-product-options-heading__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(192, 122, 151, 0.55), transparent);
+}
+
+.article-product-options-heading__divider span {
+  font-size: 0.95rem;
+  line-height: 1;
+  opacity: 0.88;
+}
+
 .article-product-gallery__main {
   width: 100%;
   aspect-ratio: 1 / 1;

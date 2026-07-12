@@ -21,10 +21,40 @@ function normalizeFieldSettings(raw, templateId) {
   return out
 }
 
+const DEFAULT_SECTION_TITLES = {
+  'verres-personnalises': 'Personnalisez votre verre',
+  'verre-communion': 'Personnalisez votre verre',
+  'chiffres-floraux': 'Personnalisez votre chiffre',
+  'fleur-sous-verre': 'Personnalisez votre création',
+  'moto-florale': 'Personnalisez votre création',
+}
+
+export function getDefaultProductOptionsSectionTitle(templateId) {
+  const id = String(templateId || '').trim()
+  if (DEFAULT_SECTION_TITLES[id]) return DEFAULT_SECTION_TITLES[id]
+  const template = getProductOptionTemplate(id)
+  if (template?.label) return `Personnalisez votre ${template.label.toLowerCase()}`
+  return 'Personnalisez votre création'
+}
+
+export function resolveProductOptionsSectionTitle(config, title = '') {
+  const custom = String(config?.sectionTitle || '').trim()
+  if (custom) return custom
+  const templateId = String(config?.templateId || suggestTemplateIdFromTitle(title) || '').trim()
+  if (!templateId) return 'Personnalisez votre création'
+  return getDefaultProductOptionsSectionTitle(templateId)
+}
+
 /** Normalise la config admin `productOptions` sur une fiche article. */
 export function normalizeArticleProductOptions(raw, title = '') {
   if (!raw || typeof raw !== 'object') {
-    return { active: false, templateId: suggestTemplateIdFromTitle(title), enabledFields: [], fieldSettings: {} }
+    return {
+      active: false,
+      templateId: suggestTemplateIdFromTitle(title),
+      enabledFields: [],
+      fieldSettings: {},
+      sectionTitle: '',
+    }
   }
   const templateId = String(raw.templateId || suggestTemplateIdFromTitle(title) || '').trim()
   const template = getProductOptionTemplate(templateId)
@@ -37,6 +67,7 @@ export function normalizeArticleProductOptions(raw, title = '') {
     templateId,
     enabledFields,
     fieldSettings: normalizeFieldSettings(raw.fieldSettings, templateId),
+    sectionTitle: String(raw.sectionTitle || '').trim(),
   }
 }
 

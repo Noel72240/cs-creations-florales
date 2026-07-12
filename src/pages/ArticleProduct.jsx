@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Seo from '../components/Seo'
-import ProductOptionsForm from '../components/ProductOptionsForm'
+import ProductOptionsSectionHeading from '../components/ProductOptionsSectionHeading'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { useCart } from '../context/CartContext'
 import {
@@ -24,6 +24,7 @@ import {
 import {
   getArticleProductOptionsConfig,
   isProductOptionsActive,
+  resolveProductOptionsSectionTitle,
 } from '../lib/articleProductOptions'
 import {
   computeOptionsCartQuantity,
@@ -153,6 +154,16 @@ export default function ArticleProduct() {
     : basePrice
 
   const hideQtyStepper = advancedOptionsActive && shouldHideCartQuantityStepper(productOptionsConfig.templateId)
+  const hasShopSection =
+    advancedOptionsActive || colors.length > 0 || personalizationEnabled || !hideQtyStepper
+  const optionsSectionTitle = useMemo(() => {
+    if (!hasShopSection) return ''
+    if (advancedOptionsActive && productOptionsConfig) {
+      return resolveProductOptionsSectionTitle(productOptionsConfig, article?.title)
+    }
+    const custom = String(article?.productOptions?.sectionTitle || '').trim()
+    return custom || 'Personnalisez votre création'
+  }, [hasShopSection, advancedOptionsActive, productOptionsConfig, article?.title, article?.productOptions?.sectionTitle])
   const cartQuantity = advancedOptionsActive
     ? computeOptionsCartQuantity({
         templateId: productOptionsConfig.templateId,
@@ -301,6 +312,8 @@ export default function ArticleProduct() {
 
             <div className="article-product-layout__shop order-3">
               <div className="article-product-options space-y-4">
+                <ProductOptionsSectionHeading title={optionsSectionTitle} />
+
                 {advancedOptionsActive ? (
                   <ProductOptionsForm
                     fields={optionFields}

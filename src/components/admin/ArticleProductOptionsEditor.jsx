@@ -4,7 +4,7 @@ import {
   getProductOptionTemplate,
   suggestTemplateIdFromTitle,
 } from '../../data/productOptionTemplates'
-import { normalizeArticleProductOptions } from '../../lib/articleProductOptions'
+import { normalizeArticleProductOptions, getDefaultProductOptionsSectionTitle } from '../../lib/articleProductOptions'
 
 export default function ArticleProductOptionsEditor({ config, title, onChange }) {
   const normalized = normalizeArticleProductOptions(config, title)
@@ -51,6 +51,21 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
         Activez le modèle adapté à la création. Cochez les champs à afficher. Pour les pastilles couleur, vous pouvez
         autoriser <strong>plusieurs couleurs</strong> sur certains articles (ex. couleur du texte + roses).
       </p>
+
+      <label className="block">
+        Titre au-dessus du formulaire client
+        <input
+          type="text"
+          className="form-field mt-1"
+          value={normalized.sectionTitle || ''}
+          onChange={(e) => setPartial({ sectionTitle: e.target.value })}
+          placeholder={getDefaultProductOptionsSectionTitle(normalized.templateId)}
+          maxLength={120}
+        />
+        <span className="block text-[10px] mt-1 leading-snug" style={{ color: 'var(--text-mid)' }}>
+          Ex. : Personnalisez votre verre, Personnalisez votre création… Laissez vide pour le titre par défaut du modèle.
+        </span>
+      </label>
 
       <label className="block">
         Activer le formulaire d’options
