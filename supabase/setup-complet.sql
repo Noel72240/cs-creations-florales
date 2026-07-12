@@ -45,8 +45,6 @@ create table if not exists public.orders (
   shipping_method text,
   relay_point jsonb,
   parcel_weight_grams integer default 1000,
-  parcel_tier text check (parcel_tier is null or parcel_tier in ('petit', 'moyen', 'grand')),
-  shipping_fee_eur numeric(10, 2),
   mondial_relay_expedition_id text,
   mondial_relay_label_url text,
   created_at timestamptz not null default now(),
