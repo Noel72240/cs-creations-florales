@@ -361,11 +361,6 @@ function CreationSurMesureSection({ moto }) {
               <Link to="/contact" className="btn-primary">{moto.ctaPrimary}</Link>
               <Link to={moto.ctaSecondaryPath || '/evenements-floraux'} className="btn-outline">{moto.ctaSecondary}</Link>
             </div>
-            {moto.tip?.trim() ? (
-              <p className="mt-4 text-xs font-body" style={{ color: 'var(--text-mid)' }}>
-                {moto.tip}
-              </p>
-            ) : null}
           </div>
         </div>
       </div>

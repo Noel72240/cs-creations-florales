@@ -10,9 +10,7 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
   const normalized = normalizeArticleProductOptions(config, title)
   const template = getProductOptionTemplate(normalized.templateId)
   const templateFields = template?.fields || []
-  const enabledSet = new Set(
-    normalized.enabledFields.length ? normalized.enabledFields : templateFields,
-  )
+  const enabledSet = new Set(normalized.enabledFields)
 
   const setPartial = (patch) => onChange({ ...normalized, ...patch })
 

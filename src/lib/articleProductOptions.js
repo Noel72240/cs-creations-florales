@@ -32,9 +32,6 @@ export function normalizeArticleProductOptions(raw, title = '') {
   let enabledFields = Array.isArray(raw.enabledFields) && raw.enabledFields.length
     ? raw.enabledFields.filter((id) => templateFields.includes(id))
     : [...templateFields]
-  if (Boolean(raw.active) && templateFields.length) {
-    enabledFields = [...new Set([...enabledFields, ...templateFields])].filter((id) => templateFields.includes(id))
-  }
   return {
     active: Boolean(raw.active),
     templateId,
