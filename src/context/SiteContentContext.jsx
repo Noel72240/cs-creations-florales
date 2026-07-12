@@ -38,6 +38,24 @@ function deepMerge(base, patch) {
   return out
 }
 
+function stripMotoAdminHints(moto) {
+  if (!moto || typeof moto !== 'object') return moto
+  const isHintText = (value) => {
+    const s = String(value || '').trim()
+    if (!s) return false
+    return (
+      /^astuce\s*[：:]?/i.test(s) ||
+      /ajoutez le fichier dans public/i.test(s) ||
+      /moto-florale\.(png|jpe?g|webp)/i.test(s)
+    )
+  }
+  return {
+    ...moto,
+    tip: '',
+    paragraphs: (moto.paragraphs || []).filter((p) => !isHintText(p)),
+  }
+}
+
 export function getMergedContent(overrides) {
   const raw = JSON.parse(JSON.stringify(SITE_CONTENT_DEFAULTS))
   const merged = deepMerge(raw, overrides || {})
@@ -51,6 +69,9 @@ export function getMergedContent(overrides) {
   }
   if (merged.home?.hero?.scrollLabel === 'Découvrir') {
     merged.home.hero.scrollLabel = ''
+  }
+  if (merged.home?.moto) {
+    merged.home.moto = stripMotoAdminHints(merged.home.moto)
   }
   if (merged.pageArticles) {
     merged.pageArticles = enrichPageArticlesProductOptions(normalizeAllPageArticleIds(merged.pageArticles))

@@ -387,7 +387,6 @@ export default function Admin() {
         overlayTitle: fd.get('moto_overlay') || '',
         pretitle: fd.get('moto_pre') || '',
         title: fd.get('moto_title') || '',
-        tip: fd.get('moto_tip') || '',
         ctaPrimary: fd.get('moto_cta1') || '',
         ctaSecondary: fd.get('moto_cta2') || '',
         ctaSecondaryPath: fd.get('moto_cta2p') || '/evenements-floraux',
@@ -782,7 +781,6 @@ export default function Admin() {
             <input name="moto_pre" defaultValue={h.moto.pretitle} className="form-field" />
             <input name="moto_title" defaultValue={h.moto.title} className="form-field" />
             <textarea name="moto_paragraphs" rows={5} className="form-field" defaultValue={(h.moto.paragraphs || []).join('\n\n')} />
-            <input name="moto_tip" defaultValue={h.moto.tip} className="form-field" placeholder="Note sous les boutons (laisser vide pour masquer)" />
             <div className="grid sm:grid-cols-2 gap-2">
               <input name="moto_cta1" defaultValue={h.moto.ctaPrimary} className="form-field" />
               <input name="moto_cta2" defaultValue={h.moto.ctaSecondary} className="form-field" />
