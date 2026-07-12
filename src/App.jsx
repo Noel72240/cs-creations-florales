@@ -15,6 +15,7 @@ import Paques from './pages/saisonniers/Paques'
 import Noel from './pages/saisonniers/Noel'
 import FeteDesMeres from './pages/saisonniers/FeteDesMeres'
 import FeteDesGrandesMeres from './pages/saisonniers/FeteDesGrandesMeres'
+import SaintValentin from './pages/saisonniers/SaintValentin'
 import Personnalisation from './pages/Personnalisation'
 import Contact from './pages/Contact'
 import AvisGoogle from './pages/AvisGoogle'
@@ -57,6 +58,7 @@ function App() {
           <Route path="/creations-saisonnieres/noel" element={<Noel />} />
           <Route path="/creations-saisonnieres/fete-des-meres" element={<FeteDesMeres />} />
           <Route path="/creations-saisonnieres/fete-des-grandes-meres" element={<FeteDesGrandesMeres />} />
+          <Route path="/creations-saisonnieres/saint-valentin" element={<SaintValentin />} />
           <Route path="/personnalisation" element={<Personnalisation />} />
           <Route path="/produit/:pageKey/:articleId" element={<ArticleProduct />} />
           <Route path="/contact" element={<Contact />} />

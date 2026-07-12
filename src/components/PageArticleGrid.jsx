@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
+import { isPublishableCatalogArticle } from '../lib/articleHubAggregation'
 import { articleProductPath, pageKeyFromPath } from '../data/pageCatalog'
 import { getArticlePhotoUrls } from '../lib/articlePhotos'
 import { formatEuro } from '../utils/formatEuro'
@@ -155,13 +156,14 @@ function ImageLightbox({ open, onClose, src, title }) {
 export default function PageArticleGrid({
   sectionTitle = 'Articles',
   intro,
+  showIntro = false,
   items,
   pagePath,
   pageKey: pageKeyProp,
   maxItems = MAX_PAGE_ARTICLES,
 }) {
   const pageKey = pageKeyProp || pageKeyFromPath(pagePath)
-  const list = Array.isArray(items) ? items.slice(0, maxItems) : []
+  const list = Array.isArray(items) ? items.filter(isPublishableCatalogArticle).slice(0, maxItems) : []
   const [preview, setPreview] = useState(null)
   const [sort, setSort] = useState('default')
   const closePreview = useCallback(() => setPreview(null), [])
@@ -178,7 +180,7 @@ export default function PageArticleGrid({
           <div className="floral-divider mb-6">
             <span className="floral-icon">✿</span>
           </div>
-          {intro ? <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p> : null}
+          {showIntro && intro ? <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p> : null}
 
           <div className="article-catalog-toolbar mb-8">
             <span className="text-sm font-medium" style={{ color: 'var(--violet)' }}>

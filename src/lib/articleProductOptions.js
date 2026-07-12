@@ -28,9 +28,13 @@ export function normalizeArticleProductOptions(raw, title = '') {
   }
   const templateId = String(raw.templateId || suggestTemplateIdFromTitle(title) || '').trim()
   const template = getProductOptionTemplate(templateId)
-  const enabledFields = Array.isArray(raw.enabledFields)
-    ? raw.enabledFields.filter((id) => template?.fields?.includes(id))
-    : template?.fields ? [...template.fields] : []
+  const templateFields = template?.fields || []
+  let enabledFields = Array.isArray(raw.enabledFields) && raw.enabledFields.length
+    ? raw.enabledFields.filter((id) => templateFields.includes(id))
+    : [...templateFields]
+  if (Boolean(raw.active) && templateFields.length) {
+    enabledFields = [...new Set([...enabledFields, ...templateFields])].filter((id) => templateFields.includes(id))
+  }
   return {
     active: Boolean(raw.active),
     templateId,

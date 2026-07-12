@@ -27,6 +27,7 @@ export default function Personnalisation() {
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
         intro={pa?.intro}
+        showIntro
         items={pa?.items}
         pagePath="/personnalisation"
         pageKey="personnalisation"

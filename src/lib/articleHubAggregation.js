@@ -3,7 +3,7 @@ import { MAX_PAGE_ARTICLES } from '../data/siteContent.defaults'
 /** Pages « hub » → clés `pageArticles` des sous-rubriques à regrouper. */
 export const PARENT_ARTICLE_CHILDREN = {
   evenementsFloraux: ['mariage', 'anniversaire', 'baptemeCommunion'],
-  creationsSaisonnieres: ['paques', 'noel', 'feteDesMeres', 'feteDesGrandesMeres'],
+  creationsSaisonnieres: ['paques', 'noel', 'feteDesMeres', 'feteDesGrandesMeres', 'saintValentin'],
 }
 
 function bucketItems(content, pageKey) {
@@ -16,6 +16,15 @@ function articleDisplayFingerprint(item) {
   const src = String(item?.src || '').trim().toLowerCase()
   if (src) return `src:${src}`
   return `id:${String(item?.id || '')}`
+}
+
+/** Article visible dans les grilles (photo ou description renseignée). */
+export function isPublishableCatalogArticle(item) {
+  const title = String(item?.title || '').trim()
+  if (!title) return false
+  const src = String(item?.src || '').trim()
+  const desc = String(item?.description || '').trim()
+  return Boolean(src || desc)
 }
 
 /**
@@ -32,6 +41,7 @@ export function aggregateHubArticles(parentKey, content, { maxItems = MAX_PAGE_A
 
   const pushItem = (item, sourcePageKey) => {
     if (!item?.id) return
+    if (!isPublishableCatalogArticle(item)) return
     const idKey = `${sourcePageKey}:${item.id}`
     if (seenIds.has(idKey)) return
 

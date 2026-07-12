@@ -73,6 +73,7 @@ export default function GoogleReviewsEditor({ initial, onDraftChange }) {
         </legend>
         <p className="text-xs leading-relaxed">
           Textes affichés en haut de la page <code>/avis-google</code> (menu « Nos avis clients »). Laissez l’URL Google vide pour masquer le bouton externe.
+          Les avis ne se synchronisent pas automatiquement avec Google : recopiez ici les témoignages de votre fiche Google, ou collez l’URL de la fiche pour le bouton « Voir sur Google ».
         </p>
         <input className="form-field" value={pageTitle} onChange={(e) => setPageTitle(e.target.value)} placeholder="Titre de la page" />
         <input className="form-field" value={pageSubtitle} onChange={(e) => setPageSubtitle(e.target.value)} placeholder="Sous-titre" />

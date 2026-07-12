@@ -112,7 +112,7 @@ export default function PageIntroSection({ pageKey }) {
                 className="w-full h-full object-cover"
               />
               {intro.image?.overlayTitle ? (
-                <div className="overlay overlay--centered">
+                <div className={`overlay ${intro.image?.overlayPosition === 'bottom-left' ? 'overlay--bottom-left' : 'overlay--centered'}`}>
                   <span
                     className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95 not-italic"
                     style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}

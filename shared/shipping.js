@@ -83,7 +83,7 @@ export const SHIPPING_METHOD_OPTIONS = [
   {
     id: SHIPPING_METHOD_MONDIAL_RELAY,
     label: 'Livraison en Point Relais',
-    description: 'Mondial Relay : choisissez un relais près de chez vous. L’atelier prépare l’envoi.',
+    description: 'Mondial Relay : choisissez un relais près de chez vous. Colissimo à domicile : contactez-nous si vous préférez cette option.',
     feeLabel: null,
   },
 ]

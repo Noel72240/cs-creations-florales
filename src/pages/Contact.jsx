@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import BrandName from '../components/BrandName'
 import PageHeader from '../components/PageHeader'
 import SocialIconLinks from '../components/SocialIconLinks'
+import { resolveSocialUrls } from '../lib/socialUrls'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { P, w1200 } from '../data/flowerPhotos'
 
@@ -12,6 +13,7 @@ export default function Contact() {
   const site = content.site
   const contactInfo = content.contact
   const ft = content.footer
+  const social = resolveSocialUrls(ft)
 
   const coordItems = useMemo(
     () => [
@@ -109,9 +111,9 @@ export default function Contact() {
               <div className="mt-8 pt-8 border-t border-mauve-light/30">
                 <p className="font-refined text-xs font-semibold tracking-wide mb-4" style={{ color: 'var(--mauve)' }}>Suivez-moi</p>
                 <SocialIconLinks
-                  facebookUrl={ft.facebookUrl}
-                  instagramUrl={ft.instagramUrl}
-                  tiktokUrl={ft.tiktokUrl}
+                  facebookUrl={social.facebookUrl}
+                  instagramUrl={social.instagramUrl}
+                  tiktokUrl={social.tiktokUrl}
                 />
               </div>
             </div>

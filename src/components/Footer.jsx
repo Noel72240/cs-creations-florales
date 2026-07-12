@@ -3,6 +3,8 @@ import { useSiteConfig } from '../context/SiteContentContext'
 import { openCookiePreferences } from '../lib/cookieConsent'
 import BrandName from './BrandName'
 import SocialIconLinks from './SocialIconLinks'
+import { resolveSocialUrls } from '../lib/socialUrls'
+import SecurePaymentNotice from './SecurePaymentNotice'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -10,6 +12,7 @@ export default function Footer() {
   const SITE = content.site
   const WEB_DEV = content.webDev
   const ft = content.footer
+  const social = resolveSocialUrls(ft)
 
   return (
     <footer className="site-footer bg-gradient-to-b from-mauve-pale to-white border-t border-mauve-light/30 relative overflow-hidden">
@@ -30,10 +33,13 @@ export default function Footer() {
               <span className="font-medium" style={{ color: 'var(--violet)' }}>Paiement :</span>{' '}
               {sumupUrl ? ft.paymentWithSumup : ft.paymentWithoutSumup}
             </p>
+            {sumupUrl ? (
+              <SecurePaymentNotice compact className="mb-4" />
+            ) : null}
             <SocialIconLinks
-              facebookUrl={ft.facebookUrl}
-              instagramUrl={ft.instagramUrl}
-              tiktokUrl={ft.tiktokUrl}
+              facebookUrl={social.facebookUrl}
+              instagramUrl={social.instagramUrl}
+              tiktokUrl={social.tiktokUrl}
             />
           </div>
 

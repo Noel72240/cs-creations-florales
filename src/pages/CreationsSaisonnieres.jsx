@@ -36,6 +36,13 @@ const SEASONS = [
     img: w600(P.peonies),
     icon: '💐',
   },
+  {
+    title: 'Saint-Valentin',
+    path: '/creations-saisonnieres/saint-valentin',
+    desc: 'Cœurs, roses et créations romantiques pour célébrer la Saint-Valentin.',
+    img: w600(P.rosesBouquet),
+    icon: '💕',
+  },
 ]
 
 export default function CreationsSaisonnieres() {

@@ -1525,6 +1525,13 @@ h1, h2, h3, h4 {
   padding: 2rem;
 }
 
+.img-overlay .overlay.overlay--bottom-left {
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 1.25rem 1.5rem;
+}
+
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 6px;
@@ -2125,6 +2132,34 @@ button.nav-link.nav-link-header {
 
 .secure-payment-notice--compact {
   padding: 0.65rem 0.85rem;
+}
+
+.secure-payment-notice__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.secure-payment-notice__head .secure-payment-notice__title {
+  margin-bottom: 0;
+}
+
+.secure-payment-notice__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 9999px;
+  background: rgba(139, 75, 106, 0.12);
+  color: var(--violet);
+  flex-shrink: 0;
+}
+
+.secure-payment-notice__lock-icon {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .secure-payment-notice__title {

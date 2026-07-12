@@ -13,10 +13,10 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
   'creations-florales-004': 'coeur-plaque-acrylique',
   'creations-florales-005': 'ourson-floral',
   'creations-florales-006': 'ourson-floral',
-  'creations-florales-007': 'communes-personnalisable',
+  'creations-florales-007': 'coeur-etoile-personnalise',
   'creations-florales-008': 'cadre-naissance',
   'creations-florales-009': 'coeur-love',
-  'creations-florales-010': 'communes-personnalisable',
+  'creations-florales-010': 'coeur-etoile-personnalise',
   'creations-florales-011': 'coeur-plaque-acrylique',
   'creations-florales-012': 'ecrin-floral',
   'creations-florales-013': 'coeur-plaque-acrylique',
@@ -99,7 +99,7 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
   'paques-003': 'communes-personnalisable',
 
   // — Personnalisation —
-  'personnalisation-001': 'coeur-plaque-bois',
+  'personnalisation-001': 'coeur-fete-parents',
   'personnalisation-002': 'coeur-plaque-bois',
   'personnalisation-003': 'coeur-plaque-bois',
   'personnalisation-004': 'coeur-plaque-bois',
@@ -111,7 +111,7 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
   'personnalisation-010': 'verres-personnalises',
   'personnalisation-011': 'verres-personnalises',
   'personnalisation-012': 'verre-communion',
-  'personnalisation-013': 'communes-personnalisable',
+  'personnalisation-013': 'horloge-personnalisee',
 
   // — Hub événements / saison —
   'evt-mariage-plateau': 'plateau-miroir-porte-alliance',

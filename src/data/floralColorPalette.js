@@ -1,6 +1,6 @@
 /** Pastilles couleur — libellés affichés au client (roses en mousse). */
 export const FLORAL_COLOR_PALETTE = {
-  // ─── Palette roses (16 teintes atelier) ───
+  // ─── Palette roses (teintes atelier) ───
   blanc: { label: 'Blanc', hex: '#f5f5f0' },
   rose: { label: 'Rose', hex: '#d9668f' },
   camel: { label: 'Camel', hex: '#b8895c' },
@@ -17,18 +17,20 @@ export const FLORAL_COLOR_PALETTE = {
   bordeaux: { label: 'Bordeaux', hex: '#7a2838' },
   violet: { label: 'Violet', hex: '#9b68b8' },
   fuchsia: { label: 'Fuchsia', hex: '#e83898' },
+  rouge: { label: 'Rouge', hex: '#c41e3a' },
+  vertFonce: { label: 'Vert foncé', hex: '#2d5016' },
+  bleuClair: { label: 'Bleu clair', hex: '#87ceeb' },
+  marron: { label: 'Marron', hex: '#6b4423' },
 
   // ─── Texte / personnalisation (palette élargie) ───
   creme: { label: 'Crème', hex: '#f5f0e6' },
-  rouge: { label: 'Rouge', hex: '#c41e3a' },
   roseBonbon: { label: 'Rose bonbon', hex: '#ff69b4' },
   roseFuchsia: { label: 'Rose fuchsia', hex: '#ff00aa' },
-  bleuClair: { label: 'Bleu clair', hex: '#87ceeb' },
+  roseRose: { label: 'Rosé', hex: '#e8b4b8' },
   bleuFonce: { label: 'Bleu foncé', hex: '#1e3a5f' },
   vertClair: { label: 'Vert clair', hex: '#90ee90' },
-  vertFonce: { label: 'Vert foncé', hex: '#2d5016' },
-  marronClair: { label: 'Camel', hex: '#b8895c' },
-  marronFonce: { label: 'Camel', hex: '#b8895c' },
+  marronClair: { label: 'Marron clair', hex: '#a67c52' },
+  marronFonce: { label: 'Marron foncé', hex: '#4a2f1a' },
   dore: { label: 'Doré', hex: '#d4af37' },
   argente: { label: 'Argenté', hex: '#c0c0c0' },
 
@@ -43,16 +45,19 @@ export const FLORAL_COLOR_PALETTE = {
   yeuxAmbre: { label: 'Ambre', hex: '#b8860b' },
 }
 
-/** 16 couleurs de roses en mousse (référence atelier). */
+/** Couleurs de roses en mousse (référence atelier). */
 export const ROSE_FOAM_COLOR_KEYS = [
   'blanc',
   'rose',
+  'rouge',
   'camel',
   'beige',
   'bleuRoi',
+  'bleuClair',
   'noir',
   'rosePale',
   'vertAnis',
+  'vertFonce',
   'jaune',
   'gris',
   'peche',
@@ -61,6 +66,7 @@ export const ROSE_FOAM_COLOR_KEYS = [
   'bordeaux',
   'violet',
   'fuchsia',
+  'marron',
 ]
 
 /** Couleurs d’yeux pour oursons et peluches. */
@@ -81,10 +87,10 @@ export const PALETTE_SETS = {
   eyes: [...EYE_COLOR_KEYS],
   text: [
     'blanc', 'creme', 'jaune', 'orange', 'rouge', 'bordeaux',
-    'rosePale', 'rose', 'fuchsia', 'violet',
+    'rosePale', 'rose', 'roseRose', 'fuchsia', 'violet',
     'bleuCiel', 'bleuRoi', 'bleuClair', 'bleuFonce',
     'vertAnis', 'vertClair', 'vertFonce',
-    'camel', 'beige', 'gris', 'noir', 'dore', 'argente',
+    'camel', 'beige', 'marron', 'marronClair', 'marronFonce', 'gris', 'noir', 'dore', 'argente',
   ],
 }
 

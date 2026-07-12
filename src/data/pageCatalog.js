@@ -12,6 +12,7 @@ export const ARTICLE_PAGE_META = {
   noel: { path: '/creations-saisonnieres/noel', label: 'Noël' },
   feteDesMeres: { path: '/creations-saisonnieres/fete-des-meres', label: 'Fêtes des Mères/Pères' },
   feteDesGrandesMeres: { path: '/creations-saisonnieres/fete-des-grandes-meres', label: 'Fête des Grandes-Mères' },
+  saintValentin: { path: '/creations-saisonnieres/saint-valentin', label: 'Saint-Valentin' },
 }
 
 /** Bandeaux par défaut (si non modifiés dans l’admin). */
@@ -70,6 +71,11 @@ export const PAGE_BANNER_FALLBACKS = {
     title: 'Fête des Grandes-Mères',
     subtitle: 'Créations saisonnières',
     photoKey: 'peonies',
+  },
+  '/creations-saisonnieres/saint-valentin': {
+    title: 'Saint-Valentin',
+    subtitle: 'Créations saisonnières',
+    photoKey: 'rosesBouquet',
   },
   '/personnalisation': {
     title: 'Personnalisations',

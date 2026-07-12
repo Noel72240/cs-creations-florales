@@ -12,21 +12,19 @@ export const PAGE_INTRO_DEFAULTS = {
     image: {
       src: '/images/personnalisation/trousse-personnalisee.png',
       photoKey: '',
-      overlayTitle: 'Créations sur mesure',
+      overlayTitle: 'Création sur mesure',
+      overlayPosition: 'bottom-left',
       alt: 'Trousse personnalisée — exemple de création sur mesure',
     },
     cta: { enabled: true, label: 'Demander une personnalisation', path: '/contact' },
     supportBox: { enabled: false, quote: '', showAuthor: true },
   },
   creationsFuneraires: {
-    enabled: true,
+    enabled: false,
     layout: 'center',
     pretitle: '',
-    title: 'Des fleurs pour honorer la mémoire',
-    paragraphs: [
-      "Dans les moments les plus difficiles, les fleurs portent les mots que l'on ne peut pas dire. Je crée avec pudeur, délicatesse et respect des compositions funéraires qui rendent hommage à celles et ceux qui nous ont quittés.",
-      "Chaque composition est réalisée avec soin, dans un esprit de sobriété et d'élégance, pour accompagner les familles endeuillées avec toute la considération qu'elles méritent. Je suis disponible dans les meilleurs délais pour vous aider.",
-    ],
+    title: '',
+    paragraphs: [],
     image: null,
     cta: { enabled: false, label: '', path: '/contact' },
     supportBox: {
@@ -37,25 +35,21 @@ export const PAGE_INTRO_DEFAULTS = {
     },
   },
   creationsFlorales: {
-    enabled: true,
+    enabled: false,
     layout: 'center',
-    pretitle: 'Artisanat floral',
-    title: 'Des créations pensées avec amour',
-    paragraphs: [
-      "Mes créations florales et décoratives sont imaginées pour embellir votre intérieur, offrir un cadeau original ou simplement s'offrir un peu de beauté au quotidien. Chaque pièce est réalisée à la main, avec soin, en utilisant des fleurs fraîches, séchées ou stabilisées de qualité.",
-    ],
+    pretitle: '',
+    title: '',
+    paragraphs: [],
     image: null,
     cta: { enabled: false, label: '', path: '/contact' },
     supportBox: { enabled: false, quote: '', showAuthor: true },
   },
   creationsSaisonnieres: {
-    enabled: true,
+    enabled: false,
     layout: 'center',
     pretitle: '',
     title: '',
-    paragraphs: [
-      "Au fil des saisons, la nature offre ses plus belles parures. Je crée des compositions florales en accord avec chaque époque de l'année, pour que vous puissiez célébrer chaque moment avec des fleurs qui lui correspondent.",
-    ],
+    paragraphs: [],
     image: null,
     cta: { enabled: false, label: '', path: '/contact' },
     supportBox: { enabled: false, quote: '', showAuthor: true },
@@ -97,6 +91,7 @@ export function normalizePageIntro(raw, pageKey) {
       src: String(imageRaw.src ?? base.image?.src ?? '').trim(),
       photoKey: String(imageRaw.photoKey ?? base.image?.photoKey ?? '').trim(),
       overlayTitle: String(imageRaw.overlayTitle ?? base.image?.overlayTitle ?? '').trim(),
+      overlayPosition: imageRaw.overlayPosition === 'bottom-left' ? 'bottom-left' : 'centered',
       alt: String(imageRaw.alt ?? base.image?.alt ?? '').trim(),
     }
   }

@@ -586,6 +586,12 @@ export const PAGE_ARTICLE_CATALOG = enrichCatalogWithProductOptions({
     ],
   },
 
+  saintValentin: {
+    sectionTitle: 'Créations Saint-Valentin',
+    intro: '',
+    items: [],
+  },
+
   personnalisation: {
     sectionTitle: 'Exemples de personnalisations',
     intro:

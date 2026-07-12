@@ -1519,6 +1519,7 @@ const ARTICLE_PAGE_OPTIONS = [
   { value: 'noel', label: 'Noël' },
   { value: 'feteDesMeres', label: 'Fêtes des Mères/Pères' },
   { value: 'feteDesGrandesMeres', label: 'Fête des Grandes-Mères' },
+  { value: 'saintValentin', label: 'Saint-Valentin' },
 ]
 
 function emptyArticleItem() {

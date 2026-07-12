@@ -7,7 +7,7 @@ import { PAGE_ARTICLE_CATALOG } from './articleCatalog'
 import { enrichPageArticlesObject } from '../lib/articleProductOptionsDefaults'
 import { EVENEMENTS_FLORAUX_HUB_DEFAULTS } from '../lib/eventHubCards'
 
-export const SITE_CONTENT_VERSION = 7
+export const SITE_CONTENT_VERSION = 8
 
 /** Nombre max d’articles boutique par page rubrique (admin + grille vitrine). */
 export const MAX_PAGE_ARTICLES = 50
@@ -54,9 +54,9 @@ export const SITE_CONTENT_DEFAULTS = {
       'paiement sécurisé en ligne (SumUp : CB, Visa, Mastercard) · sur place : carte bancaire (CB) et espèces.',
     paymentWithoutSumup:
       'sur place : carte bancaire (CB) et espèces.',
-    facebookUrl: 'https://www.facebook.com',
-    instagramUrl: 'https://www.instagram.com',
-    tiktokUrl: 'https://www.tiktok.com',
+    facebookUrl: '',
+    instagramUrl: 'https://www.instagram.com/cs_creations_florales/',
+    tiktokUrl: 'https://www.tiktok.com/@cs_creations_florales',
   },
 
   contact: {
@@ -92,8 +92,8 @@ export const SITE_CONTENT_DEFAULTS = {
   home: {
     /** Texte sous le hero, avant « Mes réalisations / Coups de cœur » */
     intro: {
-      headline: 'Créatrice florale en Sarthe',
-      tagline: 'Des fleurs qui racontent votre histoire.',
+      headline: 'Créatrice florale artisanale en Sarthe',
+      tagline: '',
       paragraph:
         'Je réalise des créations florales personnalisées, uniques, pour sublimer chaque moment et accompagner vos occasions importantes.',
     },
