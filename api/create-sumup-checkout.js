@@ -508,19 +508,18 @@ async function handleCreateCheckout(req, res, origin) {
 
   if (insertErr) {
     console.error('[create-sumup-checkout] Supabase insert', insertErr)
-    const msg = insertErr.message || ''
-    let errorText = 'Enregistrement commande impossible'
-    if (/column|schema cache|Could not find the/i.test(msg)) {
-      errorText =
-        'Enregistrement commande impossible — exécutez supabase/migrations/RUN_ORDERS_MIGRATIONS.sql dans Supabase (SQL Editor).'
-    } else if (/row-level security|RLS policy/i.test(msg)) {
-      errorText =
-        'Enregistrement commande impossible — SUPABASE_SERVICE_ROLE_KEY incorrecte (clé service_role, pas la clé anon).'
-    } else if (/relation.*orders.*does not exist/i.test(msg)) {
-      errorText =
-        'Enregistrement commande impossible — créez la table orders (supabase/setup-complet.sql, section 2).'
-    }
-    sendJson(res, 500, { error: errorText, details: msg }, origin)
+    const missingColumn = /column|schema cache|Could not find the/i.test(insertErr.message || '')
+    sendJson(
+      res,
+      500,
+      {
+        error: missingColumn
+          ? 'Enregistrement commande impossible — exécutez les migrations Supabase « orders » (voir supabase/migrations).'
+          : 'Enregistrement commande impossible',
+        details: insertErr.message,
+      },
+      origin,
+    )
     return
   }
 

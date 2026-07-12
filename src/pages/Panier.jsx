@@ -242,16 +242,10 @@ export default function Panier() {
                 {error ? (
                   <p className="text-sm rounded-xl border border-red-200 bg-red-50/90 px-4 py-3 mb-4" style={{ color: '#7f1d1d' }}>
                     {error}
-                    {import.meta.env.DEV &&
-                    /SUMUP_API_KEY|503|502|404|injoignable|Failed to fetch|NetworkError/i.test(error) ? (
-                      <span className="block mt-1 text-xs opacity-90">
-                        En local : ajoutez <code className="font-mono">SUMUP_API_KEY</code> dans{' '}
-                        <code className="font-mono">.env</code>, lancez{' '}
-                        <code className="font-mono">npm run dev:vercel</code>, ou pointez{' '}
-                        <code className="font-mono">VITE_SUMUP_CHECKOUT_API_URL</code> vers le site en ligne (voir
-                        .env.example).
-                      </span>
-                    ) : null}
+                    <span className="block mt-1 text-xs opacity-90">
+                      En développement, lancez <code className="font-mono">npm run dev:vercel</code> (ou proxy{' '}
+                      <code className="font-mono">VITE_DEV_API_PROXY</code> vers votre API — voir .env.example).
+                    </span>
                   </p>
                 ) : null}
                 {!paymentsBlocked ? (
