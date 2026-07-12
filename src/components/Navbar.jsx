@@ -130,16 +130,29 @@ export default function Navbar() {
 
       {showPromo && (
         <div
-          className="site-promo-banner bg-fuchsia-600 text-white text-center px-2 sm:px-4 py-1 sm:py-1.5 border-b border-fuchsia-800/40 shadow-sm"
+          className="site-promo-banner bg-fuchsia-600 text-white py-1 sm:py-1.5 border-b border-fuchsia-800/40 shadow-sm"
           role="region"
-          aria-label="Offre promotionnelle"
+          aria-label={`Offre promotionnelle : ${(promo.text || '').trim()}`}
         >
           <p
-            className="site-promo-banner-text max-w-6xl mx-auto leading-tight"
+            className="site-promo-banner-text site-promo-banner-text--static leading-tight"
             style={{ '--promo-scale': promoFontScale }}
           >
             <PromoBannerRich text={(promo.text || '').trim()} code={promo.code || ''} />
           </p>
+          <div className="site-promo-banner-marquee" aria-hidden="true">
+            <div
+              className="site-promo-banner-track"
+              style={{ '--promo-scale': promoFontScale }}
+            >
+              <span className="site-promo-banner-segment">
+                <PromoBannerRich text={(promo.text || '').trim()} code={promo.code || ''} />
+              </span>
+              <span className="site-promo-banner-segment">
+                <PromoBannerRich text={(promo.text || '').trim()} code={promo.code || ''} />
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
