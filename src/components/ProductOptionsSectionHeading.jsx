@@ -4,9 +4,8 @@ export default function ProductOptionsSectionHeading({ title }) {
 
   return (
     <div className="article-product-options-heading">
-      <p className="article-product-options-heading__title">{label}</p>
-      <div className="article-product-options-heading__divider" aria-hidden="true">
-        <span>♡</span>
+      <div className="article-product-options-heading__divider">
+        <span className="article-product-options-heading__title">{label}</span>
       </div>
     </div>
   )
