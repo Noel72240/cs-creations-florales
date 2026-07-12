@@ -955,7 +955,7 @@ export default function Admin() {
               <span className="text-sm">Afficher la bannière promotionnelle</span>
             </label>
             <label className="block text-xs" style={{ color: 'var(--text-mid)' }}>
-              Texte (Cormorant Garamond, fond fuchsia). Le code doit être identique au champ ci-dessous pour
+              Texte (Cormorant Garamond, fond personnalisé). Le code doit être identique au champ ci-dessous pour
               être mis en avant.
             </label>
             <textarea

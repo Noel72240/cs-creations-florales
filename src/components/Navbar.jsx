@@ -131,7 +131,7 @@ export default function Navbar() {
 
       {showPromo && (
         <div
-          className="site-promo-banner bg-fuchsia-600 text-white py-1 sm:py-1.5 border-b border-fuchsia-800/40 shadow-sm"
+          className="site-promo-banner py-1.5 sm:py-2"
           role="region"
           aria-label={`Offre promotionnelle : ${(promo.text || '').trim()}`}
         >
