@@ -19,16 +19,31 @@ export function normalizeSocialUrl(raw, platform) {
   return s
 }
 
-/** URLs par défaut — profils C&S Créations Florales (Facebook à renseigner dans l’admin). */
+/** Profils officiels C&S Créations Florales. */
 export const DEFAULT_SOCIAL_URLS = {
-  facebook: '',
+  facebook: 'https://www.facebook.com/profile.php?id=61587027218191',
   instagram: 'https://www.instagram.com/cs_creations_florales/',
   tiktok: 'https://www.tiktok.com/@cs_creations_florales',
 }
 
+const PLACEHOLDER_PATTERNS = {
+  facebook: /^https?:\/\/(www\.)?facebook\.com\/?$/i,
+  instagram: /^https?:\/\/(www\.)?instagram\.com\/?$/i,
+  tiktok: /^https?:\/\/(www\.)?tiktok\.com\/?$/i,
+}
+
+function pickSocialUrl(stored, platform) {
+  const trimmed = String(stored || '').trim()
+  if (!trimmed || PLACEHOLDER_PATTERNS[platform]?.test(trimmed)) {
+    return DEFAULT_SOCIAL_URLS[platform]
+  }
+  return normalizeSocialUrl(trimmed, platform) || DEFAULT_SOCIAL_URLS[platform]
+}
+
 export function resolveSocialUrls(footer = {}) {
-  const fb = normalizeSocialUrl(footer.facebookUrl || DEFAULT_SOCIAL_URLS.facebook, 'facebook')
-  const ig = normalizeSocialUrl(footer.instagramUrl || DEFAULT_SOCIAL_URLS.instagram, 'instagram')
-  const tt = normalizeSocialUrl(footer.tiktokUrl || DEFAULT_SOCIAL_URLS.tiktok, 'tiktok')
-  return { facebookUrl: fb, instagramUrl: ig, tiktokUrl: tt }
+  return {
+    facebookUrl: pickSocialUrl(footer.facebookUrl, 'facebook'),
+    instagramUrl: pickSocialUrl(footer.instagramUrl, 'instagram'),
+    tiktokUrl: pickSocialUrl(footer.tiktokUrl, 'tiktok'),
+  }
 }

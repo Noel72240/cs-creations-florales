@@ -54,7 +54,7 @@ export const SITE_CONTENT_DEFAULTS = {
       'paiement sécurisé en ligne (SumUp : CB, Visa, Mastercard) · sur place : carte bancaire (CB) et espèces.',
     paymentWithoutSumup:
       'sur place : carte bancaire (CB) et espèces.',
-    facebookUrl: '',
+    facebookUrl: 'https://www.facebook.com/profile.php?id=61587027218191',
     instagramUrl: 'https://www.instagram.com/cs_creations_florales/',
     tiktokUrl: 'https://www.tiktok.com/@cs_creations_florales',
   },
