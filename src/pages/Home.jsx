@@ -29,7 +29,7 @@ function HeroSection({ site, hero }) {
           : undefined
       }
     >
-      <div className="relative z-10 text-center px-4 animate-fade-up">
+      <div className="relative z-10 text-center px-4 pb-12 sm:pb-16 md:pb-20 animate-fade-up">
         <div className="hero-square-wrap mx-auto">
           <div className="hero-square-frame hero-square-frame--plain" data-animate="hero-frame">
 
@@ -100,7 +100,7 @@ function HeroSection({ site, hero }) {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-4 justify-center mt-10">
+        <div className="flex flex-wrap gap-4 justify-center mt-8 mb-2">
           <Link
             to={hero.ctaPrimaryPath}
             className="btn-primary text-sm py-3 px-8"
