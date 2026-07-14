@@ -1,9 +1,11 @@
 import { PAGE_ARTICLE_CATALOG } from '../data/articleCatalog'
-import { isPublishableCatalogArticle } from './articleHubAggregation'
+import { isPublishableCatalogArticle, articleDisplayFingerprint } from './articleHubAggregation'
 import { normalizeArticlePrice } from './articlePrices'
+import { normalizeArticleProductOptions } from './articleProductOptions'
 
 const HUB_PAGE_KEYS = new Set(['evenementsFloraux', 'creationsSaisonnieres'])
 const HUB_ONLY_ID_PREFIXES = ['evt-', 'sai-']
+const GOBELET_ARTICLE_IDS = new Set(['bapteme-communion-002', 'personnalisation-009'])
 
 function buildDefaultArticleIndex() {
   const byId = new Map()
@@ -25,24 +27,72 @@ function shouldDropFromGrandesMeres(item) {
   return id.startsWith('fete-des-meres-')
 }
 
+function isGobeletPlastiqueArticle(item) {
+  const id = String(item?.id || '')
+  if (GOBELET_ARTICLE_IDS.has(id)) return true
+  const title = String(item?.title || '')
+  return /gobelet.*(plastique|bapt)/i.test(title) && !/communion colombes|verre communion/i.test(title)
+}
+
+function repairProductOptions(item) {
+  if (!isGobeletPlastiqueArticle(item)) return item.productOptions
+  return normalizeArticleProductOptions(
+    {
+      ...(item.productOptions || {}),
+      active: true,
+      templateId: 'gobelet-bapteme',
+    },
+    item.title,
+  )
+}
+
 function repairKnownArticle(item, defaults) {
   const def = defaults.get(String(item?.id || ''))
-  if (!def) return item
+  let next = { ...item }
 
-  const next = { ...item }
-  const storedPrice = normalizeArticlePrice(item.price)
-  const defaultPrice = normalizeArticlePrice(def.price)
-  if (storedPrice === 0 && defaultPrice > 0) {
-    next.price = defaultPrice
+  if (def) {
+    const storedPrice = normalizeArticlePrice(item.price)
+    const defaultPrice = normalizeArticlePrice(def.price)
+    if (storedPrice === 0 && defaultPrice > 0) {
+      next.price = defaultPrice
+    }
   }
+
+  next.productOptions = repairProductOptions(next)
   return next
+}
+
+function dedupeItemsByFingerprint(items) {
+  const byFingerprint = new Map()
+
+  for (const item of items) {
+    const fingerprint = articleDisplayFingerprint(item)
+    const existing = byFingerprint.get(fingerprint)
+    if (!existing) {
+      byFingerprint.set(fingerprint, item)
+      continue
+    }
+    const existingPrice = normalizeArticlePrice(existing.price)
+    const nextPrice = normalizeArticlePrice(item.price)
+    if (nextPrice > existingPrice) {
+      byFingerprint.set(fingerprint, item)
+    } else if (nextPrice === existingPrice && existingPrice === 0) {
+      const existingHasDefault = Boolean(existing.id && existing.id === item.id)
+      if (!existingHasDefault && String(item.id || '').length > String(existing.id || '').length) {
+        byFingerprint.set(fingerprint, item)
+      }
+    }
+  }
+
+  return [...byFingerprint.values()]
 }
 
 /**
  * Nettoie les articles éditables / affichés :
  * - vide les aperçus hub (doublons evt-* / sai-*),
  * - retire les articles hub-only et les fantômes à 0 €,
- * - corrige les prix connus depuis le catalogue par défaut.
+ * - déduplique par photo (src),
+ * - corrige les prix et modèles connus depuis le catalogue par défaut.
  */
 export function sanitizePageArticles(pageArticles) {
   if (!pageArticles || typeof pageArticles !== 'object') return pageArticles
@@ -61,19 +111,21 @@ export function sanitizePageArticles(pageArticles) {
       continue
     }
 
-    const items = (Array.isArray(page.items) ? page.items : [])
-      .filter((item) => {
-        if (!item?.id || isHubOnlyArticleId(item.id)) return false
-        if (pageKey === 'feteDesGrandesMeres' && shouldDropFromGrandesMeres(item)) return false
-        if (!isPublishableCatalogArticle(item)) return false
+    const items = dedupeItemsByFingerprint(
+      (Array.isArray(page.items) ? page.items : [])
+        .filter((item) => {
+          if (!item?.id || isHubOnlyArticleId(item.id)) return false
+          if (pageKey === 'feteDesGrandesMeres' && shouldDropFromGrandesMeres(item)) return false
+          if (!isPublishableCatalogArticle(item)) return false
 
-        const storedPrice = normalizeArticlePrice(item.price)
-        const hasDefault = defaults.has(String(item.id))
-        if (storedPrice === 0 && !hasDefault && !String(item.src || '').trim()) return false
+          const storedPrice = normalizeArticlePrice(item.price)
+          const hasDefault = defaults.has(String(item.id))
+          if (storedPrice === 0 && !hasDefault && !String(item.src || '').trim()) return false
 
-        return true
-      })
-      .map((item) => repairKnownArticle(item, defaults))
+          return true
+        })
+        .map((item) => repairKnownArticle(item, defaults)),
+    )
 
     out[pageKey] = { ...page, items }
   }

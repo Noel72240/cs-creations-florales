@@ -28,6 +28,7 @@ export default function CreationsFuneraires() {
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
         intro={pa?.intro}
+        showIntro
         items={pa?.items}
         pagePath="/creations-funeraires"
         pageKey="creationsFuneraires"

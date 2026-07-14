@@ -11,7 +11,7 @@ export default function EvenementsFloraux() {
   const { content } = useSiteConfig()
   const pa = content.pageArticles?.evenementsFloraux
   const hubItems = aggregateHubArticles('evenementsFloraux', content, { maxItems: 500 })
-  const { cards } = resolveEvenementsFlorauxHub(pa)
+  const { cards, hubIntro } = resolveEvenementsFlorauxHub(pa)
 
   return (
     <>
@@ -25,8 +25,11 @@ export default function EvenementsFloraux() {
           }}
         />
       </div>
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-5xl mx-auto">
+      <section className="py-10 px-4" style={{ background: 'var(--blanc)' }}>
+        <div className="max-w-5xl mx-auto text-center">
+          {hubIntro ? (
+            <p className="text-refined max-w-3xl mx-auto mb-8 leading-relaxed">{hubIntro}</p>
+          ) : null}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {cards.map((ev) => (
               <Link key={ev.path} to={ev.path} className="card group block touch-manipulation">
@@ -36,14 +39,17 @@ export default function EvenementsFloraux() {
                     <span>Découvrir →</span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="p-6 text-left">
+                  <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl">{ev.icon}</span>
                     <h2 className="font-heading text-xl font-medium" style={{ color: 'var(--violet)' }}>
                       {ev.title}
                     </h2>
                   </div>
-                  <div className="mt-3 text-xs font-body flex items-center gap-1" style={{ color: 'var(--mauve)' }}>
+                  {ev.desc ? (
+                    <p className="text-body-soft text-sm leading-relaxed mb-3">{ev.desc}</p>
+                  ) : null}
+                  <div className="text-xs font-body flex items-center gap-1" style={{ color: 'var(--mauve)' }}>
                     <span>En savoir plus</span>
                     <svg
                       className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"
@@ -68,6 +74,7 @@ export default function EvenementsFloraux() {
         pagePath="/evenements-floraux"
         pageKey="evenementsFloraux"
         maxItems={500}
+        showIntro
       />
 
       <ContactCTA message="Vous avez un événement à préparer ? Contactez-moi pour un devis personnalisé et gratuit." />

@@ -2095,7 +2095,7 @@ button.nav-link.nav-link-header {
 .product-options-form {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 1rem;
 }
 
 .product-options-form__field {
@@ -2107,7 +2107,21 @@ button.nav-link.nav-link-header {
 }
 
 .article-product-options {
-  gap: 0.65rem;
+  gap: 1rem;
+}
+
+.article-product-layout__desc {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1023px) {
+  .article-product-layout__desc {
+    margin-bottom: 1rem;
+  }
+
+  .article-product-layout__shop {
+    margin-top: 0.75rem;
+  }
 }
 
 .article-product-options-heading {
@@ -2388,6 +2402,45 @@ button.nav-link.nav-link-header {
   line-height: 1.55;
   color: var(--text-mid);
   margin-bottom: 0.5rem;
+}
+
+.secure-payment-notice__cards-strip,
+.sumup-payment-methods-strip {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  height: auto;
+  margin-top: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.home-presentation__paragraph {
+  line-height: 1.5;
+}
+
+.home-presentation__bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-presentation__bullets li {
+  margin: 0;
+}
+
+.qui-suis-je-section {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .qui-suis-je-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
 }
 
 .secure-payment-notice__cards {

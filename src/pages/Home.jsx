@@ -6,6 +6,7 @@ import { resolveItemPhoto, resolvePhotoSrc } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
+import SecurePaymentNotice from '../components/SecurePaymentNotice'
 
 const CREATOR_PHOTO_DEFAULT = w600(P.womanFlorist)
 const CREATOR_PHOTO_PATHS = ['/charlene.png', '/charlene.webp', '/charlene.jpg']
@@ -135,29 +136,55 @@ function HeroSection({ site, hero }) {
   )
 }
 
-function IntroSection({ intro }) {
+function IntroSection({ intro, site }) {
   const headline = intro?.headline?.trim() || ''
   const tagline = intro?.tagline?.trim() || ''
   const paragraph = intro?.paragraph?.trim() || ''
-  if (!headline && !tagline && !paragraph) return null
+  const whyTitle = intro?.whyTitle?.trim() || ''
+  const whyBullets = Array.isArray(intro?.whyBullets)
+    ? intro.whyBullets.map((b) => String(b || '').trim()).filter(Boolean)
+    : []
+  if (!headline && !tagline && !paragraph && !whyTitle && whyBullets.length === 0) return null
 
   return (
-    <section className="py-16 md:py-20 px-4" style={{ background: 'var(--blanc)' }}>
+    <section className="home-presentation py-12 md:py-16 px-4" style={{ background: 'var(--blanc)' }}>
       <div className="max-w-3xl mx-auto text-center">
-        {headline && (
-          <p className="section-subtitle mb-3">{headline}</p>
-        )}
-        {tagline && (
+        {headline ? (
+          <p
+            className="home-presentation__headline font-heading font-semibold leading-snug mb-3"
+            style={{ fontSize: 'clamp(1.45rem, 3.6vw, 2.15rem)', color: 'var(--violet)' }}
+          >
+            {renderQuiParagraphAccents(headline, site?.ownerFirstName, site?.businessName ? [site.businessName] : [])}
+          </p>
+        ) : null}
+        {tagline ? (
           <h2
-            className="font-heading font-medium leading-snug mb-6"
-            style={{ fontSize: 'clamp(1.65rem, 4vw, 2.75rem)', color: 'var(--violet)' }}
+            className="font-heading font-medium leading-snug mb-4"
+            style={{ fontSize: 'clamp(1.15rem, 2.4vw, 1.55rem)', color: 'var(--mauve)' }}
           >
             {tagline}
           </h2>
-        )}
-        {paragraph && (
-          <p className="text-refined max-w-[36rem] mx-auto">{paragraph}</p>
-        )}
+        ) : null}
+        {paragraph ? (
+          <p className="home-presentation__paragraph text-refined max-w-[38rem] mx-auto">{paragraph}</p>
+        ) : null}
+        {whyTitle ? (
+          <h3
+            className="home-presentation__why-title font-heading font-medium mt-6 mb-3"
+            style={{ fontSize: 'clamp(1.25rem, 2.8vw, 1.75rem)', color: 'var(--violet)' }}
+          >
+            {whyTitle}
+          </h3>
+        ) : null}
+        {whyBullets.length > 0 ? (
+          <ul className="home-presentation__bullets max-w-md mx-auto text-left">
+            {whyBullets.map((line) => (
+              <li key={line} className="text-refined text-sm leading-snug">
+                ✓ {line}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </section>
   )
@@ -196,7 +223,7 @@ function QuiSuisJeSection({ site, qui }) {
 
   return (
     <section
-      className="qui-suis-je-section py-20 px-4"
+      className="qui-suis-je-section px-4"
       style={{ background: 'linear-gradient(to bottom, #fff7fb, var(--beige))' }}
     >
       <div className="max-w-6xl mx-auto">
@@ -235,7 +262,7 @@ function QuiSuisJeSection({ site, qui }) {
               <span className="text-mauve text-sm">✿</span>
             </div>
 
-            <div className="space-y-5 text-refined text-left">
+            <div className="space-y-3.5 text-refined text-left leading-snug">
               {paragraphs.map((text, idx) => (
                 <p key={idx}>
                   {renderQuiParagraphAccents(text, site.ownerFirstName, brandExtra)}
@@ -337,9 +364,9 @@ function CreationSurMesureSection({ moto }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div className="img-overlay rounded-3xl" style={{ minHeight: '360px' }}>
             <img src={motoPhoto} alt="Création sur mesure — moto florale" className="w-full h-full object-cover" />
-            <div className="overlay" style={{ opacity: 1, background: 'linear-gradient(to top, rgba(139, 75, 106, 0.72) 0%, rgba(139, 75, 106, 0.12) 65%)' }}>
+            <div className="overlay flex items-end justify-start p-5 sm:p-6" style={{ opacity: 1, background: 'linear-gradient(to top, rgba(139, 75, 106, 0.72) 0%, rgba(139, 75, 106, 0.12) 65%)' }}>
               <span
-                className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95"
+                className="font-refined text-[22px] sm:text-[26px] font-semibold tracking-wide text-white/95 text-left"
                 style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
               >
                 {moto.overlayTitle}
@@ -406,41 +433,43 @@ function CategoryPreviewSection({ prest }) {
   )
 }
 
+function HomePaymentTrust() {
+  return (
+    <section className="py-10 px-4" style={{ background: 'var(--beige)' }}>
+      <div className="max-w-3xl mx-auto">
+        <SecurePaymentNotice compact />
+      </div>
+    </section>
+  )
+}
+
 function ContactStrip({ site, strip }) {
   return (
-    <section
-      className="py-20 px-4 text-center relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, var(--violet) 0%, var(--mauve) 60%, #c49fd4 100%)',
-      }}
-    >
-      <div className="absolute top-4 left-8 text-white/10 text-6xl font-heading">✿</div>
-      <div className="absolute bottom-4 right-8 text-white/10 text-6xl font-heading">❀</div>
-      <div className="relative z-10 max-w-2xl mx-auto">
-        <p className="contact-strip-pretitle mb-3 text-lg sm:text-xl md:text-[1.35rem] font-refined font-medium leading-snug sm:leading-normal tracking-wide text-white/95">
+    <section className="contact-cta-band py-16 px-4 relative overflow-hidden">
+      <div className="contact-cta-band__glow" aria-hidden="true" />
+      <div className="max-w-2xl mx-auto text-center relative z-10">
+        <p className="contact-strip-pretitle mb-2 text-lg sm:text-xl font-refined font-medium leading-snug tracking-wide" style={{ color: 'var(--violet)' }}>
           {strip.pretitle}
         </p>
         <h2
-          className="font-heading font-medium text-white mb-4"
-          style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
+          className="font-heading font-medium mb-3"
+          style={{ fontSize: 'clamp(1.65rem, 4vw, 2.5rem)', color: 'var(--violet)' }}
         >
           {strip.title}
         </h2>
-        <p className="font-heading text-base font-normal tracking-[0.12em] text-white/85 mb-8">
+        <p className="font-body text-sm sm:text-base mb-6 leading-snug" style={{ color: 'var(--text-mid)' }}>
           {strip.subtitle}
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <Link
             to="/contact"
             className="btn-primary"
-            style={{ background: 'white', color: 'var(--violet)' }}
           >
             {strip.ctaLabel}
           </Link>
           <a
             href={site.phoneHref}
             className="btn-outline"
-            style={{ borderColor: 'white', color: 'white' }}
           >
             {strip.phoneCtaPrefix}{site.ownerFirstName}
           </a>
@@ -458,11 +487,11 @@ export default function Home() {
   return (
     <>
       <HeroSection site={site} hero={h.hero} />
+      <IntroSection intro={h.intro} site={site} />
       <QuiSuisJeSection site={site} qui={h.quiSuisJe} />
-      <IntroSection intro={h.intro} />
-      <ArtisanBannerSection banner={h.artisanBanner} />
       <CreationSurMesureSection moto={h.moto} />
       <CategoryPreviewSection prest={h.prestations} />
+      <HomePaymentTrust />
       <ContactStrip site={site} strip={h.contactStrip} />
     </>
   )

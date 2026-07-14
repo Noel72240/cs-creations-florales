@@ -35,6 +35,7 @@ import {
   shouldHideCartQuantityStepper,
   validateProductOptions,
 } from '../lib/productOptionsEngine'
+import { getProductOptionTemplate } from '../data/productOptionTemplates'
 
 function QuantityStepper({ value, onChange, min = 1, max = 99 }) {
   return (
@@ -153,6 +154,15 @@ export default function ArticleProduct() {
         basePrice,
       })
     : basePrice
+
+  const optionTemplate = advancedOptionsActive
+    ? getProductOptionTemplate(productOptionsConfig.templateId)
+    : null
+  const useCatalogBasePrice =
+    optionTemplate?.pricingMode === 'unitQuantity' ||
+    productOptionsConfig?.templateId === 'gobelet-bapteme'
+  const displayPrice =
+    advancedOptionsActive && !useCatalogBasePrice && unitPrice > 0 ? unitPrice : basePrice
 
   const hideQtyStepper = advancedOptionsActive && shouldHideCartQuantityStepper(productOptionsConfig.templateId)
   const hasShopSection =
@@ -312,8 +322,8 @@ export default function ArticleProduct() {
               </div>
             </div>
 
-            <div className="article-product-layout__shop order-3">
-              <div className="article-product-options space-y-3">
+            <div className="article-product-layout__shop order-4 lg:order-3">
+              <div className="article-product-options space-y-4">
                 <ProductOptionsSectionHeading title={optionsSectionTitle} />
 
                 {advancedOptionsActive ? (
@@ -388,7 +398,7 @@ export default function ArticleProduct() {
                   {article.title}
                 </h1>
                 <p className="font-refined text-lg sm:text-xl font-semibold mb-0 text-center sm:text-left" style={{ color: 'var(--mauve)' }}>
-                  {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
+                  {formatEuro(displayPrice)}
                   {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' ? (
                     <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
                       Prix à l&apos;unité (par chiffre), selon la taille choisie
@@ -414,7 +424,7 @@ export default function ArticleProduct() {
                 </p>
               </div>
 
-              <div className="article-product-layout__desc order-4">
+              <div className="article-product-layout__desc order-3 lg:order-4">
                 {descriptionBlocks.length > 0 ? (
                   <div className="article-product-description">
                     {descriptionBlocks.map((block, i) => (

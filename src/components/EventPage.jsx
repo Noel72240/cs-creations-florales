@@ -27,6 +27,7 @@ export default function EventPage({ title, subtitle, coverImg, articlePageKey, p
           items={pa.items}
           pagePath={pagePath}
           pageKey={articlePageKey}
+          showIntro
         />
       )}
 

@@ -83,7 +83,7 @@ export default function ProductOptionsForm({
   }
 
   return (
-    <div className="product-options-form space-y-3">
+    <div className="product-options-form space-y-4">
       {fields.map((field) => {
         if (!isFieldVisible(field, values)) return null
         const err = errors[field.id]

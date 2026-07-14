@@ -113,6 +113,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
     id: 'box-florale',
     label: 'Box / boîte florale',
     fields: [
+      'bagColorExtended',
       'smallRoseColor',
       'largeRoseColorMax3',
       'largeFlowerColor',
@@ -128,7 +129,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'panneau-bienvenue': {
     id: 'panneau-bienvenue',
     label: 'Panneau de bienvenue',
-    fields: ['roseColorMax3', 'personalizationText', 'textColor', 'welcomeDecorationLarge', 'specialRequests'],
+    fields: ['roseColorMax3', 'largeFlowerColor', 'personalizationText', 'textColor', 'welcomeDecorationLarge', 'specialRequests'],
   },
   'grand-sac-floral': {
     id: 'grand-sac-floral',
@@ -183,7 +184,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'plaque-funeraire': {
     id: 'plaque-funeraire',
     label: 'Plaque funéraire',
-    fields: ['roseColorMax3', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'personalizationColor', 'candleMessageYesNo', 'candleMessageText', 'candleTextColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'candleMessageYesNo', 'candleMessageText', 'candleTextColor', 'specialRequests'],
   },
   'croix-florale': {
     id: 'croix-florale',
@@ -213,7 +214,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'jardin-souvenir': {
     id: 'jardin-souvenir',
     label: 'Jardin du Souvenir',
-    fields: ['roseColorMax3', 'gateMaterial', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'gateMaterial', 'specialRequests'],
   },
   'lapin-paques': {
     id: 'lapin-paques',
@@ -247,7 +248,7 @@ export const TITLE_TO_OPTION_TEMPLATE = [
   { match: /alliances entrelac|porte.?alliance/i, templateId: 'porte-alliance-floral' },
   { match: /plateau alliances miroir|plateau miroir|porte.?alliances miroir/i, templateId: 'plateau-miroir-porte-alliance' },
   { match: /plaque baptême|panneau bapt/i, templateId: 'panneau-bapteme' },
-  { match: /gobelet.*plastique|gobelet bapt/i, templateId: 'gobelet-bapteme' },
+  { match: /gobelet.*plastique|gobelet bapt|gobelet baptême|gobelet doré/i, templateId: 'gobelet-bapteme' },
   { match: /verre communion|gobelet.*communion|verre.*communion/i, templateId: 'verre-communion' },
   { match: /cône|cone floral/i, templateId: 'cone-floral' },
   { match: /arche|grande composition/i, templateId: 'grande-composition-florale' },

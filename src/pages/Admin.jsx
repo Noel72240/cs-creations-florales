@@ -348,6 +348,11 @@ export default function Admin() {
         headline: fd.get('intro_headline')?.trim() || '',
         tagline: fd.get('intro_tagline')?.trim() || '',
         paragraph: fd.get('intro_paragraph')?.trim() || '',
+        whyTitle: fd.get('intro_why_title')?.trim() || '',
+        whyBullets: String(fd.get('intro_why_bullets') || '')
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean),
       }
       const bgDraft = heroBackgroundDraftRef.current || {}
       const hero = {
@@ -750,11 +755,20 @@ export default function Admin() {
           <HeroBackgroundEditor initial={h.hero} onDraftChange={handleHeroBackgroundDraft} />
 
           <fieldset className="space-y-2">
-            <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Texte d’intro (sous le bandeau hero)</legend>
-            <p className="text-xs">Affiché avant « Mes réalisations / Coup de cœur ». Laissez vide pour masquer.</p>
-            <input name="intro_headline" defaultValue={h.intro?.headline || ''} className="form-field" placeholder="ex. Créatrice florale en Sarthe" />
+            <legend className="text-lg mb-2" style={{ color: 'var(--violet)' }}>Présentation (avant votre photo)</legend>
+            <p className="text-xs">Bloc principal sous le hero, avant la section « Qui suis-je ? ».</p>
+            <input name="intro_headline" defaultValue={h.intro?.headline || ''} className="form-field" placeholder="ex. Créatrice florale artisanale en Sarthe" />
             <input name="intro_tagline" defaultValue={h.intro?.tagline || ''} className="form-field" placeholder="ex. Des fleurs qui racontent votre histoire." />
-            <textarea name="intro_paragraph" rows={3} className="form-field" defaultValue={h.intro?.paragraph || ''} placeholder="Paragraphe" />
+            <textarea name="intro_paragraph" rows={4} className="form-field" defaultValue={h.intro?.paragraph || ''} placeholder="Paragraphe de présentation" />
+            <input name="intro_why_title" defaultValue={h.intro?.whyTitle || ''} className="form-field" placeholder="Titre liste (ex. Pourquoi choisir mes créations ?)" />
+            <label className="block text-xs">Points forts (un par ligne, sans ✓)</label>
+            <textarea
+              name="intro_why_bullets"
+              rows={6}
+              className="form-field"
+              defaultValue={(h.intro?.whyBullets || []).join('\n')}
+              placeholder={'Fabrication artisanale\nCréations 100 % personnalisées…'}
+            />
           </fieldset>
 
           <HomeCoupsEditor key={JSON.stringify(h.coupsDeCoeur)} initial={h.coupsDeCoeur} onDraftChange={handleCoupsDraft} />

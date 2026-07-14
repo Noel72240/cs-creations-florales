@@ -100,9 +100,18 @@ export const SITE_CONTENT_DEFAULTS = {
     /** Texte sous le hero, avant « Mes réalisations / Coups de cœur » */
     intro: {
       headline: 'Créatrice florale artisanale en Sarthe',
-      tagline: '',
+      tagline: 'Des fleurs qui racontent votre histoire',
       paragraph:
-        'Je réalise des créations florales personnalisées, uniques, pour sublimer chaque moment et accompagner vos occasions importantes.',
+        'Je réalise des créations florales personnalisées, entièrement confectionnées à la main, pour célébrer les plus beaux moments de votre vie : mariage, anniversaire, baptême, naissance, fête des mères, fête des grands-mères, deuil et toutes les occasions. 🌸',
+      whyTitle: 'Pourquoi choisir mes créations ?',
+      whyBullets: [
+        'Fabrication artisanale',
+        'Créations 100 % personnalisées et sur mesure',
+        'Fleurs éternelles de qualité et finitions soignées',
+        'Large choix de modèles et de couleurs',
+        'Cadeaux uniques pour toutes les occasions',
+        'Expédition rapide et soignée dans toute la France',
+      ],
     },
     hero: {
       /** Fond (hero + body) : comme les galeries — src prioritaire, sinon clé Unsplash ; vide = site-bg.png */
@@ -125,9 +134,9 @@ export const SITE_CONTENT_DEFAULTS = {
       },
     },
     artisanBanner: {
-      enabled: true,
-      title: 'Créatrice florale artisanale en Sarthe',
-      subtitle: 'Des créations uniques, entièrement personnalisées et réalisées à la main.',
+      enabled: false,
+      title: '',
+      subtitle: '',
     },
     quiSuisJe: {
       sectionPretitle: 'À propos',

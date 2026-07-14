@@ -12,7 +12,7 @@ function bucketItems(content, pageKey) {
 }
 
 /** Empreinte légère pour éviter les doublons visuels (aperçus hub vs catalogue complet). */
-function articleDisplayFingerprint(item) {
+export function articleDisplayFingerprint(item) {
   const src = String(item?.src || '').trim().toLowerCase()
   if (src) return `src:${src}`
   return `id:${String(item?.id || '')}`
@@ -47,6 +47,17 @@ export function aggregateHubArticles(parentKey, content, { maxItems = MAX_PAGE_A
 
     const fingerprint = articleDisplayFingerprint(item)
     if (seenFingerprints.has(fingerprint)) return
+
+    const storedPrice = Number(item.price) || 0
+    if (storedPrice <= 0) {
+      const src = String(item?.src || '').trim().toLowerCase()
+      if (src) {
+        const pricedDuplicate = result.find(
+          (row) => String(row?.src || '').trim().toLowerCase() === src && Number(row.price) > 0,
+        )
+        if (pricedDuplicate) return
+      }
+    }
 
     seenIds.add(idKey)
     seenFingerprints.add(fingerprint)

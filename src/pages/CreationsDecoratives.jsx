@@ -28,6 +28,7 @@ export default function CreationsDecoratives() {
       <PageArticleGrid
         sectionTitle={pa?.sectionTitle}
         intro={pa?.intro}
+        showIntro
         items={pa?.items}
         pagePath="/creations-florales"
         pageKey="creationsFlorales"

@@ -73,6 +73,7 @@ export default function CreationsSaisonnieres() {
         pagePath="/creations-saisonnieres"
         pageKey="creationsSaisonnieres"
         maxItems={500}
+        showIntro
       />
 
       {showSeasonCards ? (

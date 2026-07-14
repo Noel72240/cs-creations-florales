@@ -1,5 +1,6 @@
 /** Bandeau « paiement sécurisé » + cartes acceptées (SumUp). */
 const SECURE_PAYMENT_LOGO = '/images/paiement-securise.png'
+const SUMUP_PAYMENT_METHODS = '/images/sumup-moyens-paiement.png'
 
 export default function SecurePaymentNotice({ compact = false, className = '' }) {
   return (
@@ -28,11 +29,13 @@ export default function SecurePaymentNotice({ compact = false, className = '' })
               ? 'Redirection vers la page sécurisée SumUp (3-D Secure si votre banque l’exige).'
               : 'Le règlement en ligne s’effectue sur une page hébergée par SumUp — vos données de carte ne transitent pas par ce site.'}
           </p>
-          <p className="secure-payment-notice__cards" aria-label="Cartes acceptées sur SumUp">
-            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">CB</span>
-            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Visa</span>
-            <span className="secure-payment-notice__badge secure-payment-notice__badge--brand">Mastercard</span>
-          </p>
+          <img
+            src={SUMUP_PAYMENT_METHODS}
+            alt="Cartes et moyens de paiement acceptés : Visa, Mastercard, Apple Pay, Google Pay, Samsung Pay…"
+            className="secure-payment-notice__cards-strip"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
     </div>
@@ -64,6 +67,18 @@ export function SecurePaymentLogo({ className = '', size = 'md' }) {
       className={`secure-payment-logo${className ? ` ${className}` : ''}`}
       width={dim}
       height={dim}
+      loading="lazy"
+      decoding="async"
+    />
+  )
+}
+
+export function SumupPaymentMethodsStrip({ className = '' }) {
+  return (
+    <img
+      src={SUMUP_PAYMENT_METHODS}
+      alt="Moyens de paiement SumUp acceptés"
+      className={`sumup-payment-methods-strip${className ? ` ${className}` : ''}`}
       loading="lazy"
       decoding="async"
     />

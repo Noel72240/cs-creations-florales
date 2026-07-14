@@ -137,10 +137,13 @@ const OPTION_FIELD_SORT_PRIORITY = {
 function sortOptionFieldIds(ids, templateFields = []) {
   const templateIndex = new Map(templateFields.map((id, index) => [id, index]))
   return [...ids].sort((a, b) => {
-    const pa = OPTION_FIELD_SORT_PRIORITY[a] ?? 500 + (templateIndex.get(a) ?? 99)
-    const pb = OPTION_FIELD_SORT_PRIORITY[b] ?? 500 + (templateIndex.get(b) ?? 99)
+    const ia = templateIndex.get(a)
+    const ib = templateIndex.get(b)
+    if (ia !== undefined && ib !== undefined) return ia - ib
+    const pa = OPTION_FIELD_SORT_PRIORITY[a] ?? 500 + (ia ?? 99)
+    const pb = OPTION_FIELD_SORT_PRIORITY[b] ?? 500 + (ib ?? 99)
     if (pa !== pb) return pa - pb
-    return (templateIndex.get(a) ?? 0) - (templateIndex.get(b) ?? 0)
+    return (ia ?? 999) - (ib ?? 999)
   })
 }
 
