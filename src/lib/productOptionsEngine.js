@@ -57,12 +57,103 @@ export function applyFieldSettings(fieldDef, settings) {
   return fieldDef
 }
 
+/** Ordre cohérent des champs sur toutes les fiches (demandes particulières en dernier). */
+const OPTION_FIELD_SORT_PRIORITY = {
+  feteCategorySelect: 5,
+  smallRoseColor: 10,
+  coneColor: 12,
+  bagColorPale: 12,
+  bagColorExtended: 12,
+  supportColorEcrin: 12,
+  gateMaterial: 12,
+  roseColor: 20,
+  roseColorMulti: 20,
+  roseColorMax3: 20,
+  roseColorExtended: 20,
+  cloudColor: 22,
+  largeFlowerColor: 30,
+  largeFlowerColorDual: 30,
+  largeRoseColorMax3: 30,
+  flowerSelectMax2: 40,
+  flowerSelect2: 40,
+  flowerColor: 40,
+  flowerColorIfFleur: 40,
+  supportColorRoseBlanc: 42,
+  supportColorRoseBlancNoir: 42,
+  loveInscriptionYesNo: 42,
+  messageSupportYesNo: 42,
+  photoPersonalizationYesNo: 42,
+  sacTopPersonalizationYesNo: 42,
+  messagePersonalizationYesNo: 42,
+  personalizationYesNo: 42,
+  chiffreNumber: 50,
+  birthSizeText: 51,
+  birthWeightText: 52,
+  birthTimeText: 53,
+  chiffreSize: 54,
+  personalizationText: 55,
+  personalizationTextIfYes: 56,
+  messagePersonalizationText: 56,
+  messageSupportText: 56,
+  sacTopPersonalizationText: 56,
+  plaqueAcryliqueText: 57,
+  plaqueAcryliqueTextIfYes: 58,
+  plaqueWoodText: 57,
+  plaqueHeartText: 57,
+  plaqueHeartTextIfYes: 58,
+  textColor: 60,
+  personalizationColor: 61,
+  candleTextColor: 62,
+  guirlandePearlColor: 63,
+  ribbonColor: 63,
+  pearlYesNo: 70,
+  pearlColor: 80,
+  pearlColorIfYes: 80,
+  pearlColorMulti: 80,
+  ledYesNo: 85,
+  colombeYesNo: 88,
+  inscriptionSupportYesNo: 88,
+  papillonMetalSelect: 88,
+  decorationSelect: 88,
+  decorationTypeSelect: 88,
+  plaqueAcryliqueYesNo: 88,
+  plaqueHeartYesNo: 88,
+  candleMessageYesNo: 88,
+  decorationOtherText: 91,
+  decorationText: 91,
+  coeurTextIfCoeur: 91,
+  themeText: 91,
+  flowersDecorationsText: 92,
+  flowerDetailsLarge: 92,
+  flowerDetailsMax2: 92,
+  welcomeDecorationLarge: 92,
+  paquesDecorationsText: 92,
+  glassQuantity: 94,
+  chiffreQuantity: 94,
+  chiffreWishes: 998,
+  specialRequests: 1000,
+}
+
+function sortOptionFieldIds(ids, templateFields = []) {
+  const templateIndex = new Map(templateFields.map((id, index) => [id, index]))
+  return [...ids].sort((a, b) => {
+    const pa = OPTION_FIELD_SORT_PRIORITY[a] ?? 500 + (templateIndex.get(a) ?? 99)
+    const pb = OPTION_FIELD_SORT_PRIORITY[b] ?? 500 + (templateIndex.get(b) ?? 99)
+    if (pa !== pb) return pa - pb
+    return (templateIndex.get(a) ?? 0) - (templateIndex.get(b) ?? 0)
+  })
+}
+
 export function resolveProductOptionFields(templateId, enabledFieldIds, fieldSettings = {}) {
   const template = getProductOptionTemplate(templateId)
   if (!template) return []
-  const ids = Array.isArray(enabledFieldIds) && enabledFieldIds.length
-    ? enabledFieldIds
-    : template.fields
+  let ids = Array.isArray(enabledFieldIds) && enabledFieldIds.length
+    ? enabledFieldIds.filter((id) => template.fields.includes(id) && id !== 'eyeColor')
+    : [...template.fields]
+  if (template.fields.includes('specialRequests') && !ids.includes('specialRequests')) {
+    ids = [...ids, 'specialRequests']
+  }
+  ids = sortOptionFieldIds(ids, template.fields)
   return ids
     .map((id) => applyFieldSettings(getOptionFieldDef(id), fieldSettings[id]))
     .filter(Boolean)
@@ -75,6 +166,10 @@ export function computeOptionsUnitPrice({ templateId, values = {}, basePrice = 0
   if (template.pricingMode === 'glassTier') {
     const qty = parseInt(values.glassQuantity, 10) || 1
     return glassUnitPrice(qty)
+  }
+
+  if (template.pricingMode === 'unitQuantity') {
+    return resolveArticlePriceFallback(basePrice)
   }
 
   if (template.pricingMode === 'chiffreFloral') {
@@ -95,9 +190,14 @@ function resolveArticlePriceFallback(basePrice) {
 
 export function computeOptionsCartQuantity({ templateId, values = {}, fallbackQty = 1 }) {
   const template = getProductOptionTemplate(templateId)
-  if (template?.pricingMode === 'glassTier') {
+  if (template?.pricingMode === 'glassTier' || template?.pricingMode === 'unitQuantity') {
     const q = parseInt(values.glassQuantity, 10)
     return Number.isFinite(q) && q >= 1 ? Math.min(999, q) : 1
+  }
+  if (template?.pricingMode === 'chiffreFloral') {
+    const q = parseInt(values.chiffreQuantity, 10)
+    const base = Number.isFinite(q) && q >= 1 ? Math.min(999, q) : 1
+    return base * fallbackQty
   }
   return fallbackQty
 }
@@ -108,7 +208,7 @@ export function usesGlassQuantityAsCartQty(templateId) {
 
 export function shouldHideCartQuantityStepper(templateId) {
   const mode = getProductOptionTemplate(templateId)?.pricingMode
-  return mode === 'glassTier' || mode === 'chiffreFloral'
+  return mode === 'glassTier' || mode === 'chiffreFloral' || mode === 'unitQuantity'
 }
 
 export function validateProductOptions(fields, values) {

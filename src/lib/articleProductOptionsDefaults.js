@@ -70,7 +70,7 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
 
   // — Baptême & communion —
   'bapteme-communion-001': 'croix-florale',
-  'bapteme-communion-002': 'verre-communion',
+  'bapteme-communion-002': 'gobelet-bapteme',
   'bapteme-communion-003': 'verre-communion',
   'bapteme-communion-004': 'panneau-bapteme',
 
@@ -107,7 +107,7 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
   'personnalisation-006': 'communes-personnalisable',
   'personnalisation-007': 'communes-personnalisable',
   'personnalisation-008': 'communes-personnalisable',
-  'personnalisation-009': 'verre-communion',
+  'personnalisation-009': 'gobelet-bapteme',
   'personnalisation-010': 'verres-personnalises',
   'personnalisation-011': 'verres-personnalises',
   'personnalisation-012': 'verre-communion',
@@ -118,7 +118,7 @@ export const ARTICLE_OPTION_TEMPLATE_BY_ID = {
   'evt-anniversaire-verre': 'verres-personnalises',
   'evt-anniversaire-chiffre': 'chiffres-floraux',
   'evt-bapteme-plaque': 'panneau-bapteme',
-  'evt-bapteme-gobelet': 'verre-communion',
+  'evt-bapteme-gobelet': 'gobelet-bapteme',
   'sai-paques-lapin': 'lapin-paques',
   'sai-paques-lapin-gris': 'lapin-paques',
   'sai-fete-meres-plaque': 'coeur-plaque-bois',

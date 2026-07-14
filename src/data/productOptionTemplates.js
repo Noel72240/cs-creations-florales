@@ -4,28 +4,28 @@ export const PRODUCT_OPTION_TEMPLATES = {
     id: 'verres-personnalises',
     label: 'Verres personnalisés',
     pricingMode: 'glassTier',
-    fields: ['textColor', 'personalizationText', 'roseColor', 'glassQuantity', 'specialRequests'],
+    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
   },
   'chiffres-floraux': {
     id: 'chiffres-floraux',
     label: 'Chiffres floraux',
     pricingMode: 'chiffreFloral',
-    fields: ['chiffreNumber', 'chiffreSize', 'roseColorExtended', 'chiffreWishes'],
+    fields: ['roseColorExtended', 'chiffreNumber', 'chiffreSize', 'chiffreQuantity', 'specialRequests'],
   },
   'centre-de-table': {
     id: 'centre-de-table',
     label: 'Centre de table',
-    fields: ['roseColor', 'ledYesNo', 'largeFlowerColor', 'flowersDecorationsText'],
+    fields: ['roseColor', 'largeFlowerColor', 'ledYesNo', 'textColor', 'flowersDecorationsText', 'specialRequests'],
   },
   'fleur-sous-verre': {
     id: 'fleur-sous-verre',
     label: 'Fleur sous verre',
-    fields: ['roseColor', 'textColor', 'personalizationText', 'specialRequests'],
+    fields: ['roseColor', 'personalizationYesNo', 'personalizationTextIfYes', 'textColor', 'specialRequests'],
   },
   'porte-alliance-floral': {
     id: 'porte-alliance-floral',
     label: 'Porte-alliance floral',
-    fields: ['roseColor', 'personalizationText', 'specialRequests', 'inscriptionSupportYesNo'],
+    fields: ['roseColor', 'personalizationText', 'textColor', 'inscriptionSupportYesNo', 'specialRequests'],
   },
   'plateau-miroir-porte-alliance': {
     id: 'plateau-miroir-porte-alliance',
@@ -46,7 +46,13 @@ export const PRODUCT_OPTION_TEMPLATES = {
     id: 'verre-communion',
     label: 'Verre de communion / gobelet baptême',
     pricingMode: 'glassTier',
-    fields: ['textColor', 'personalizationText', 'roseColor', 'glassQuantity', 'specialRequests'],
+    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
+  },
+  'gobelet-bapteme': {
+    id: 'gobelet-bapteme',
+    label: 'Gobelet baptême plastique',
+    pricingMode: 'unitQuantity',
+    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
   },
   'coeur-plaque-acrylique': {
     id: 'coeur-plaque-acrylique',
@@ -76,7 +82,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'ourson-floral': {
     id: 'ourson-floral',
     label: 'Ourson floral',
-    fields: ['roseColorMulti', 'eyeColor', 'decorationTypeSelect', 'flowerColorIfFleur', 'coeurTextIfCoeur', 'textColor', 'specialRequests'],
+    fields: ['roseColorMulti', 'decorationTypeSelect', 'flowerColorIfFleur', 'coeurTextIfCoeur', 'textColor', 'specialRequests'],
   },
   'cadre-naissance': {
     id: 'cadre-naissance',
@@ -101,7 +107,23 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'petit-sac-floral': {
     id: 'petit-sac-floral',
     label: 'Petit sac floral',
-    fields: ['bagColorPale', 'roseColorMax3', 'flowerSelectMax2', 'flowerDetailsLarge', 'specialRequests'],
+    fields: ['bagColorPale', 'roseColorMax3', 'largeFlowerColor', 'flowerSelectMax2', 'flowerDetailsLarge', 'textColor', 'specialRequests'],
+  },
+  'box-florale': {
+    id: 'box-florale',
+    label: 'Box / boîte florale',
+    fields: [
+      'smallRoseColor',
+      'largeRoseColorMax3',
+      'largeFlowerColor',
+      'flowerSelectMax2',
+      'personalizationYesNo',
+      'personalizationTextIfYes',
+      'textColor',
+      'pearlYesNo',
+      'pearlColorIfYes',
+      'specialRequests',
+    ],
   },
   'panneau-bienvenue': {
     id: 'panneau-bienvenue',
@@ -111,7 +133,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'grand-sac-floral': {
     id: 'grand-sac-floral',
     label: 'Grand sac floral',
-    fields: ['bagColorExtended', 'roseColorMax3', 'flowerSelectMax2', 'sacTopPersonalizationYesNo', 'sacTopPersonalizationText', 'textColor', 'specialRequests'],
+    fields: ['bagColorExtended', 'roseColorMax3', 'largeFlowerColor', 'flowerSelectMax2', 'sacTopPersonalizationYesNo', 'sacTopPersonalizationText', 'textColor', 'specialRequests'],
   },
   'papillon-floral': {
     id: 'papillon-floral',
@@ -136,7 +158,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'ecrin-floral': {
     id: 'ecrin-floral',
     label: 'Écrin floral',
-    fields: ['supportColorEcrin', 'pearlYesNo', 'pearlColorIfYes', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'flowerColor', 'ribbonColor', 'specialRequests'],
+    fields: ['supportColorEcrin', 'pearlYesNo', 'pearlColorIfYes', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'textColor', 'flowerColor', 'ribbonColor', 'specialRequests'],
   },
   'coeur-plexiglass': {
     id: 'coeur-plexiglass',
@@ -212,6 +234,7 @@ export const TITLE_TO_OPTION_TEMPLATE = [
   { match: /boîte.*mouchoir|boite.*mouchoir/i, templateId: 'boite-mouchoirs' },
   { match: /plaque bienvenue|plaque « bienvenue/i, templateId: 'panneau-bienvenue' },
   { match: /sac noir|grand sac/i, templateId: 'grand-sac-floral' },
+  { match: /box florale|boîte florale|boite florale/i, templateId: 'box-florale' },
   { match: /sac matelassé|sac blanc|sac bleu|petit sac|écrin blanc roses/i, templateId: 'petit-sac-floral' },
   { match: /lapin.*pâques|lapin pâques/i, templateId: 'lapin-paques' },
   { match: /plaque.*bois|suspension bois|cœur bois message|bonne fête maman|bonne fête mamie|bonne fête papa/i, templateId: 'coeur-plaque-bois' },
@@ -224,7 +247,8 @@ export const TITLE_TO_OPTION_TEMPLATE = [
   { match: /alliances entrelac|porte.?alliance/i, templateId: 'porte-alliance-floral' },
   { match: /plateau alliances miroir|plateau miroir|porte.?alliances miroir/i, templateId: 'plateau-miroir-porte-alliance' },
   { match: /plaque baptême|panneau bapt/i, templateId: 'panneau-bapteme' },
-  { match: /verre communion|gobelet.*communion|gobelet bapt|gobelet personnalis/i, templateId: 'verre-communion' },
+  { match: /gobelet.*plastique|gobelet bapt/i, templateId: 'gobelet-bapteme' },
+  { match: /verre communion|gobelet.*communion|verre.*communion/i, templateId: 'verre-communion' },
   { match: /cône|cone floral/i, templateId: 'cone-floral' },
   { match: /arche|grande composition/i, templateId: 'grande-composition-florale' },
   { match: /ourson/i, templateId: 'ourson-floral' },

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import ConfigurablePageHeader from './ConfigurablePageHeader'
 import ContactCTA from './ContactCTA'
 import PageArticleGrid from './PageArticleGrid'
@@ -31,9 +30,6 @@ export default function EventPage({ title, subtitle, coverImg, articlePageKey, p
         />
       )}
 
-      <div className="px-4 pb-4 flex justify-center">
-        <Link to="/contact" className="btn-primary">Demander un devis gratuit</Link>
-      </div>
       <ContactCTA />
     </>
   )

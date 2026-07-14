@@ -4,13 +4,14 @@
  */
 import { enrichCatalogWithProductOptions } from '../lib/articleProductOptionsDefaults'
 
-function item(slug, num, { title, description, price: _price, photoKey = 'vaseInterior' }) {
+function item(slug, num, { title, description, price = 0, photoKey = 'vaseInterior' }) {
   const n = String(num).padStart(3, '0')
+  const normalizedPrice = Number(String(price ?? '').trim().replace(',', '.'))
   return {
     id: `${slug}-${n}`,
     title,
     description,
-    price: 0,
+    price: Number.isFinite(normalizedPrice) ? Math.max(0, Math.round(normalizedPrice * 100) / 100) : 0,
     photoKey,
     src: `/images/articles/${slug}/${n}.png`,
   }
@@ -415,7 +416,7 @@ export const PAGE_ARTICLE_CATALOG = enrichCatalogWithProductOptions({
         title: 'Gobelet baptême personnalisé',
         description:
           'Gobelet givré avec cadre doré, dentelle et prénom gravé. Souvenir élégant et réutilisable pour vos invités.',
-        price: 32,
+        price: 2.9,
         photoKey: 'bouquetSoft',
       }),
       item('bapteme-communion', 3, {
@@ -654,7 +655,7 @@ export const PAGE_ARTICLE_CATALOG = enrichCatalogWithProductOptions({
         title: 'Gobelet baptême doré',
         description:
           'Gobelet givré avec cadre doré, dentelle et prénom gravé. Souvenir raffiné pour vos invités.',
-        price: 32,
+        price: 2.9,
       }),
       item('personnalisation', 10, {
         title: 'Verre à vin prénom doré',

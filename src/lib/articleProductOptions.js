@@ -60,7 +60,7 @@ export function normalizeArticleProductOptions(raw, title = '') {
   const template = getProductOptionTemplate(templateId)
   const templateFields = template?.fields || []
   let enabledFields = Array.isArray(raw.enabledFields) && raw.enabledFields.length
-    ? raw.enabledFields.filter((id) => templateFields.includes(id))
+    ? raw.enabledFields.filter((id) => templateFields.includes(id) && id !== 'eyeColor')
     : [...templateFields]
   return {
     active: Boolean(raw.active),

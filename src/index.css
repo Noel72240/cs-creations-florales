@@ -2092,6 +2092,24 @@ button.nav-link.nav-link-header {
   color: var(--violet);
 }
 
+.product-options-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.product-options-form__field {
+  margin: 0;
+}
+
+.product-options-form__field + .product-options-form__field {
+  padding-top: 0;
+}
+
+.article-product-options {
+  gap: 0.65rem;
+}
+
 .article-product-options-heading {
   margin: 0.35rem 0 0.85rem;
 }

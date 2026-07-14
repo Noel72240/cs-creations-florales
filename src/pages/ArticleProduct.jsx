@@ -313,7 +313,7 @@ export default function ArticleProduct() {
             </div>
 
             <div className="article-product-layout__shop order-3">
-              <div className="article-product-options space-y-4">
+              <div className="article-product-options space-y-3">
                 <ProductOptionsSectionHeading title={optionsSectionTitle} />
 
                 {advancedOptionsActive ? (
@@ -389,9 +389,19 @@ export default function ArticleProduct() {
                 </h1>
                 <p className="font-refined text-lg sm:text-xl font-semibold mb-0 text-center sm:text-left" style={{ color: 'var(--mauve)' }}>
                   {advancedOptionsActive && unitPrice > 0 ? formatEuro(unitPrice) : formatEuro(basePrice)}
-                  {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' && unitPrice > 0 ? (
+                  {advancedOptionsActive && productOptionsConfig.templateId === 'chiffres-floraux' ? (
                     <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
-                      selon taille et nombre de chiffres
+                      Prix à l&apos;unité (par chiffre), selon la taille choisie
+                    </span>
+                  ) : null}
+                  {advancedOptionsActive && productOptionsConfig.templateId === 'panneau-bapteme' ? (
+                    <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                      Prix à l&apos;unité
+                    </span>
+                  ) : null}
+                  {advancedOptionsActive && productOptionsConfig.templateId === 'gobelet-bapteme' ? (
+                    <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                      Prix à l&apos;unité
                     </span>
                   ) : null}
                   {advancedOptionsActive &&

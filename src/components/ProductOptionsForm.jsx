@@ -25,8 +25,15 @@ function YesNoSelect({ id, value, onChange, required }) {
 
 function FieldHint({ field, values, templateId }) {
   if (field.id === 'glassQuantity' && values.glassQuantity) {
-    const unit = glassUnitPrice(values.glassQuantity)
     const q = parseInt(values.glassQuantity, 10) || 1
+    if (templateId === 'gobelet-bapteme') {
+      return (
+        <p className="font-body text-[11px] mt-1.5" style={{ color: 'var(--text-mid)' }}>
+          Prix à l&apos;unité · Quantité : {q}
+        </p>
+      )
+    }
+    const unit = glassUnitPrice(values.glassQuantity)
     return (
       <p className="font-body text-[11px] mt-1.5" style={{ color: 'var(--text-mid)' }}>
         Tarif : {formatEuro(unit)} / verre · Total : {formatEuro(unit * q)}
@@ -38,12 +45,28 @@ function FieldHint({ field, values, templateId }) {
     const size = String(values.chiffreSize || '')
     const per = CHIFFRE_SIZE_PRICES[size]
     if (digits > 0 && per) {
+      const qty = parseInt(values.chiffreQuantity, 10) || 1
       return (
         <p className="font-body text-[11px] mt-1.5" style={{ color: 'var(--text-mid)' }}>
           {digits} chiffre{digits > 1 ? 's' : ''} × {formatEuro(per)} = {formatEuro(per * digits)}
+          {qty > 1 ? ` · ${qty} création${qty > 1 ? 's' : ''}` : ''}
         </p>
       )
     }
+  }
+  if (field.id === 'chiffreSize' && templateId === 'chiffres-floraux') {
+    return (
+      <p className="font-body text-[11px] mt-1.5" style={{ color: 'var(--text-mid)' }}>
+        Prix à l&apos;unité (par chiffre), selon la taille choisie.
+      </p>
+    )
+  }
+  if (field.id === 'chiffreQuantity' && templateId === 'chiffres-floraux') {
+    return (
+      <p className="font-body text-[11px] mt-1.5" style={{ color: 'var(--text-mid)' }}>
+        Exemple : pour deux chiffres, sélectionner une quantité de 2.
+      </p>
+    )
   }
   return null
 }
@@ -60,7 +83,7 @@ export default function ProductOptionsForm({
   }
 
   return (
-    <div className="product-options-form space-y-4">
+    <div className="product-options-form space-y-3">
       {fields.map((field) => {
         if (!isFieldVisible(field, values)) return null
         const err = errors[field.id]
@@ -69,7 +92,7 @@ export default function ProductOptionsForm({
         return (
           <div key={field.id} className="product-options-form__field">
             <label htmlFor={field.type === 'color' || field.type === 'colorMulti' ? undefined : fieldId} className="block">
-              <span className="text-sm font-medium mb-1 block" style={{ color: 'var(--violet)' }}>
+              <span className="text-sm font-medium mb-0.5 block" style={{ color: 'var(--violet)' }}>
                 {field.label}
                 {field.required ? ' *' : ''}
               </span>

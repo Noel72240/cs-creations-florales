@@ -2101,8 +2101,20 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           Introduction (sous le titre)
           <textarea className="form-field mt-1" rows={2} value={localIntro} onChange={(e) => setLocalIntro(e.target.value)} placeholder="Texte optionnel" />
         </label>
+
+        {pageKey === 'evenementsFloraux' || pageKey === 'creationsSaisonnieres' ? (
+          <p className="text-[11px] leading-snug rounded-lg border border-mauve-light/35 bg-mauve-light/10 px-3 py-2.5" style={{ color: 'var(--text-mid)' }}>
+            Les créations de cette page « Voir tout » sont regroupées automatiquement depuis les rubriques dédiées
+            {pageKey === 'evenementsFloraux'
+              ? ' (Mariage, Anniversaire, Baptême & Communion)'
+              : ' (Pâques, Fête des Mères/Pères, Fête des Grandes-Mères, Noël, Saint-Valentin)'}
+            . Modifiez chaque article dans la rubrique correspondante ci-dessus — pas ici — pour éviter les doublons.
+          </p>
+        ) : null}
       </div>
 
+      {pageKey === 'evenementsFloraux' || pageKey === 'creationsSaisonnieres' ? null : (
+      <>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
           Articles ({localItems.length}/{MAX_PAGE_ARTICLES})
@@ -2445,6 +2457,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           </div>
         ))}
       </div>
+      </>
+      )}
 
       <button type="button" onClick={savePage} className="btn-primary">
         Enregistrer cette page

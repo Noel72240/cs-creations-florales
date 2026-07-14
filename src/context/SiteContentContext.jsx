@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { SITE_CONTENT_DEFAULTS } from '../data/siteContent.defaults'
 import { normalizeAllPageArticleIds } from '../lib/articleIdNormalization'
+import { sanitizePageArticles } from '../lib/pageArticlesSanitizer'
 import { enrichPageArticlesProductOptions } from '../lib/articleProductOptionsDefaults'
 import { SUMUP_PAYMENT_URL as SUMUP_ENV } from '../config/site'
 import {
@@ -74,7 +75,9 @@ export function getMergedContent(overrides) {
     merged.home.moto = stripMotoAdminHints(merged.home.moto)
   }
   if (merged.pageArticles) {
-    merged.pageArticles = enrichPageArticlesProductOptions(normalizeAllPageArticleIds(merged.pageArticles))
+    merged.pageArticles = enrichPageArticlesProductOptions(
+      normalizeAllPageArticleIds(sanitizePageArticles(merged.pageArticles)),
+    )
   }
   return merged
 }

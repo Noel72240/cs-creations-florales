@@ -1,5 +1,5 @@
-/** Livraison : 0 € par défaut. Mettre VITE_FORCE_ZERO_PRICES=false sur Vercel quand les vrais prix sont prêts. */
-const FORCE_ZERO = (import.meta.env.VITE_FORCE_ZERO_PRICES ?? 'true').trim().toLowerCase() !== 'false'
+/** Livraison : afficher les prix par défaut. Mettre VITE_FORCE_ZERO_PRICES=true pour masquer temporairement. */
+const FORCE_ZERO = (import.meta.env.VITE_FORCE_ZERO_PRICES ?? 'false').trim().toLowerCase() === 'true'
 
 /** @param {unknown} raw Prix brut (nombre ou chaîne, virgule ou point) */
 export function normalizeArticlePrice(raw) {
