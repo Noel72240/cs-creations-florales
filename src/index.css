@@ -2165,11 +2165,11 @@ button.nav-link.nav-link-header {
     order: 2;
   }
 
-  .article-product-layout__shop {
+  .article-product-layout__desc {
     order: 3;
   }
 
-  .article-product-layout__desc {
+  .article-product-layout__shop {
     order: 4;
   }
 
