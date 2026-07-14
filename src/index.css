@@ -2415,7 +2415,8 @@ button.nav-link.nav-link-header {
 }
 
 .home-presentation__paragraph {
-  line-height: 1.5;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
 }
 
 .home-presentation__bullets {
@@ -2429,6 +2430,7 @@ button.nav-link.nav-link-header {
 
 .home-presentation__bullets li {
   margin: 0;
+  line-height: 1.4;
 }
 
 .qui-suis-je-section {
@@ -2436,10 +2438,28 @@ button.nav-link.nav-link-header {
   padding-bottom: 2.5rem;
 }
 
+.qui-suis-je-section .qui-intro-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  line-height: 1.42;
+  font-size: clamp(1.05rem, 1.45vw, 1.22rem);
+  letter-spacing: 0.02em;
+}
+
+.qui-suis-je-section .qui-intro-text p {
+  margin: 0;
+}
+
 @media (min-width: 768px) {
   .qui-suis-je-section {
     padding-top: 3rem;
     padding-bottom: 3rem;
+  }
+
+  .qui-suis-je-section .qui-intro-text {
+    gap: 0.55rem;
+    line-height: 1.45;
   }
 }
 

@@ -262,7 +262,7 @@ function QuiSuisJeSection({ site, qui }) {
               <span className="text-mauve text-sm">✿</span>
             </div>
 
-            <div className="space-y-3.5 text-refined text-left leading-snug">
+            <div className="qui-intro-text text-refined text-left">
               {paragraphs.map((text, idx) => (
                 <p key={idx}>
                   {renderQuiParagraphAccents(text, site.ownerFirstName, brandExtra)}
