@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom'
-import ConfigurablePageHeader from './ConfigurablePageHeader'
-import ContactCTA from './ContactCTA'
-import PageArticleGrid from './PageArticleGrid'
-import PageIntroSection from './PageIntroSection'
+import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
+import ContactCTA from '../components/ContactCTA'
+import PageArticleGrid from '../components/PageArticleGrid'
+import PageIntroSection from '../components/PageIntroSection'
+import PageOrderCta from '../components/PageOrderCta'
 import { useSiteConfig } from '../context/SiteContentContext'
 
 export default function SeasonPage({ title, subtitle, coverImg, items, articlePageKey, pagePath }) {
@@ -28,6 +28,7 @@ export default function SeasonPage({ title, subtitle, coverImg, items, articlePa
           items={pa.items}
           pagePath={pagePath}
           pageKey={articlePageKey}
+          showIntro
         />
       ) : null}
 
@@ -51,10 +52,8 @@ export default function SeasonPage({ title, subtitle, coverImg, items, articlePa
         </section>
       ) : null}
 
-      <div className="py-8 text-center">
-        <Link to="/contact" className="btn-primary">Commander cette création</Link>
-      </div>
-      <ContactCTA />
+      <PageOrderCta pageKey={articlePageKey} />
+      <ContactCTA pageKey={articlePageKey} />
     </>
   )
 }

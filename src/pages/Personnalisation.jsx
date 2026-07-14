@@ -33,7 +33,7 @@ export default function Personnalisation() {
         pageKey="personnalisation"
       />
 
-      <ContactCTA message="Une idée de cadeau personnalisé ? Parlons-en ensemble, je suis là pour concrétiser votre vision !" />
+      <ContactCTA pageKey="personnalisation" />
     </>
   )
 }

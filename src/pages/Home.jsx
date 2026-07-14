@@ -6,7 +6,7 @@ import { resolveItemPhoto, resolvePhotoSrc } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
-import SecurePaymentNotice from '../components/SecurePaymentNotice'
+import { SumupPaymentMethodsStrip } from '../components/SecurePaymentNotice'
 
 const CREATOR_PHOTO_DEFAULT = w600(P.womanFlorist)
 const CREATOR_PHOTO_PATHS = ['/charlene.png', '/charlene.webp', '/charlene.jpg']
@@ -433,19 +433,23 @@ function CategoryPreviewSection({ prest }) {
   )
 }
 
-function HomePaymentTrust() {
-  return (
-    <section className="py-10 px-4" style={{ background: 'var(--beige)' }}>
-      <div className="max-w-3xl mx-auto">
-        <SecurePaymentNotice compact />
-      </div>
-    </section>
-  )
-}
-
 function ContactStrip({ site, strip }) {
+  const heroBg = useSiteBackgroundUrl()
+  const useImageBg = Boolean(heroBg && heroBg.trim())
+
   return (
-    <section className="contact-cta-band py-16 px-4 relative overflow-hidden">
+    <section
+      className={`contact-cta-band contact-cta-band--home py-16 px-4 relative overflow-hidden${useImageBg ? ' hero-section--image-bg' : ''}`}
+      style={
+        useImageBg
+          ? {
+              backgroundImage: `url(${JSON.stringify(heroBg)})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }
+          : undefined
+      }
+    >
       <div className="contact-cta-band__glow" aria-hidden="true" />
       <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="contact-strip-pretitle mb-2 text-lg sm:text-xl font-refined font-medium leading-snug tracking-wide" style={{ color: 'var(--violet)' }}>
@@ -461,18 +465,15 @@ function ContactStrip({ site, strip }) {
           {strip.subtitle}
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
-          <Link
-            to="/contact"
-            className="btn-primary"
-          >
+          <Link to="/contact" className="btn-primary">
             {strip.ctaLabel}
           </Link>
-          <a
-            href={site.phoneHref}
-            className="btn-outline"
-          >
+          <a href={site.phoneHref} className="btn-outline">
             {strip.phoneCtaPrefix}{site.ownerFirstName}
           </a>
+        </div>
+        <div className="mt-10 flex justify-center px-2">
+          <SumupPaymentMethodsStrip className="home-payment-cards" />
         </div>
       </div>
     </section>
@@ -491,7 +492,6 @@ export default function Home() {
       <QuiSuisJeSection site={site} qui={h.quiSuisJe} />
       <CreationSurMesureSection moto={h.moto} />
       <CategoryPreviewSection prest={h.prestations} />
-      <HomePaymentTrust />
       <ContactStrip site={site} strip={h.contactStrip} />
     </>
   )

@@ -2,7 +2,7 @@ import ConfigurablePageHeader from '../components/ConfigurablePageHeader'
 import ContactCTA from '../components/ContactCTA'
 import PageArticleGrid from '../components/PageArticleGrid'
 import PageIntroSection from '../components/PageIntroSection'
-import { Link } from 'react-router-dom'
+import PageMidCta from '../components/PageMidCta'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { P, w1200 } from '../data/flowerPhotos'
 
@@ -34,10 +34,8 @@ export default function CreationsDecoratives() {
         pageKey="creationsFlorales"
       />
 
-      <div className="py-8 text-center">
-        <Link to="/contact" className="btn-primary">Commander une création</Link>
-      </div>
-      <ContactCTA message="Vous souhaitez une création florale personnalisée ? Contactez-moi pour en discuter !" />
+      <PageMidCta pageKey="creationsFlorales" />
+      <ContactCTA pageKey="creationsFlorales" />
     </>
   )
 }

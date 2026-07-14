@@ -77,7 +77,7 @@ export default function EvenementsFloraux() {
         showIntro
       />
 
-      <ContactCTA message="Vous avez un événement à préparer ? Contactez-moi pour un devis personnalisé et gratuit." />
+      <ContactCTA pageKey="evenementsFloraux" />
     </>
   )
 }

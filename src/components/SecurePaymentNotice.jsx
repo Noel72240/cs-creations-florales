@@ -1,6 +1,8 @@
 /** Bandeau « paiement sécurisé » + cartes acceptées (SumUp). */
+import sumupPaymentMethodsImg from '../assets/sumup-moyens-paiement.png'
+
 const SECURE_PAYMENT_LOGO = '/images/paiement-securise.png'
-const SUMUP_PAYMENT_METHODS = '/images/sumup-moyens-paiement.png'
+const SUMUP_PAYMENT_METHODS = sumupPaymentMethodsImg
 
 export default function SecurePaymentNotice({ compact = false, className = '' }) {
   return (

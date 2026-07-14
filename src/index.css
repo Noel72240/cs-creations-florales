@@ -1124,6 +1124,10 @@ main.site-main {
 }
 
 /* Bloc CTA contact (bas de page) */
+.contact-cta-band--home:not(.hero-section--image-bg) {
+  background: linear-gradient(135deg, var(--beige), rgba(240, 210, 221, 0.35), var(--blanc));
+}
+
 .contact-cta-band__glow {
   position: absolute;
   inset: 0;
@@ -2408,10 +2412,19 @@ button.nav-link.nav-link-header {
 .sumup-payment-methods-strip {
   display: block;
   width: 100%;
-  max-width: 28rem;
+  max-width: min(100%, 36rem);
   height: auto;
   margin-top: 0.75rem;
   border-radius: 0.5rem;
+}
+
+.home-payment-cards {
+  max-width: min(100%, 40rem);
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 20px rgba(139, 75, 106, 0.08);
 }
 
 .home-presentation__paragraph {

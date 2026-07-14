@@ -4,7 +4,7 @@ import CartTotals from '../components/CartTotals'
 import MaintenancePaymentNotice from '../components/MaintenancePaymentNotice'
 import PromoCodeForm from '../components/PromoCodeForm'
 import CheckoutDeliverySection from '../components/CheckoutDeliverySection'
-import SecurePaymentNotice, { AcceptedPaymentMethodsList } from '../components/SecurePaymentNotice'
+import SecurePaymentNotice, { AcceptedPaymentMethodsList, SumupPaymentMethodsStrip } from '../components/SecurePaymentNotice'
 import { useSiteConfig } from '../context/SiteContentContext'
 import { getMaintenanceState } from '../lib/maintenance'
 import { useCart } from '../context/CartContext'
@@ -239,6 +239,9 @@ export default function Paiement() {
             <h3 className="font-heading text-xl mb-3" style={{ color: 'var(--violet)' }}>
               Moyens de paiement acceptés
             </h3>
+            <div className="flex justify-center mb-6">
+              <SumupPaymentMethodsStrip />
+            </div>
             {hasCart && !paymentsBlocked ? (
               <div
                 className="rounded-xl border border-mauve-light/35 p-5 mb-6"

@@ -2,6 +2,9 @@ import ConfigurablePageHeader from './ConfigurablePageHeader'
 import ContactCTA from './ContactCTA'
 import PageArticleGrid from './PageArticleGrid'
 import PageIntroSection from './PageIntroSection'
+import PageContactBlock from './PageContactBlock'
+import PageMidCta from './PageMidCta'
+import PageOrderCta from './PageOrderCta'
 import { useSiteConfig } from '../context/SiteContentContext'
 
 export default function EventPage({ title, subtitle, coverImg, articlePageKey, pagePath }) {
@@ -20,7 +23,7 @@ export default function EventPage({ title, subtitle, coverImg, articlePageKey, p
 
       {articlePageKey ? <PageIntroSection pageKey={articlePageKey} /> : null}
 
-      {hasArticles && pagePath && (
+      {hasArticles && pagePath ? (
         <PageArticleGrid
           sectionTitle={pa.sectionTitle}
           intro={pa.intro}
@@ -29,9 +32,12 @@ export default function EventPage({ title, subtitle, coverImg, articlePageKey, p
           pageKey={articlePageKey}
           showIntro
         />
-      )}
+      ) : null}
 
-      <ContactCTA />
+      <PageMidCta pageKey={articlePageKey} />
+      <PageContactBlock pageKey={articlePageKey} />
+      <PageOrderCta pageKey={articlePageKey} />
+      <ContactCTA pageKey={articlePageKey} />
     </>
   )
 }

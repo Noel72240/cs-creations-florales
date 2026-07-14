@@ -17,6 +17,21 @@ function loadScript(src) {
   })
 }
 
+function loadStylesheet(href) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`link[href="${href}"]`)) {
+      resolve()
+      return
+    }
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = href
+    link.onload = () => resolve()
+    link.onerror = () => reject(new Error(`Stylesheet ${href}`))
+    document.head.appendChild(link)
+  })
+}
+
 /**
  * Widget officiel Mondial Relay (carte + liste de Points Relais).
  * Nécessite VITE_MONDIAL_RELAY_BRAND_CODE (code enseigne 6–8 car.).
@@ -34,6 +49,9 @@ export default function MondialRelayPicker({ value, onChange, defaultPostcode = 
 
     async function mountWidget() {
       try {
+        await loadStylesheet(
+          'https://widget.mondialrelay.com/parcelshop-picker/css/jquery.plugin.mondialrelay.parcelshoppicker.min.css',
+        )
         await loadScript('https://code.jquery.com/jquery-3.7.1.min.js')
         await loadScript(
           'https://widget.mondialrelay.com/parcelshop-picker/jquery.plugin.mondialrelay.parcelshoppicker.min.js',

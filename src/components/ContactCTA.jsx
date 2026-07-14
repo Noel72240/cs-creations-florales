@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom'
 import { useSiteConfig } from '../context/SiteContentContext'
+import { resolvePageTexts } from '../lib/pageTexts'
 
-export default function ContactCTA({ message = "Une question ? Un projet ? Je suis là pour vous accompagner." }) {
+export default function ContactCTA({ pageKey, message: messageProp }) {
   const { content } = useSiteConfig()
   const SITE = content.site
+  const pa = pageKey ? content.pageArticles?.[pageKey] : null
+  const texts = resolvePageTexts(pageKey || '', pa)
+  const title = texts.contactCta.title
+  const message = String(messageProp ?? texts.contactCta.message).trim() || texts.contactCta.message
+  const primaryLabel = texts.contactCta.primaryLabel
+  const phoneLabel = `${texts.contactCta.phoneLabelPrefix}${SITE.ownerFirstName}`.trim()
 
   return (
     <section
@@ -14,17 +21,15 @@ export default function ContactCTA({ message = "Une question ? Un projet ? Je su
       <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="text-4xl mb-4" style={{ color: 'var(--mauve)', opacity: 0.6 }}>✿</p>
         <h2 className="font-heading text-3xl md:text-4xl mb-4" style={{ color: 'var(--violet)' }}>
-          Parlons de votre projet
+          {title}
         </h2>
-        <p className="text-refined--sm max-w-md mx-auto mb-8">
-          {message}
-        </p>
+        <p className="text-refined--sm max-w-md mx-auto mb-8">{message}</p>
         <div className="flex flex-wrap gap-4 justify-center">
           <Link to="/contact" className="btn-primary">
-            Demander un devis gratuit
+            {primaryLabel}
           </Link>
           <a href={SITE.phoneHref} className="btn-outline">
-            Appeler {SITE.ownerFirstName}
+            {phoneLabel}
           </a>
         </div>
       </div>

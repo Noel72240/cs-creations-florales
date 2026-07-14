@@ -19,8 +19,11 @@ import { EVENEMENTS_FLORAUX_HUB_DEFAULTS, mergeEventHubCards } from '../lib/even
 import { isLikelySupabaseBucketUrl, isSupabaseStorageConfigured } from '../services/supabaseStorageUpload'
 import ArticleProductOptionsEditor from '../components/admin/ArticleProductOptionsEditor'
 import PageIntroEditor from '../components/admin/PageIntroEditor'
+import PageTextsEditor from '../components/admin/PageTextsEditor'
 import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 import { normalizePageIntro } from '../lib/pageIntro'
+import { normalizePageTexts } from '../lib/pageTexts'
+import { mergeSeasonHubCards } from '../lib/seasonHubCards'
 import { normalizePageArticleIds } from '../lib/articleIdNormalization'
 import { PARCEL_TIER_OPTIONS, normalizeParcelTier } from '../../shared/shipping.js'
 
@@ -1618,8 +1621,12 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     pageKey === 'evenementsFloraux' ? mergeEventHubCards(current.eventCards) : [],
   )
   const [localPageIntro, setLocalPageIntro] = useState(() => normalizePageIntro(current.pageIntro, pageKey))
+  const [localPageTexts, setLocalPageTexts] = useState(() => normalizePageTexts(current.pageTexts, pageKey))
   const [localSeasonCardsEnabled, setLocalSeasonCardsEnabled] = useState(() =>
     Boolean(current.seasonCardsSectionEnabled),
+  )
+  const [localSeasonCards, setLocalSeasonCards] = useState(() =>
+    pageKey === 'creationsSaisonnieres' ? mergeSeasonHubCards(current.seasonCards) : [],
   )
 
   useEffect(() => {
@@ -1659,7 +1666,11 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       setLocalEventCards(mergeEventHubCards(next.eventCards))
     }
     setLocalPageIntro(normalizePageIntro(next.pageIntro, pageKey))
+    setLocalPageTexts(normalizePageTexts(next.pageTexts, pageKey))
     setLocalSeasonCardsEnabled(Boolean(next.seasonCardsSectionEnabled))
+    if (pageKey === 'creationsSaisonnieres') {
+      setLocalSeasonCards(mergeSeasonHubCards(next.seasonCards))
+    }
   }, [pageKey, pageArticles])
 
   const setField = (idx, key, value) => {
@@ -1771,6 +1782,32 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     }
   }
 
+  const setSeasonCardField = (idx, key, value) => {
+    setLocalSeasonCards((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
+  }
+
+  const setSeasonCardPhotoKey = (idx, photoKey) => {
+    setLocalSeasonCards((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, photoKey, src: '' } : it)),
+    )
+  }
+
+  const pickSeasonCardImage = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    try {
+      const url = await fileToSrc(file, { variant: 'gallery', folder: 'site/saisonnieres' })
+      if (url) {
+        setSeasonCardField(idx, 'src', url)
+        setMsg('')
+      } else {
+        setMsg('Image trop lourde. Essayez une image plus légère ou connectez-vous à Supabase.')
+      }
+    } catch {
+      setMsg('Impossible de lire cette image.')
+    }
+  }
+
   const savePage = async () => {
     const items = normalizePageArticleIds(
       pageKey,
@@ -1793,7 +1830,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
     })),
     )
+    const existing = pageArticles?.[pageKey] || {}
     const pagePayload = {
+      ...existing,
       sectionTitle: localTitle.trim(),
       intro: localIntro.trim(),
       banner: {
@@ -1804,9 +1843,18 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       },
       items,
       pageIntro: localPageIntro,
+      pageTexts: normalizePageTexts(localPageTexts, pageKey),
     }
     if (pageKey === 'creationsSaisonnieres') {
       pagePayload.seasonCardsSectionEnabled = localSeasonCardsEnabled
+      pagePayload.seasonCards = localSeasonCards.map((c) => ({
+        title: String(c.title || '').trim(),
+        desc: String(c.desc || '').trim(),
+        icon: String(c.icon || '').trim(),
+        path: String(c.path || '').trim(),
+        photoKey: String(c.photoKey || 'tulips').trim() || 'tulips',
+        src: String(c.src || '').trim(),
+      }))
     }
     if (pageKey === 'evenementsFloraux') {
       pagePayload.hubIntro = localHubIntro.trim()
@@ -1973,13 +2021,15 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           fileToSrc={fileToSrc}
         />
 
+        <PageTextsEditor value={localPageTexts} onChange={setLocalPageTexts} showContactBlock showMidCta showOrderCta />
+
         {pageKey === 'creationsSaisonnieres' ? (
           <fieldset className="rounded-xl border border-mauve-light/35 p-4 space-y-2">
             <legend className="text-sm font-medium px-1" style={{ color: 'var(--violet)' }}>
               Cartes en bas de page (Pâques, Noël…)
             </legend>
             <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-              Les 4 cartes avec photo en bas de « Créations saisonnières ». Désactivez tant que vos créations Noël ne sont
+              Les cartes avec photo en bas de « Créations saisonnières ». Désactivez tant que vos créations Noël ne sont
               pas prêtes — vous pourrez les réactiver ici.
             </p>
             <label className="block">
@@ -1993,6 +2043,90 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
                 <option value="yes">Oui</option>
               </select>
             </label>
+            <div className="space-y-4 pt-2">
+              {localSeasonCards.map((card, i) => (
+                <div key={i} className="border border-mauve-light/30 rounded-xl p-3 space-y-2">
+                  <p className="text-xs font-medium" style={{ color: 'var(--violet)' }}>
+                    Carte {i + 1}
+                  </p>
+                  <input
+                    className="form-field"
+                    value={card.title}
+                    onChange={(e) => setSeasonCardField(i, 'title', e.target.value)}
+                    placeholder="Titre"
+                  />
+                  <textarea
+                    className="form-field"
+                    rows={2}
+                    value={card.desc}
+                    onChange={(e) => setSeasonCardField(i, 'desc', e.target.value)}
+                    placeholder="Description"
+                  />
+                  <input
+                    className="form-field"
+                    value={card.icon}
+                    onChange={(e) => setSeasonCardField(i, 'icon', e.target.value)}
+                    placeholder="Emoji (ex. 🐣)"
+                  />
+                  <label className="block">
+                    Lien de la carte
+                    <select
+                      className="form-field mt-1"
+                      value={card.path}
+                      onChange={(e) => setSeasonCardField(i, 'path', e.target.value)}
+                    >
+                      <option value="/creations-saisonnieres/paques">Pâques</option>
+                      <option value="/creations-saisonnieres/noel">Noël</option>
+                      <option value="/creations-saisonnieres/fete-des-meres">Fêtes des Mères/Pères</option>
+                      <option value="/creations-saisonnieres/fete-des-grandes-meres">Fête des Grandes-Mères</option>
+                      <option value="/creations-saisonnieres/saint-valentin">Saint-Valentin</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    Clé photo (Unsplash)
+                    <select
+                      className="form-field mt-1"
+                      value={card.photoKey}
+                      onChange={(e) => setSeasonCardPhotoKey(i, e.target.value)}
+                    >
+                      {PHOTO_KEY_OPTIONS.map((k) => (
+                        <option key={k} value={k}>
+                          {k}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="btn-primary text-xs py-2 px-4 cursor-pointer">
+                      Choisir une photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={(e) => {
+                          pickSeasonCardImage(i, e.target.files)
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                    {adminSrcIsRemovable(card.src) ? (
+                      <button
+                        type="button"
+                        className="btn-outline text-xs py-2 px-4"
+                        onClick={() => setSeasonCardField(i, 'src', '')}
+                      >
+                        Retirer la photo
+                      </button>
+                    ) : null}
+                  </div>
+                  <img
+                    src={card.src?.trim() ? resolvePhotoSrc(card.src) : resolvePhotoSrc(card.photoKey)}
+                    alt=""
+                    className="h-24 w-full max-w-xs rounded-lg object-cover border border-mauve-light/30 bg-mauve-light/10"
+                  />
+                </div>
+              ))}
+            </div>
           </fieldset>
         ) : null}
 
