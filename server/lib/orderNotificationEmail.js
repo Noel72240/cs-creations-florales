@@ -111,6 +111,8 @@ export function buildOrderNotificationContent(order) {
   const promo = order.promo_code ? String(order.promo_code) : null
   const shippingSummary = formatShippingSummary(order)
   const phone = order.customer_phone ? String(order.customer_phone) : ''
+  const labelUrl = String(order.mondial_relay_label_url || '').trim()
+  const expeditionId = String(order.mondial_relay_expedition_id || '').trim()
 
   const text = [
     'Nouvelle commande payée sur cscreationsflorales.com',
@@ -125,7 +127,9 @@ export function buildOrderNotificationContent(order) {
     '',
     shippingSummary ? '── Livraison ──' : null,
     shippingSummary || null,
-    shippingSummary ? '' : null,
+    labelUrl ? `Étiquette Mondial Relay : ${labelUrl}` : null,
+    expeditionId ? `N° expédition MR : ${expeditionId}` : null,
+    shippingSummary || labelUrl ? '' : null,
     '── Articles ──',
     buildLineItemsText(order.line_items),
     '',
@@ -166,8 +170,19 @@ export function buildOrderNotificationContent(order) {
       ${
         shippingSummary
           ? `<h2 style="font-size:15px;color:#6b4c6e;margin:0 0 8px;">Livraison</h2>
-      <p style="font-size:13px;line-height:1.55;margin:0 0 20px;white-space:pre-line;">${escapeHtml(shippingSummary)}</p>`
+      <p style="font-size:13px;line-height:1.55;margin:0 0 12px;white-space:pre-line;">${escapeHtml(shippingSummary)}</p>`
           : ''
+      }
+      ${
+        labelUrl
+          ? `<p style="font-size:13px;line-height:1.55;margin:0 0 20px;">
+        <strong style="color:#6b4c6e;">Étiquette Mondial Relay :</strong>
+        <a href="${escapeHtml(labelUrl)}" style="color:#6b4c6e;word-break:break-all;">${escapeHtml(labelUrl)}</a>
+        ${expeditionId ? `<br><span style="color:#777;font-size:12px;">N° expédition : ${escapeHtml(expeditionId)}</span>` : ''}
+      </p>`
+          : shippingSummary
+            ? '<div style="margin-bottom:20px;"></div>'
+            : ''
       }
       <h2 style="font-size:15px;color:#6b4c6e;margin:0 0 8px;">Articles</h2>
       <table style="width:100%;font-size:13px;margin-bottom:20px;border-collapse:collapse;">

@@ -8,6 +8,7 @@ import { fetchMaintenanceMode } from '../server/lib/maintenanceMode.js'
 import { corsHeaders, readJsonBody, sendJson } from '../server/lib/http.js'
 import { isPromoBlockedForEmail, normalizeCustomerEmail } from '../server/lib/promoRedemption.js'
 import { sendOrderNotificationEmail } from '../server/lib/orderNotificationEmail.js'
+import { ensureMondialRelayLabelForOrder } from '../server/lib/mondialRelay.js'
 import { buildPromoCatalog, normalizePromoCode, validatePromoCode } from '../shared/promoCodes.js'
 import {
   buildShippingOrderFields,
@@ -206,7 +207,20 @@ async function notifyOwnerIfNeeded(supabase, order) {
     return { sent: false, skipped: true }
   }
 
-  const enriched = await enrichOrderFromSumup(order)
+  let orderForEmail = order
+  if (order.shipping_method === 'mondial_relay') {
+    try {
+      const { order: withLabel, labelResult } = await ensureMondialRelayLabelForOrder(supabase, order)
+      orderForEmail = withLabel
+      if (labelResult && !labelResult.ok && !labelResult.skipped) {
+        console.warn('[confirm-checkout-return] étiquette MR', labelResult.reason, labelResult.message || '')
+      }
+    } catch (e) {
+      console.error('[confirm-checkout-return] mondial-relay', e)
+    }
+  }
+
+  const enriched = await enrichOrderFromSumup(orderForEmail)
   const result = await sendOrderNotificationEmail(enriched)
 
   if (result.sent) {
