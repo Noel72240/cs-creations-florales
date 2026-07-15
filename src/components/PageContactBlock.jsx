@@ -11,7 +11,7 @@ export default function PageContactBlock({ pageKey }) {
   if (!block.enabled) return null
 
   return (
-    <section className="py-16 px-4 text-center" style={{ background: 'var(--beige)' }}>
+    <section className="py-10 px-4 text-center" style={{ background: 'var(--beige)' }}>
       <h2 className="font-heading text-2xl mb-4" style={{ color: 'var(--violet)' }}>
         {block.title}
       </h2>

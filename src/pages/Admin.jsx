@@ -22,7 +22,7 @@ import PageIntroEditor from '../components/admin/PageIntroEditor'
 import PageTextsEditor from '../components/admin/PageTextsEditor'
 import { normalizeArticleProductOptions } from '../lib/articleProductOptions'
 import { normalizePageIntro } from '../lib/pageIntro'
-import { normalizePageTexts } from '../lib/pageTexts'
+import { normalizePageTexts, pageTextsForEditor } from '../lib/pageTexts'
 import { mergeSeasonHubCards } from '../lib/seasonHubCards'
 import { normalizePageArticleIds } from '../lib/articleIdNormalization'
 import { PARCEL_TIER_OPTIONS, normalizeParcelTier } from '../../shared/shipping.js'
@@ -1620,8 +1620,12 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
   const [localEventCards, setLocalEventCards] = useState(() =>
     pageKey === 'evenementsFloraux' ? mergeEventHubCards(current.eventCards) : [],
   )
-  const [localPageIntro, setLocalPageIntro] = useState(() => normalizePageIntro(current.pageIntro, pageKey))
-  const [localPageTexts, setLocalPageTexts] = useState(() => normalizePageTexts(current.pageTexts, pageKey))
+  const [localPageIntro, setLocalPageIntro] = useState(() =>
+    normalizePageIntro(current.pageIntro, pageKey, { trimText: false }),
+  )
+  const [localPageTexts, setLocalPageTexts] = useState(() =>
+    pageTextsForEditor(current.pageTexts, pageKey),
+  )
   const [localSeasonCardsEnabled, setLocalSeasonCardsEnabled] = useState(() =>
     Boolean(current.seasonCardsSectionEnabled),
   )
@@ -1665,8 +1669,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       setLocalHubIntro(next.hubIntro || EVENEMENTS_FLORAUX_HUB_DEFAULTS.hubIntro)
       setLocalEventCards(mergeEventHubCards(next.eventCards))
     }
-    setLocalPageIntro(normalizePageIntro(next.pageIntro, pageKey))
-    setLocalPageTexts(normalizePageTexts(next.pageTexts, pageKey))
+    setLocalPageIntro(normalizePageIntro(next.pageIntro, pageKey, { trimText: false }))
+    setLocalPageTexts(pageTextsForEditor(next.pageTexts, pageKey))
     setLocalSeasonCardsEnabled(Boolean(next.seasonCardsSectionEnabled))
     if (pageKey === 'creationsSaisonnieres') {
       setLocalSeasonCards(mergeSeasonHubCards(next.seasonCards))
@@ -1827,7 +1831,10 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         : ['', '', ''],
       parcelTier: normalizeParcelTier(it.parcelTier),
       personalizationMessageEnabled: Boolean(it.personalizationMessageEnabled),
-      productOptions: normalizeArticleProductOptions(it.productOptions, it.title),
+      productOptions: (() => {
+        const po = normalizeArticleProductOptions(it.productOptions, it.title)
+        return { ...po, sectionTitle: String(po.sectionTitle || '').trim() }
+      })(),
     })),
     )
     const existing = pageArticles?.[pageKey] || {}
@@ -1842,7 +1849,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         photoKey: localBanner.photoKey.trim(),
       },
       items,
-      pageIntro: localPageIntro,
+      pageIntro: normalizePageIntro(localPageIntro, pageKey),
       pageTexts: normalizePageTexts(localPageTexts, pageKey),
     }
     if (pageKey === 'creationsSaisonnieres') {

@@ -169,52 +169,63 @@ export default function PageArticleGrid({
   const closePreview = useCallback(() => setPreview(null), [])
 
   const sorted = useMemo(() => sortArticles(list, sort), [list, sort])
+  const displayTitle = String(sectionTitle || '').trim() || (list.length ? 'Articles' : '')
+  const displayIntro = String(intro || '').trim()
+  const hasCopy = Boolean(displayTitle || displayIntro)
 
-  if (!list.length || !pageKey) return null
+  if (!pageKey || (!list.length && !hasCopy)) return null
 
   return (
     <>
-      <section className="article-catalog-section py-10 px-3 sm:py-16 sm:px-4" style={{ background: 'var(--beige)' }}>
+      <section className="article-catalog-section py-6 px-3 sm:py-10 sm:px-4" style={{ background: 'var(--beige)' }}>
         <div className="max-w-3xl mx-auto lg:max-w-4xl">
-          <h2 className="section-title mb-2">{sectionTitle}</h2>
-          <div className="floral-divider mb-6">
-            <span className="floral-icon">✿</span>
-          </div>
-          {showIntro && intro ? <p className="text-refined text-center max-w-2xl mx-auto mb-6">{intro}</p> : null}
+          {displayTitle ? <h2 className="section-title mb-1">{displayTitle}</h2> : null}
+          {displayTitle ? (
+            <div className="floral-divider mb-4">
+              <span className="floral-icon">✿</span>
+            </div>
+          ) : null}
+          {showIntro && displayIntro ? <p className="article-catalog-intro mb-5">{displayIntro}</p> : null}
 
-          <div className="article-catalog-toolbar mb-8">
-            <span className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
-              {list.length} article{list.length > 1 ? 's' : ''}
-            </span>
-            <label className="article-catalog-sort">
-              <span className="sr-only">Trier les articles</span>
-              <select value={sort} onChange={(e) => setSort(e.target.value)} className="form-field text-sm py-2">
-                <option value="default">Trier : par défaut</option>
-                <option value="price-asc">Prix croissant</option>
-                <option value="price-desc">Prix décroissant</option>
-                <option value="title-asc">Nom A → Z</option>
-              </select>
-            </label>
-          </div>
+          {list.length ? (
+            <>
+              <div className="article-catalog-toolbar mb-5">
+                <span className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
+                  {list.length} article{list.length > 1 ? 's' : ''}
+                </span>
+                <label className="article-catalog-sort">
+                  <span className="sr-only">Trier les articles</span>
+                  <select value={sort} onChange={(e) => setSort(e.target.value)} className="form-field text-sm py-2">
+                    <option value="default">Trier : par défaut</option>
+                    <option value="price-asc">Prix croissant</option>
+                    <option value="price-desc">Prix décroissant</option>
+                    <option value="title-asc">Nom A → Z</option>
+                  </select>
+                </label>
+              </div>
 
-          <p
-            className="article-catalog-notice font-refined text-sm text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-3 py-3 sm:px-4 rounded-xl border border-mauve-light/35"
-            style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
-          >
-            <span className="font-semibold" style={{ color: 'var(--violet)' }}>Délai de commande :</span>{' '}
-            réalisation en général sous <strong>1 semaine</strong>, selon disponibilité — confirmé au devis.
-          </p>
+              <p
+                className="article-catalog-notice font-refined text-sm text-center max-w-2xl mx-auto mb-8 sm:mb-10 px-3 py-3 sm:px-4 rounded-xl border border-mauve-light/35"
+                style={{ background: 'rgba(255, 248, 251, 0.95)', color: 'var(--text-mid)' }}
+              >
+                <span className="font-semibold" style={{ color: 'var(--violet)' }}>
+                  Délai de commande :
+                </span>{' '}
+                réalisation en général sous <strong>1 semaine</strong>, selon disponibilité — confirmé au devis.
+              </p>
 
-          <div className="article-catalog-list">
-            {sorted.map((item, index) => (
-              <ArticleCatalogCard
-                key={`${item.sourcePageKey || pageKey}:${item.id || index}`}
-                item={item}
-                pageKey={pageKey}
-                onPreview={setPreview}
-              />
-            ))}
-          </div>
+              <div className="article-catalog-list">
+                {sorted.map((item, index) => (
+                  <ArticleCatalogCard
+                    key={`${item.sourcePageKey || pageKey}:${item.id || index}`}
+                    item={item}
+                    pageKey={pageKey}
+                    onPreview={setPreview}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       </section>
       <ImageLightbox open={Boolean(preview)} onClose={closePreview} src={preview?.src} title={preview?.title} />

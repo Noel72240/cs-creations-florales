@@ -25,10 +25,10 @@ export default function EvenementsFloraux() {
           }}
         />
       </div>
-      <section className="py-10 px-4" style={{ background: 'var(--blanc)' }}>
+      <section className="py-8 px-4" style={{ background: 'var(--blanc)' }}>
         <div className="max-w-5xl mx-auto text-center">
           {hubIntro ? (
-            <p className="text-refined max-w-3xl mx-auto mb-8 leading-relaxed">{hubIntro}</p>
+            <p className="text-refined max-w-3xl mx-auto mb-5 leading-relaxed">{hubIntro}</p>
           ) : null}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {cards.map((ev) => (
@@ -40,15 +40,12 @@ export default function EvenementsFloraux() {
                   </div>
                 </div>
                 <div className="p-6 text-left">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <span className="text-2xl">{ev.icon}</span>
                     <h2 className="font-heading text-xl font-medium" style={{ color: 'var(--violet)' }}>
                       {ev.title}
                     </h2>
                   </div>
-                  {ev.desc ? (
-                    <p className="text-body-soft text-sm leading-relaxed mb-3">{ev.desc}</p>
-                  ) : null}
                   <div className="text-xs font-body flex items-center gap-1" style={{ color: 'var(--mauve)' }}>
                     <span>En savoir plus</span>
                     <svg

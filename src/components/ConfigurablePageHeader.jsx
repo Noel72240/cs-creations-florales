@@ -8,7 +8,7 @@ import PageHeader from './PageHeader'
  * Bandeau de page : valeurs admin (pageArticles.banner) + repli code.
  * @param {{ pagePath: string, fallback?: { title?: string, subtitle?: string, image?: string, photoKey?: string } }} props
  */
-export default function ConfigurablePageHeader({ pagePath, fallback = {} }) {
+export default function ConfigurablePageHeader({ pagePath, fallback = {}, className = '' }) {
   const { content } = useSiteConfig()
 
   const { title, subtitle, image } = useMemo(() => {
@@ -30,5 +30,5 @@ export default function ConfigurablePageHeader({ pagePath, fallback = {} }) {
     return { title, subtitle, image }
   }, [content.pageArticles, content.pageBanners, fallback.image, fallback.photoKey, fallback.subtitle, fallback.title, pagePath])
 
-  return <PageHeader title={title} subtitle={subtitle} image={image} />
+  return <PageHeader title={title} subtitle={subtitle} image={image} className={className} />
 }

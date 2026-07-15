@@ -9,6 +9,7 @@ export default function SaintValentin() {
       coverImg={w1200(P.rosesBouquet)}
       articlePageKey="saintValentin"
       pagePath="/creations-saisonnieres/saint-valentin"
+      headerClassName="page-header--subtitle-lower"
     />
   )
 }

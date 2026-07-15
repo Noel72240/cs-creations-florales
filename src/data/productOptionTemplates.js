@@ -4,7 +4,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
     id: 'verres-personnalises',
     label: 'Verres personnalisés',
     pricingMode: 'glassTier',
-    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
+    fields: ['roseColor', 'personalizationText', 'textColor', 'glassQuantity', 'specialRequests'],
   },
   'chiffres-floraux': {
     id: 'chiffres-floraux',
@@ -40,19 +40,19 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'panneau-bapteme': {
     id: 'panneau-bapteme',
     label: 'Panneau de baptême',
-    fields: ['roseColor', 'textColor', 'personalizationText', 'decorationSelect', 'decorationOtherText', 'specialRequests'],
+    fields: ['roseColor', 'personalizationText', 'textColor', 'decorationSelect', 'decorationOtherText', 'specialRequests'],
   },
   'verre-communion': {
     id: 'verre-communion',
     label: 'Verre de communion / gobelet baptême',
     pricingMode: 'glassTier',
-    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
+    fields: ['roseColor', 'personalizationText', 'textColor', 'glassQuantity', 'specialRequests'],
   },
   'gobelet-bapteme': {
     id: 'gobelet-bapteme',
     label: 'Gobelet baptême plastique',
     pricingMode: 'unitQuantity',
-    fields: ['roseColor', 'textColor', 'personalizationText', 'glassQuantity', 'specialRequests'],
+    fields: ['roseColor', 'personalizationText', 'textColor', 'glassQuantity', 'specialRequests'],
   },
   'coeur-plaque-acrylique': {
     id: 'coeur-plaque-acrylique',
@@ -116,11 +116,11 @@ export const PRODUCT_OPTION_TEMPLATES = {
       'bagColorExtended',
       'smallRoseColor',
       'largeRoseColorMax3',
-      'largeFlowerColor',
-      'flowerSelectMax2',
       'personalizationYesNo',
       'personalizationTextIfYes',
       'textColor',
+      'largeFlowerColor',
+      'flowerSelectMax2',
       'pearlYesNo',
       'pearlColorIfYes',
       'specialRequests',
@@ -144,7 +144,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'boite-mouchoirs': {
     id: 'boite-mouchoirs',
     label: 'Boîte à mouchoirs florale',
-    fields: ['largeFlowerColor', 'smallRoseColor', 'personalizationText', 'pearlYesNo', 'pearlColorIfYes', 'textColor', 'specialRequests'],
+    fields: ['largeFlowerColor', 'smallRoseColor', 'personalizationText', 'textColor', 'pearlYesNo', 'pearlColorIfYes', 'specialRequests'],
   },
   'camion-floral': {
     id: 'camion-floral',
@@ -159,7 +159,17 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'ecrin-floral': {
     id: 'ecrin-floral',
     label: 'Écrin floral',
-    fields: ['supportColorEcrin', 'pearlYesNo', 'pearlColorIfYes', 'messagePersonalizationYesNo', 'messagePersonalizationText', 'textColor', 'flowerColor', 'ribbonColor', 'specialRequests'],
+    fields: [
+      'supportColorEcrin',
+      'flowerColor',
+      'pearlYesNo',
+      'pearlColorIfYes',
+      'messagePersonalizationYesNo',
+      'messagePersonalizationText',
+      'textColor',
+      'ribbonColor',
+      'specialRequests',
+    ],
   },
   'coeur-plexiglass': {
     id: 'coeur-plexiglass',
@@ -189,7 +199,7 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'croix-florale': {
     id: 'croix-florale',
     label: 'Croix florale',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'specialRequests'],
   },
   'tracteur-floral': {
     id: 'tracteur-floral',

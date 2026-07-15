@@ -141,7 +141,11 @@ export default function PageTextsEditor({ value, onChange, showContactBlock = fa
       {showContactBlock ? (
         <>
           <p className="text-xs font-medium pt-2" style={{ color: 'var(--violet)' }}>
-            Bloc contact (avant le bandeau rose)
+            Bloc « Nous contacter » (avant le bandeau rose)
+          </p>
+          <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+            Modifiez ici le texte affiché sur la page (ex. créations funéraires). Pensez à enregistrer la rubrique
+            Articles.
           </p>
           <label className="block text-xs">
             Afficher

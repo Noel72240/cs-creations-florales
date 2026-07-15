@@ -6,7 +6,6 @@ import { resolveItemPhoto, resolvePhotoSrc } from '../data/photoResolver'
 import { useSiteBackgroundUrl } from '../hooks/useSiteBackgroundUrl'
 import { P, w600 } from '../data/flowerPhotos'
 import { renderQuiParagraphAccents } from '../utils/quiTextAccents'
-import { SumupPaymentMethodsStrip } from '../components/SecurePaymentNotice'
 
 const CREATOR_PHOTO_DEFAULT = w600(P.womanFlorist)
 const CREATOR_PHOTO_PATHS = ['/charlene.png', '/charlene.webp', '/charlene.jpg']
@@ -81,20 +80,26 @@ function HeroSection({ site, hero }) {
 
         {hero.ideaBox?.enabled !== false && (hero.ideaBox?.title || hero.ideaBox?.text) ? (
           <div
-            className="max-w-xl mx-auto mt-8 px-5 py-4 rounded-2xl text-left border"
+            className="hero-idea-box max-w-2xl mx-auto mt-8 px-6 py-6 sm:px-8 sm:py-7 rounded-2xl text-left border"
             style={{
-              borderColor: 'rgba(192, 122, 151, 0.35)',
-              background: 'rgba(255, 255, 255, 0.88)',
-              boxShadow: '0 8px 28px rgba(139, 75, 106, 0.08)',
+              borderColor: 'rgba(192, 122, 151, 0.4)',
+              background: 'rgba(255, 255, 255, 0.92)',
+              boxShadow: '0 10px 34px rgba(139, 75, 106, 0.12)',
             }}
           >
             {hero.ideaBox?.title ? (
-              <p className="font-heading text-base sm:text-lg font-medium mb-2" style={{ color: 'var(--violet)' }}>
+              <p
+                className="font-heading font-medium mb-3 leading-snug"
+                style={{ fontSize: 'clamp(1.2rem, 2.8vw, 1.55rem)', color: 'var(--violet)' }}
+              >
                 {hero.ideaBox.title}
               </p>
             ) : null}
             {hero.ideaBox?.text ? (
-              <p className="font-body text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+              <p
+                className="font-body leading-relaxed"
+                style={{ fontSize: 'clamp(0.98rem, 2vw, 1.12rem)', color: 'var(--text-mid)', lineHeight: 1.7 }}
+              >
                 {hero.ideaBox.text}
               </p>
             ) : null}
@@ -119,7 +124,7 @@ function HeroSection({ site, hero }) {
         </div>
 
         {hero.scrollLabel?.trim() ? (
-        <div className="mt-12 md:mt-14 flex flex-col items-center gap-2 animate-float opacity-80 pb-6">
+        <div className="mt-6 md:mt-8 flex flex-col items-center gap-2 animate-float opacity-80 pb-3">
           <p
             className="hero-scroll-label text-lg sm:text-xl md:text-[1.35rem] font-refined font-medium leading-snug sm:leading-normal tracking-wide"
             style={{ color: 'var(--violet)' }}
@@ -147,20 +152,20 @@ function IntroSection({ intro, site }) {
   if (!headline && !tagline && !paragraph && !whyTitle && whyBullets.length === 0) return null
 
   return (
-    <section className="home-presentation py-12 md:py-16 px-4" style={{ background: 'var(--blanc)' }}>
+    <section className="home-presentation py-8 md:py-10 px-4" style={{ background: 'var(--blanc)' }}>
       <div className="max-w-3xl mx-auto text-center">
         {headline ? (
           <p
             className="home-presentation__headline font-heading font-semibold leading-snug mb-3"
-            style={{ fontSize: 'clamp(1.45rem, 3.6vw, 2.15rem)', color: 'var(--violet)' }}
+            style={{ fontSize: 'clamp(1.25rem, 2.8vw, 1.75rem)', color: 'var(--violet)' }}
           >
             {renderQuiParagraphAccents(headline, site?.ownerFirstName, site?.businessName ? [site.businessName] : [])}
           </p>
         ) : null}
         {tagline ? (
           <h2
-            className="font-heading font-medium leading-snug mb-4"
-            style={{ fontSize: 'clamp(1.15rem, 2.4vw, 1.55rem)', color: 'var(--mauve)' }}
+            className="font-heading font-medium leading-snug mb-3"
+            style={{ fontSize: 'clamp(1.02rem, 2vw, 1.25rem)', color: 'var(--mauve)' }}
           >
             {tagline}
           </h2>
@@ -170,14 +175,14 @@ function IntroSection({ intro, site }) {
         ) : null}
         {whyTitle ? (
           <h3
-            className="home-presentation__why-title font-heading font-medium mt-6 mb-3"
-            style={{ fontSize: 'clamp(1.25rem, 2.8vw, 1.75rem)', color: 'var(--violet)' }}
+            className="home-presentation__why-title font-heading font-medium mt-5 mb-2"
+            style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', color: 'var(--violet)' }}
           >
             {whyTitle}
           </h3>
         ) : null}
         {whyBullets.length > 0 ? (
-          <ul className="home-presentation__bullets max-w-md mx-auto text-left">
+          <ul className="home-presentation__bullets">
             {whyBullets.map((line) => (
               <li key={line} className="text-refined text-sm leading-snug">
                 ✓ {line}
@@ -215,7 +220,6 @@ function QuiSuisJeSection({ site, qui }) {
     }
   }, [])
 
-  const brandExtra = site?.businessName ? [site.businessName] : []
   const q = qui ?? {}
   const paragraphs = (q.paragraphs || []).map((p) =>
     String(p ?? '').replace(/\{firstName\}/g, site?.ownerFirstName ?? ''),
@@ -227,7 +231,7 @@ function QuiSuisJeSection({ site, qui }) {
       style={{ background: 'linear-gradient(to bottom, #fff7fb, var(--beige))' }}
     >
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="relative">
             <div
               className="absolute inset-0 rounded-2xl -rotate-2 opacity-20"
@@ -254,10 +258,10 @@ function QuiSuisJeSection({ site, qui }) {
 
           <div className="animate-fade-up">
             <p className="section-subtitle text-left mb-2">{q.sectionPretitle}</p>
-            <h2 className="qui-section-title mb-6" style={{ fontSize: 'clamp(2.25rem, 4.5vw, 3.25rem)' }}>
+            <h2 className="qui-section-title mb-3" style={{ fontSize: 'clamp(1.65rem, 3.5vw, 2.25rem)' }}>
               {q.sectionTitle}
             </h2>
-            <div className="flex items-center gap-3 mb-7">
+            <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-16 bg-mauve-light" />
               <span className="text-mauve text-sm">✿</span>
             </div>
@@ -265,15 +269,25 @@ function QuiSuisJeSection({ site, qui }) {
             <div className="qui-intro-text text-refined text-left">
               {paragraphs.map((text, idx) => (
                 <p key={idx}>
-                  {renderQuiParagraphAccents(text, site.ownerFirstName, brandExtra)}
+                  {renderQuiParagraphAccents(text, site.ownerFirstName, [
+                    site.businessName,
+                    'Création florale et personnalisation',
+                    'Créations florales et personnalisation',
+                  ].filter(Boolean))}
                 </p>
               ))}
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-8 mt-8">
+            <div className="grid grid-cols-3 gap-3 mb-5 mt-5">
               {(q.values || []).map(({ icon, label }) => (
-                <div key={label} className="text-center p-3 rounded-xl" style={{ background: 'rgba(240,210,221,0.22)' }}>
-                  <p className="text-2xl mb-1">{icon}</p>
+                <div
+                  key={label}
+                  className="qui-value-card text-center p-3 rounded-xl"
+                  style={{ background: 'rgba(240,210,221,0.22)' }}
+                >
+                  <p className="text-2xl mb-1" aria-hidden="true">
+                    {icon}
+                  </p>
                   <p
                     className="qui-value-label font-brand"
                     style={{ color: 'var(--mauve)', fontFamily: 'var(--font-brand)' }}
@@ -305,12 +319,12 @@ function ArtisanBannerSection({ banner }) {
   if (!title && !subtitle) return null
 
   return (
-    <section className="py-14 md:py-16 px-4" style={{ background: 'var(--blanc)' }}>
+    <section className="py-8 md:py-10 px-4" style={{ background: 'var(--blanc)' }}>
       <div className="max-w-3xl mx-auto text-center">
         {title ? (
           <h2
             className="font-heading font-medium leading-snug mb-3"
-            style={{ fontSize: 'clamp(1.65rem, 4vw, 2.5rem)', color: 'var(--violet)' }}
+            style={{ fontSize: 'clamp(1.35rem, 3vw, 1.85rem)', color: 'var(--violet)' }}
           >
             {title}
           </h2>
@@ -359,10 +373,10 @@ function CreationSurMesureSection({ moto }) {
   }, [moto?.src])
 
   return (
-    <section className="py-20 px-4" style={{ background: 'var(--blanc)' }}>
+    <section className="py-10 md:py-12 px-4" style={{ background: 'var(--blanc)' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div className="img-overlay rounded-3xl" style={{ minHeight: '360px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="img-overlay rounded-3xl" style={{ minHeight: '300px' }}>
             <img src={motoPhoto} alt="Création sur mesure — moto florale" className="w-full h-full object-cover" />
             <div className="overlay flex items-end justify-start p-5 sm:p-6" style={{ opacity: 1, background: 'linear-gradient(to top, rgba(139, 75, 106, 0.72) 0%, rgba(139, 75, 106, 0.12) 65%)' }}>
               <span
@@ -376,15 +390,15 @@ function CreationSurMesureSection({ moto }) {
 
           <div className="animate-fade-up">
             <p className="section-subtitle text-left mb-2">{moto.pretitle}</p>
-            <h2 className="font-heading font-medium mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--violet)' }}>
+            <h2 className="font-heading font-medium mb-3" style={{ fontSize: 'clamp(1.55rem, 3.2vw, 2.15rem)', color: 'var(--violet)' }}>
               {moto.title}
             </h2>
-            <div className="space-y-4 text-refined text-left">
+            <div className="home-moto-copy text-refined text-left">
               {(moto.paragraphs || []).map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
             </div>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <Link to="/contact" className="btn-primary">{moto.ctaPrimary}</Link>
               <Link to={moto.ctaSecondaryPath || '/evenements-floraux'} className="btn-outline">{moto.ctaSecondary}</Link>
             </div>
@@ -397,9 +411,9 @@ function CreationSurMesureSection({ moto }) {
 
 function CategoryPreviewSection({ prest }) {
   return (
-    <section className="py-20 px-4" style={{ background: 'var(--blanc)' }}>
+    <section className="py-10 md:py-12 px-4" style={{ background: 'var(--blanc)' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-6">
           <p className="section-subtitle mb-2">{prest.pretitle}</p>
           <h2 className="section-title">{prest.title}</h2>
           <div className="floral-divider mt-3">
@@ -439,7 +453,7 @@ function ContactStrip({ site, strip }) {
 
   return (
     <section
-      className={`contact-cta-band contact-cta-band--home py-16 px-4 relative overflow-hidden${useImageBg ? ' hero-section--image-bg' : ''}`}
+      className={`contact-cta-band contact-cta-band--home py-10 px-4 relative overflow-hidden${useImageBg ? ' hero-section--image-bg' : ''}`}
       style={
         useImageBg
           ? {
@@ -456,12 +470,12 @@ function ContactStrip({ site, strip }) {
           {strip.pretitle}
         </p>
         <h2
-          className="font-heading font-medium mb-3"
-          style={{ fontSize: 'clamp(1.65rem, 4vw, 2.5rem)', color: 'var(--violet)' }}
+          className="font-heading font-medium mb-2"
+          style={{ fontSize: 'clamp(1.35rem, 3vw, 1.85rem)', color: 'var(--violet)' }}
         >
           {strip.title}
         </h2>
-        <p className="font-body text-sm sm:text-base mb-6 leading-snug" style={{ color: 'var(--text-mid)' }}>
+        <p className="font-body text-sm sm:text-[0.95rem] mb-5 leading-snug" style={{ color: 'var(--text-mid)' }}>
           {strip.subtitle}
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
@@ -471,9 +485,6 @@ function ContactStrip({ site, strip }) {
           <a href={site.phoneHref} className="btn-outline">
             {strip.phoneCtaPrefix}{site.ownerFirstName}
           </a>
-        </div>
-        <div className="mt-10 flex justify-center px-2">
-          <SumupPaymentMethodsStrip className="home-payment-cards" />
         </div>
       </div>
     </section>

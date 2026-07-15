@@ -120,7 +120,10 @@ export function sanitizePageArticles(pageArticles) {
 
           const storedPrice = normalizeArticlePrice(item.price)
           const hasDefault = defaults.has(String(item.id))
-          if (storedPrice === 0 && !hasDefault && !String(item.src || '').trim()) return false
+          const hasPhoto =
+            Boolean(String(item.src || '').trim()) || Boolean(String(item.photoKey || '').trim())
+          // Ne pas masquer les créations à 0 € si une photo (fichier ou clé) est présente.
+          if (storedPrice === 0 && !hasDefault && !hasPhoto) return false
 
           return true
         })

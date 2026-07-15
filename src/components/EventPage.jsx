@@ -6,11 +6,15 @@ import PageContactBlock from './PageContactBlock'
 import PageMidCta from './PageMidCta'
 import PageOrderCta from './PageOrderCta'
 import { useSiteConfig } from '../context/SiteContentContext'
+import { isPublishableCatalogArticle } from '../lib/articleHubAggregation'
 
 export default function EventPage({ title, subtitle, coverImg, articlePageKey, pagePath }) {
   const { content } = useSiteConfig()
   const pa = articlePageKey ? content.pageArticles?.[articlePageKey] : null
-  const hasArticles = Array.isArray(pa?.items) && pa.items.length > 0
+  const catalogItems = Array.isArray(pa?.items) ? pa.items : []
+  const publishable = catalogItems.filter(isPublishableCatalogArticle)
+  const hasSectionCopy = Boolean(String(pa?.sectionTitle || '').trim() || String(pa?.intro || '').trim())
+  const showCatalog = Boolean(pagePath && (publishable.length > 0 || hasSectionCopy))
 
   return (
     <>
@@ -23,11 +27,11 @@ export default function EventPage({ title, subtitle, coverImg, articlePageKey, p
 
       {articlePageKey ? <PageIntroSection pageKey={articlePageKey} /> : null}
 
-      {hasArticles && pagePath ? (
+      {showCatalog ? (
         <PageArticleGrid
-          sectionTitle={pa.sectionTitle}
-          intro={pa.intro}
-          items={pa.items}
+          sectionTitle={pa?.sectionTitle}
+          intro={pa?.intro}
+          items={catalogItems}
           pagePath={pagePath}
           pageKey={articlePageKey}
           showIntro

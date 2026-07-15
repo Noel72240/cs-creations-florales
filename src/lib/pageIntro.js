@@ -13,7 +13,7 @@ export const PAGE_INTRO_DEFAULTS = {
       src: '/images/personnalisation/trousse-personnalisee.png',
       photoKey: '',
       overlayTitle: 'Création sur mesure',
-      overlayPosition: 'bottom-left',
+      overlayPosition: 'bottom-right',
       alt: 'Trousse personnalisée — exemple de création sur mesure',
     },
     cta: { enabled: true, label: 'Demander une personnalisation', path: '/contact' },
@@ -146,7 +146,24 @@ export const PAGE_INTRO_DEFAULTS = {
   },
 }
 
-export function normalizePageIntro(raw, pageKey) {
+function normalizeOverlayPosition(raw, fallback = 'centered') {
+  if (raw === 'bottom-left' || raw === 'bottom-right' || raw === 'centered') return raw
+  if (fallback === 'bottom-left' || fallback === 'bottom-right' || fallback === 'centered') return fallback
+  return 'centered'
+}
+
+/**
+ * @param {object|null|undefined} raw
+ * @param {string} pageKey
+ * @param {{ trimText?: boolean }} [options] — trimText=false pendant la saisie admin (sinon les espaces disparaissent)
+ */
+export function normalizePageIntro(raw, pageKey, options = {}) {
+  const trimText = options.trimText !== false
+  const soft = (v, fallback = '') => {
+    const s = String(v ?? fallback ?? '')
+    return trimText ? s.trim() : s
+  }
+
   const base = PAGE_INTRO_DEFAULTS[pageKey] || {
     enabled: false,
     layout: 'center',
@@ -159,38 +176,49 @@ export function normalizePageIntro(raw, pageKey) {
   }
   if (!raw || typeof raw !== 'object') return { ...base, paragraphs: [...(base.paragraphs || [])] }
 
-  const paragraphs = Array.isArray(raw.paragraphs)
-    ? raw.paragraphs.map((p) => String(p || '').trim()).filter(Boolean)
-    : base.paragraphs
+  let paragraphs = Array.isArray(raw.paragraphs)
+    ? raw.paragraphs.map((p) => soft(p, ''))
+    : [...(base.paragraphs || [])]
+  if (trimText) {
+    paragraphs = paragraphs.map((p) => p.trim()).filter(Boolean)
+  }
 
   const imageRaw = raw.image
   let image = base.image
   if (imageRaw === null) image = null
   else if (imageRaw && typeof imageRaw === 'object') {
+    let overlayPosition = normalizeOverlayPosition(
+      imageRaw.overlayPosition,
+      base.image?.overlayPosition || 'centered',
+    )
+    // Ancien défaut personnalisation : bas gauche → bas droite.
+    if (pageKey === 'personnalisation' && overlayPosition === 'bottom-left') {
+      overlayPosition = 'bottom-right'
+    }
     image = {
       src: String(imageRaw.src ?? base.image?.src ?? '').trim(),
       photoKey: String(imageRaw.photoKey ?? base.image?.photoKey ?? '').trim(),
-      overlayTitle: String(imageRaw.overlayTitle ?? base.image?.overlayTitle ?? '').trim(),
-      overlayPosition: imageRaw.overlayPosition === 'bottom-left' ? 'bottom-left' : 'centered',
-      alt: String(imageRaw.alt ?? base.image?.alt ?? '').trim(),
+      overlayTitle: soft(imageRaw.overlayTitle ?? base.image?.overlayTitle ?? ''),
+      overlayPosition,
+      alt: soft(imageRaw.alt ?? base.image?.alt ?? ''),
     }
   }
 
   return {
     enabled: raw.enabled !== undefined ? Boolean(raw.enabled) : base.enabled,
     layout: raw.layout === 'split' ? 'split' : 'center',
-    pretitle: String(raw.pretitle ?? base.pretitle ?? '').trim(),
-    title: String(raw.title ?? base.title ?? '').trim(),
+    pretitle: soft(raw.pretitle ?? base.pretitle ?? ''),
+    title: soft(raw.title ?? base.title ?? ''),
     paragraphs,
     image,
     cta: {
       enabled: Boolean(raw.cta?.enabled ?? base.cta?.enabled),
-      label: String(raw.cta?.label ?? base.cta?.label ?? '').trim(),
+      label: soft(raw.cta?.label ?? base.cta?.label ?? ''),
       path: String(raw.cta?.path ?? base.cta?.path ?? '/contact').trim() || '/contact',
     },
     supportBox: {
       enabled: Boolean(raw.supportBox?.enabled ?? base.supportBox?.enabled),
-      quote: String(raw.supportBox?.quote ?? base.supportBox?.quote ?? '').trim(),
+      quote: soft(raw.supportBox?.quote ?? base.supportBox?.quote ?? ''),
       showAuthor: raw.supportBox?.showAuthor !== false,
     },
   }

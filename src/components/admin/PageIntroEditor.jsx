@@ -3,18 +3,30 @@ import { PHOTO_KEY_OPTIONS } from '../../data/homePhotos'
 import { resolvePhotoSrc } from '../../data/photoResolver'
 import { normalizePageIntro } from '../../lib/pageIntro'
 
+function paragraphsToText(paragraphs) {
+  return Array.isArray(paragraphs) ? paragraphs.join('\n\n') : ''
+}
+
+function textToParagraphs(text) {
+  // Conserve les espaces et les paragraphes en cours de saisie (y compris lignes vides finales).
+  return String(text || '').split(/\n\n/)
+}
+
 export default function PageIntroEditor({ pageKey, value, onChange, fileToSrc }) {
-  const intro = normalizePageIntro(value, pageKey)
+  const intro = normalizePageIntro(value, pageKey, { trimText: false })
   const [imageSrc, setImageSrc] = useState(intro.image?.src || '')
   const [imageKey, setImageKey] = useState(intro.image?.photoKey || '')
+  const [paragraphsText, setParagraphsText] = useState(() => paragraphsToText(intro.paragraphs))
 
   useEffect(() => {
-    const next = normalizePageIntro(value, pageKey)
+    const next = normalizePageIntro(value, pageKey, { trimText: false })
     setImageSrc(next.image?.src || '')
     setImageKey(next.image?.photoKey || '')
+    const text = paragraphsToText(next.paragraphs)
+    setParagraphsText((prev) => (prev === text ? prev : text))
   }, [pageKey, value])
 
-  const patch = (partial) => onChange(normalizePageIntro({ ...intro, ...partial }, pageKey))
+  const patch = (partial) => onChange(normalizePageIntro({ ...intro, ...partial }, pageKey, { trimText: false }))
 
   const pickImage = async (fileList) => {
     const file = fileList?.[0]
@@ -93,15 +105,12 @@ export default function PageIntroEditor({ pageKey, value, onChange, fileToSrc })
           <textarea
             className="form-field"
             rows={5}
-            value={(intro.paragraphs || []).join('\n\n')}
-            onChange={(e) =>
-              patch({
-                paragraphs: e.target.value
-                  .split(/\n\n+/)
-                  .map((s) => s.trim())
-                  .filter(Boolean),
-              })
-            }
+            value={paragraphsText}
+            onChange={(e) => {
+              const next = e.target.value
+              setParagraphsText(next)
+              patch({ paragraphs: textToParagraphs(next) })
+            }}
             placeholder="Paragraphes (séparés par une ligne vide)"
           />
 
@@ -140,9 +149,9 @@ export default function PageIntroEditor({ pageKey, value, onChange, fileToSrc })
                 }}
               >
                 <option value="">— Clé photo (si pas d’URL) —</option>
-                {PHOTO_KEY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
+                {PHOTO_KEY_OPTIONS.map((k) => (
+                  <option key={k} value={k}>
+                    {k}
                   </option>
                 ))}
               </select>
@@ -154,6 +163,27 @@ export default function PageIntroEditor({ pageKey, value, onChange, fileToSrc })
                 }
                 placeholder="Texte sur la photo (optionnel)"
               />
+              <label className="block text-xs">
+                Position du texte sur la photo
+                <select
+                  className="form-field mt-1"
+                  value={intro.image?.overlayPosition || 'centered'}
+                  onChange={(e) =>
+                    patch({
+                      image: {
+                        ...(intro.image || {}),
+                        overlayPosition: e.target.value,
+                        src: imageSrc,
+                        photoKey: imageKey,
+                      },
+                    })
+                  }
+                >
+                  <option value="centered">Centré</option>
+                  <option value="bottom-left">Bas gauche</option>
+                  <option value="bottom-right">Bas droite</option>
+                </select>
+              </label>
               <input
                 className="form-field"
                 value={intro.image?.alt || ''}

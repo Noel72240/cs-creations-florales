@@ -9,7 +9,7 @@ export default function PageOrderCta({ pageKey }) {
   if (!texts.orderCta.enabled || !texts.orderCta.label) return null
 
   return (
-    <div className="py-8 text-center">
+    <div className="py-5 text-center">
       <Link to={texts.orderCta.path || '/contact'} className="btn-primary">
         {texts.orderCta.label}
       </Link>

@@ -106,7 +106,7 @@ export default function Panier() {
         }}
       />
 
-      <section className="py-14 px-4" style={{ background: 'var(--blanc)' }}>
+      <section className="py-8 px-4" style={{ background: 'var(--blanc)' }}>
         <div className="max-w-3xl mx-auto">
           {items.length === 0 ? (
             <div className="text-center py-12 px-4 rounded-2xl border border-mauve-light/35" style={{ background: 'rgba(240,210,221,0.1)' }}>

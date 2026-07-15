@@ -12,11 +12,17 @@ function resolveIntroImage(intro) {
   return ''
 }
 
+function overlayClass(position) {
+  if (position === 'bottom-left') return 'overlay overlay--bottom-left'
+  if (position === 'bottom-right') return 'overlay overlay--bottom-right'
+  return 'overlay overlay--centered'
+}
+
 function SupportQuoteBox({ quote, ownerFullName, showAuthor }) {
   if (!quote?.trim()) return null
   return (
     <div
-      className="mt-10 p-6 rounded-2xl"
+      className="mt-6 p-5 rounded-2xl"
       style={{
         background: 'linear-gradient(to right, rgba(240,210,221,0.2), rgba(239,230,234,0.3))',
         border: '1px solid rgba(240,210,221,0.4)',
@@ -46,40 +52,61 @@ export default function PageIntroSection({ pageKey }) {
   const imageUrl = resolveIntroImage(intro)
   const showImage = !isCenter && imageUrl
 
-  const textBlock = (
-    <>
+  if (!intro.pretitle && !intro.title && !intro.paragraphs.length && !showImage && !intro.supportBox.enabled) {
+    return null
+  }
+
+  const headerBlock = (
+    <div className={`page-intro-header ${showImage ? 'page-intro-header--centered mb-8' : ''}`}>
       {intro.pretitle ? (
-        <p className={`section-subtitle mb-2 ${isCenter ? 'text-center' : 'text-left'}`}>{intro.pretitle}</p>
+        <p className={`section-subtitle mb-2 ${showImage || isCenter ? 'text-center' : 'text-left'}`}>
+          {intro.pretitle}
+        </p>
       ) : null}
       {intro.title ? (
         <h2
-          className={`font-heading font-medium mb-6 ${isCenter ? 'section-title mb-4' : 'text-3xl md:text-4xl'}`}
+          className={`font-heading font-medium mb-3 ${
+            showImage || isCenter ? 'section-title mb-2 text-center' : 'text-2xl md:text-3xl text-left'
+          }`}
           style={{ color: 'var(--violet)' }}
         >
           {intro.title}
         </h2>
       ) : null}
-      {isCenter && intro.title ? (
-        <div className="floral-divider mb-8">
+      {(showImage || isCenter) && intro.title ? (
+        <div className="floral-divider mb-4">
           <span className="floral-icon">✿</span>
         </div>
       ) : null}
-      {!isCenter ? (
-        <div className="flex items-center gap-3 mb-7">
+      {!showImage && !isCenter ? (
+        <div className="flex items-center gap-3 mb-4">
           <div className="h-px w-16 bg-mauve-light" />
           <span className="text-mauve text-sm">✿</span>
         </div>
       ) : null}
-      {intro.paragraphs.map((p, i) => (
-        <p
-          key={i}
-          className={`text-refined mb-5 ${isCenter ? 'max-w-[36rem] mx-auto text-center' : 'text-left'}`}
-        >
-          {p}
-        </p>
-      ))}
+    </div>
+  )
+
+  const bodyBlock = (
+    <>
+      {intro.paragraphs.length ? (
+        <div className={`page-intro-copy ${showImage ? 'page-intro-copy--split' : ''} ${isCenter && !showImage ? 'text-center' : ''}`}>
+          {intro.paragraphs.map((p, i) => (
+            <p
+              key={i}
+              className={
+                showImage
+                  ? 'page-intro-copy__p'
+                  : `article-catalog-intro mb-3 ${isCenter ? '' : 'article-catalog-intro--left'}`
+              }
+            >
+              {p}
+            </p>
+          ))}
+        </div>
+      ) : null}
       {intro.cta.enabled && intro.cta.label ? (
-        <div className={`mt-2 ${isCenter ? 'text-center' : ''}`}>
+        <div className={`mt-5 ${showImage || isCenter ? '' : ''} ${!showImage && isCenter ? 'text-center' : ''}`}>
           <Link to={intro.cta.path || '/contact'} className="btn-primary">
             {intro.cta.label}
           </Link>
@@ -95,36 +122,41 @@ export default function PageIntroSection({ pageKey }) {
     </>
   )
 
-  if (!intro.pretitle && !intro.title && !intro.paragraphs.length && !showImage && !intro.supportBox.enabled) {
-    return null
-  }
-
   return (
-    <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-      <div className={showImage ? 'max-w-4xl mx-auto' : 'max-w-3xl mx-auto'}>
+    <section
+      className={`page-intro-section py-10 px-4${showImage ? ' page-intro-section--split' : ''}`}
+      style={{ background: showImage ? 'linear-gradient(to bottom, #fff7fb, var(--beige))' : 'var(--blanc)' }}
+    >
+      <div className={showImage ? 'max-w-6xl mx-auto' : 'max-w-3xl mx-auto'}>
         {showImage ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>{textBlock}</div>
-            <div className="img-overlay rounded-2xl page-intro-photo" style={{ minHeight: '380px' }}>
-              <img
-                src={imageUrl}
-                alt={intro.image?.alt || intro.title || 'Illustration'}
-                className="w-full h-full object-cover"
-              />
-              {intro.image?.overlayTitle ? (
-                <div className={`overlay ${intro.image?.overlayPosition === 'bottom-left' ? 'overlay--bottom-left' : 'overlay--centered'}`}>
-                  <span
-                    className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95 not-italic"
-                    style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
-                  >
-                    {intro.image.overlayTitle}
-                  </span>
-                </div>
-              ) : null}
+          <>
+            {headerBlock}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
+              <div className="img-overlay rounded-2xl page-intro-photo order-2 md:order-1" style={{ minHeight: '300px' }}>
+                <img
+                  src={imageUrl}
+                  alt={intro.image?.alt || intro.title || 'Illustration'}
+                  className="w-full h-full object-cover"
+                />
+                {intro.image?.overlayTitle ? (
+                  <div className={overlayClass(intro.image?.overlayPosition)}>
+                    <span
+                      className="font-refined text-[26px] sm:text-[27px] font-semibold tracking-wide text-white/95 not-italic"
+                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
+                    >
+                      {intro.image.overlayTitle}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+              <div className="order-1 md:order-2 animate-fade-up">{bodyBlock}</div>
             </div>
-          </div>
+          </>
         ) : (
-          textBlock
+          <>
+            {headerBlock}
+            {bodyBlock}
+          </>
         )}
       </div>
     </section>

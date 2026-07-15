@@ -9,7 +9,7 @@ export default function PageMidCta({ pageKey }) {
   if (!texts.midCta.enabled || !texts.midCta.label) return null
 
   return (
-    <div className="py-8 text-center">
+    <div className="py-5 text-center">
       <Link to={texts.midCta.path || '/contact'} className="btn-primary">
         {texts.midCta.label}
       </Link>

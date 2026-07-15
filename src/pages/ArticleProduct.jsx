@@ -118,7 +118,7 @@ export default function ArticleProduct() {
   if (!remoteLoaded) {
     return (
       <section
-        className="article-product-page is-visible py-20 px-4 text-center"
+        className="article-product-page is-visible py-10 px-4 text-center"
         style={{ background: 'var(--beige)' }}
         aria-busy="true"
       >
@@ -131,7 +131,7 @@ export default function ArticleProduct() {
 
   if (!article) {
     return (
-      <section className="article-product-page is-visible py-20 px-4 text-center" style={{ background: 'var(--beige)' }}>
+      <section className="article-product-page is-visible py-10 px-4 text-center" style={{ background: 'var(--beige)' }}>
         <p className="font-heading text-xl mb-4" style={{ color: 'var(--violet)' }}>
           Article introuvable
         </p>
@@ -241,10 +241,12 @@ export default function ArticleProduct() {
     window.setTimeout(() => setAdded(false), 2200)
   }
 
+  // Conserve les lignes vides saisies dans l’admin (sauts de paragraphe).
   const descriptionBlocks = String(article.description || '')
-    .split(/\n+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map((line) => line.replace(/\s+$/g, ''))
+  const hasDescription = descriptionBlocks.some((line) => line.trim().length > 0)
 
   const lineTotal = unitPrice * (hideQtyStepper ? cartQuantity : quantity)
 
@@ -425,13 +427,19 @@ export default function ArticleProduct() {
               </div>
 
               <div className="article-product-layout__desc order-3 lg:order-4">
-                {descriptionBlocks.length > 0 ? (
+                {hasDescription ? (
                   <div className="article-product-description">
-                    {descriptionBlocks.map((block, i) => (
-                      <p key={i}>
-                        <ArticleDescriptionBlock text={block} />
-                      </p>
-                    ))}
+                    {descriptionBlocks.map((block, i) =>
+                      block.trim() ? (
+                        <p key={i}>
+                          <ArticleDescriptionBlock text={block} />
+                        </p>
+                      ) : (
+                        <p key={i} className="is-blank" aria-hidden="true">
+                          &nbsp;
+                        </p>
+                      ),
+                    )}
                   </div>
                 ) : null}
               </div>

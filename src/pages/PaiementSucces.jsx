@@ -31,8 +31,8 @@ export default function PaiementSucces() {
         subtitle="Retour depuis la page sécurisée"
         image={w1200(P.bouquetSoft)}
       />
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-2xl mx-auto text-center space-y-6 font-body text-sm" style={{ color: 'var(--text-mid)', lineHeight: 1.85 }}>
+      <section className="py-10 px-4" style={{ background: 'var(--blanc)' }}>
+        <div className="max-w-2xl mx-auto text-center space-y-5 font-body text-sm" style={{ color: 'var(--text-mid)', lineHeight: 1.85 }}>
           <p className="font-heading text-2xl" style={{ color: 'var(--violet)' }}>
             Merci pour votre retour
           </p>

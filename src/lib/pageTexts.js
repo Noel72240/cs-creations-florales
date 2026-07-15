@@ -49,7 +49,7 @@ export const PAGE_TEXTS_PAGE_DEFAULTS = {
     contactBlock: {
       enabled: true,
       title: 'Nous contacter',
-      text: 'Je suis disponible rapidement pour vous accompagner. Appelez-moi ou envoyez un message.',
+      text: 'Je suis à votre écoute dans ces moments difficiles. N’hésitez pas à me contacter par téléphone pour une réponse rapide.',
       phoneLabel: '📞 Appeler',
       messageLabel: 'Envoyer un message',
     },
@@ -103,36 +103,45 @@ function pickText(value, fallback) {
   return s || fallback
 }
 
-/** Enregistrement admin : conserve les champs saisis (chaînes vides = repli au défaut à l’affichage). */
-export function normalizePageTexts(raw, pageKey = '') {
+/**
+ * @param {object|null|undefined} raw
+ * @param {string} [pageKey]
+ * @param {{ trimText?: boolean }} [options] — trimText=false pendant la saisie (espaces entre les mots)
+ */
+export function normalizePageTexts(raw, pageKey = '', options = {}) {
+  const trimText = options.trimText !== false
+  const soft = (v) => {
+    const s = String(v ?? '')
+    return trimText ? s.trim() : s
+  }
   const pageDefaults = PAGE_TEXTS_PAGE_DEFAULTS[pageKey] || {}
   const fromRaw = raw && typeof raw === 'object' ? raw : {}
 
   return {
     contactCta: {
-      title: String(fromRaw.contactCta?.title ?? '').trim(),
-      message: String(fromRaw.contactCta?.message ?? '').trim(),
-      primaryLabel: String(fromRaw.contactCta?.primaryLabel ?? '').trim(),
-      phoneLabelPrefix: String(fromRaw.contactCta?.phoneLabelPrefix ?? '').trim(),
+      title: soft(fromRaw.contactCta?.title),
+      message: soft(fromRaw.contactCta?.message),
+      primaryLabel: soft(fromRaw.contactCta?.primaryLabel),
+      phoneLabelPrefix: soft(fromRaw.contactCta?.phoneLabelPrefix),
     },
     midCta: {
       enabled: Boolean(fromRaw.midCta?.enabled ?? pageDefaults.midCta?.enabled ?? BASE.midCta.enabled),
-      label: String(fromRaw.midCta?.label ?? '').trim(),
+      label: soft(fromRaw.midCta?.label),
       path: String(fromRaw.midCta?.path ?? '/contact').trim() || '/contact',
     },
     orderCta: {
       enabled: Boolean(fromRaw.orderCta?.enabled ?? pageDefaults.orderCta?.enabled ?? BASE.orderCta.enabled),
-      label: String(fromRaw.orderCta?.label ?? '').trim(),
+      label: soft(fromRaw.orderCta?.label),
       path: String(fromRaw.orderCta?.path ?? '/contact').trim() || '/contact',
     },
     contactBlock: {
       enabled: Boolean(
         fromRaw.contactBlock?.enabled ?? pageDefaults.contactBlock?.enabled ?? BASE.contactBlock.enabled,
       ),
-      title: String(fromRaw.contactBlock?.title ?? '').trim(),
-      text: String(fromRaw.contactBlock?.text ?? '').trim(),
-      phoneLabel: String(fromRaw.contactBlock?.phoneLabel ?? '').trim(),
-      messageLabel: String(fromRaw.contactBlock?.messageLabel ?? '').trim(),
+      title: soft(fromRaw.contactBlock?.title),
+      text: soft(fromRaw.contactBlock?.text),
+      phoneLabel: soft(fromRaw.contactBlock?.phoneLabel),
+      messageLabel: soft(fromRaw.contactBlock?.messageLabel),
     },
   }
 }
@@ -141,6 +150,16 @@ export function normalizePageTexts(raw, pageKey = '') {
 export function resolvePageTexts(pageKey, pageArticlesEntry) {
   const base = buildDefaults(pageKey)
   const saved = pageArticlesEntry?.pageTexts || {}
+
+  let contactBlockText = pickText(saved.contactBlock?.text, base.contactBlock.text)
+  // Remplace l’ancien texte funéraire figé s’il est encore en base.
+  if (
+    pageKey === 'creationsFuneraires' &&
+    contactBlockText ===
+      'Je suis disponible rapidement pour vous accompagner. Appelez-moi ou envoyez un message.'
+  ) {
+    contactBlockText = base.contactBlock.text
+  }
 
   return {
     contactCta: {
@@ -165,9 +184,40 @@ export function resolvePageTexts(pageKey, pageArticlesEntry) {
           ? Boolean(saved.contactBlock.enabled)
           : base.contactBlock.enabled,
       title: pickText(saved.contactBlock?.title, base.contactBlock.title),
-      text: pickText(saved.contactBlock?.text, base.contactBlock.text),
+      text: contactBlockText,
       phoneLabel: pickText(saved.contactBlock?.phoneLabel, base.contactBlock.phoneLabel),
       messageLabel: pickText(saved.contactBlock?.messageLabel, base.contactBlock.messageLabel),
+    },
+  }
+}
+
+/** Préremplit l’admin avec les textes réellement affichés (sinon champs vides = pas éditables). */
+export function pageTextsForEditor(raw, pageKey = '') {
+  const resolved = resolvePageTexts(pageKey, { pageTexts: raw })
+  const normalized = normalizePageTexts(raw, pageKey, { trimText: false })
+  return {
+    contactCta: {
+      title: normalized.contactCta.title || resolved.contactCta.title,
+      message: normalized.contactCta.message || resolved.contactCta.message,
+      primaryLabel: normalized.contactCta.primaryLabel || resolved.contactCta.primaryLabel,
+      phoneLabelPrefix: normalized.contactCta.phoneLabelPrefix || resolved.contactCta.phoneLabelPrefix,
+    },
+    midCta: {
+      enabled: normalized.midCta.enabled,
+      label: normalized.midCta.label || resolved.midCta.label,
+      path: normalized.midCta.path || resolved.midCta.path,
+    },
+    orderCta: {
+      enabled: normalized.orderCta.enabled,
+      label: normalized.orderCta.label || resolved.orderCta.label,
+      path: normalized.orderCta.path || resolved.orderCta.path,
+    },
+    contactBlock: {
+      enabled: normalized.contactBlock.enabled,
+      title: normalized.contactBlock.title || resolved.contactBlock.title,
+      text: normalized.contactBlock.text || resolved.contactBlock.text,
+      phoneLabel: normalized.contactBlock.phoneLabel || resolved.contactBlock.phoneLabel,
+      messageLabel: normalized.contactBlock.messageLabel || resolved.contactBlock.messageLabel,
     },
   }
 }

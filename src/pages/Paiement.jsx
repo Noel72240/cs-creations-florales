@@ -104,8 +104,8 @@ export default function Paiement() {
         }}
       />
 
-      <section className="py-16 px-4" style={{ background: 'var(--blanc)' }}>
-        <div className="max-w-3xl mx-auto space-y-10 font-body text-sm" style={{ color: 'var(--text-mid)', lineHeight: '1.85' }}>
+      <section className="py-10 px-4" style={{ background: 'var(--blanc)' }}>
+        <div className="max-w-3xl mx-auto space-y-8 font-body text-sm" style={{ color: 'var(--text-mid)', lineHeight: '1.85' }}>
           <MaintenancePaymentNotice />
 
           <div className="rounded-2xl border border-mauve-light/40 p-6 sm:p-8" style={{ background: 'rgba(240,210,221,0.12)' }}>

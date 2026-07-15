@@ -45,6 +45,31 @@ export function resolveProductOptionsSectionTitle(config, title = '') {
   return getDefaultProductOptionsSectionTitle(templateId)
 }
 
+/** Assure les champs clés présents (ex. couleur du texte) même si l’admin avait une liste partielle. */
+function ensureTemplateFields(templateId, enabledFields, templateFields) {
+  let ids = enabledFields.map((id) =>
+    templateId === 'croix-florale' && id === 'personalizationColor' ? 'textColor' : id,
+  )
+
+  const ensure = (fieldId) => {
+    if (templateFields.includes(fieldId) && !ids.includes(fieldId)) ids.push(fieldId)
+  }
+
+  if (templateId === 'box-florale' || templateId === 'boite-mouchoirs' || templateId === 'ecrin-floral') {
+    ensure('textColor')
+  }
+  if (
+    templateId === 'croix-florale' ||
+    templateId === 'verre-communion' ||
+    templateId === 'gobelet-bapteme' ||
+    templateId === 'verres-personnalises'
+  ) {
+    ensure('textColor')
+  }
+
+  return ids.filter((id) => templateFields.includes(id) && id !== 'eyeColor')
+}
+
 /** Normalise la config admin `productOptions` sur une fiche article. */
 export function normalizeArticleProductOptions(raw, title = '') {
   if (!raw || typeof raw !== 'object') {
@@ -59,15 +84,22 @@ export function normalizeArticleProductOptions(raw, title = '') {
   const templateId = String(raw.templateId || suggestTemplateIdFromTitle(title) || '').trim()
   const template = getProductOptionTemplate(templateId)
   const templateFields = template?.fields || []
-  let enabledFields = Array.isArray(raw.enabledFields) && raw.enabledFields.length
-    ? raw.enabledFields.filter((id) => templateFields.includes(id) && id !== 'eyeColor')
-    : [...templateFields]
+  let enabledFields =
+    Array.isArray(raw.enabledFields) && raw.enabledFields.length
+      ? raw.enabledFields.filter((id) => templateFields.includes(id) && id !== 'eyeColor')
+      : [...templateFields]
+
+  if (Array.isArray(raw.enabledFields) && raw.enabledFields.length) {
+    enabledFields = ensureTemplateFields(templateId, enabledFields, templateFields)
+  }
+
   return {
     active: Boolean(raw.active),
     templateId,
     enabledFields,
     fieldSettings: normalizeFieldSettings(raw.fieldSettings, templateId),
-    sectionTitle: String(raw.sectionTitle || '').trim(),
+    // Ne pas trimmer ici : sinon la saisie admin mange les espaces à chaque frappe.
+    sectionTitle: String(raw.sectionTitle || ''),
   }
 }
 

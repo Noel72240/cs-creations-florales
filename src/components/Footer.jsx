@@ -4,7 +4,7 @@ import { openCookiePreferences } from '../lib/cookieConsent'
 import BrandName from './BrandName'
 import SocialIconLinks from './SocialIconLinks'
 import { resolveSocialUrls } from '../lib/socialUrls'
-import SecurePaymentNotice from './SecurePaymentNotice'
+import SecurePaymentNotice, { SumupPaymentMethodsStrip } from './SecurePaymentNotice'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -19,8 +19,8 @@ export default function Footer() {
       <div className="site-footer-glow" aria-hidden="true" />
       <div className="h-px bg-gradient-to-r from-transparent via-mauve-light/40 to-transparent relative z-10" aria-hidden="true" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-6">
           {/* Brand */}
           <div>
             <h3 className="font-brand text-2xl font-medium mb-3" style={{ color: 'var(--violet)' }}>
@@ -33,9 +33,6 @@ export default function Footer() {
               <span className="font-medium" style={{ color: 'var(--violet)' }}>Paiement :</span>{' '}
               {sumupUrl ? ft.paymentWithSumup : ft.paymentWithoutSumup}
             </p>
-            {sumupUrl ? (
-              <SecurePaymentNotice compact className="mb-4" />
-            ) : null}
             <SocialIconLinks
               facebookUrl={social.facebookUrl}
               instagramUrl={social.instagramUrl}
@@ -96,6 +93,13 @@ export default function Footer() {
             <Link to="/contact" className="btn-primary inline-block mt-5 text-xs py-2 px-5">
               Nous contacter
             </Link>
+            <div className="mt-5">
+              <p className="text-xs font-medium mb-2" style={{ color: 'var(--violet)' }}>
+                Moyens de paiement
+              </p>
+              <SumupPaymentMethodsStrip className="home-payment-cards footer-payment-cards" />
+              {sumupUrl ? <SecurePaymentNotice compact className="mt-3" /> : null}
+            </div>
           </div>
         </div>
 

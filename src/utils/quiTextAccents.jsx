@@ -5,10 +5,16 @@ export function escapeRegExp(s) {
 export const DEFAULT_BRAND_PHRASES = [
   'C&S Créations Florales et Personnalisation',
   'C&S Créations Florales',
+  'Créations Florales et Personnalisation',
+  'Création florale et personnalisation',
+  'Créations florales et personnalisation',
 ]
 
+export const DEFAULT_PLACE_PHRASES = ['Écommoy', 'Ecommoy', 'Sarthe']
+
 /**
- * Prénom en manuscrite (Great Vibes), nom de marque en Cookie (.qui-inline-brand).
+ * Accents violet + police Cookie (comme « C&S Créations Florales »)
+ * pour prénom, marque, lieux (Écommoy, Sarthe).
  */
 export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = []) {
   const str = String(text ?? '')
@@ -16,12 +22,7 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
   const brands = [...new Set([...extraBrandPhrases, ...DEFAULT_BRAND_PHRASES])]
     .filter(Boolean)
     .sort((a, b) => b.length - a.length)
-
-  const wrapScript = (content, k) => (
-    <span key={k} className="qui-inline-script">
-      {content}
-    </span>
-  )
+  const places = [...DEFAULT_PLACE_PHRASES].sort((a, b) => b.length - a.length)
 
   const wrapBrand = (content, k) => (
     <span key={k} className="qui-inline-brand font-brand">
@@ -29,42 +30,23 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
     </span>
   )
 
-  if (!brands.length && !fn) {
-    return str
-  }
+  const highlightTerms = [fn, ...brands, ...places].filter(Boolean).sort((a, b) => b.length - a.length)
+  if (!highlightTerms.length) return str
 
-  const brandRe =
-    brands.length > 0 ? new RegExp(`(${brands.map(escapeRegExp).join('|')})`, 'g') : null
-
-  if (!brandRe) {
-    const fnRe = new RegExp(`(${escapeRegExp(fn)})`, 'gi')
-    let k = 0
-    return str.split(fnRe).map((chunk) =>
-      chunk.toLowerCase() === fn.toLowerCase() ? wrapScript(chunk, k++) : chunk,
-    )
-  }
-
+  const re = new RegExp(`(${highlightTerms.map(escapeRegExp).join('|')})`, 'gi')
   const nodes = []
   let key = 0
+  let last = 0
+  let match
 
-  str.split(brandRe).forEach((chunk) => {
-    if (brands.includes(chunk)) {
-      nodes.push(wrapBrand(chunk, key++))
-      return
+  while ((match = re.exec(str)) !== null) {
+    if (match.index > last) {
+      nodes.push(str.slice(last, match.index))
     }
-    if (fn) {
-      const fnRe = new RegExp(`(${escapeRegExp(fn)})`, 'gi')
-      chunk.split(fnRe).forEach((c) => {
-        if (c.toLowerCase() === fn.toLowerCase()) {
-          nodes.push(wrapScript(c, key++))
-        } else if (c) {
-          nodes.push(c)
-        }
-      })
-    } else if (chunk) {
-      nodes.push(chunk)
-    }
-  })
+    nodes.push(wrapBrand(match[0], key++))
+    last = match.index + match[0].length
+  }
+  if (last < str.length) nodes.push(str.slice(last))
 
-  return nodes
+  return nodes.length ? nodes : str
 }
