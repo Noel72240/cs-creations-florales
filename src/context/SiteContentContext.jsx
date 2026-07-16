@@ -197,9 +197,13 @@ export function SiteContentProvider({ children }) {
     writeLocalSiteOverrides(data)
   }, [])
 
+  /** Contenu pour l’admin : articles non filtrés (évite d’effacer des créations à l’enregistrement). */
+  const adminContent = useMemo(() => getMergedContent(overrides, { forPersist: true }), [overrides])
+
   const value = useMemo(
     () => ({
       content,
+      adminContent,
       overrides,
       remoteLoaded,
       contentDriver: USE_SUPABASE ? 'supabase' : 'local',
@@ -208,7 +212,7 @@ export function SiteContentProvider({ children }) {
       exportJson,
       importJson,
     }),
-    [content, overrides, remoteLoaded, save, reset, exportJson, importJson],
+    [content, adminContent, overrides, remoteLoaded, save, reset, exportJson, importJson],
   )
 
   return <SiteContentContext.Provider value={value}>{children}</SiteContentContext.Provider>
@@ -229,6 +233,7 @@ export function useSiteConfig() {
   if (!ctx) {
     return {
       content,
+      adminContent: content,
       overrides: null,
       remoteLoaded: true,
       contentDriver: 'local',

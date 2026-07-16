@@ -198,7 +198,7 @@ function parseQuiValuesFromForm(fd, fallback = QUI_VALUES_FALLBACK) {
 }
 
 export default function Admin() {
-  const { content, save, reset, exportJson, importJson, contentDriver } = useSiteContent()
+  const { content, adminContent, save, reset, exportJson, importJson, contentDriver } = useSiteContent()
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD?.trim()
   const [auth, setAuth] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1')
   const [pwd, setPwd] = useState('')
@@ -885,7 +885,7 @@ export default function Admin() {
         <PageArticlesEditor
           pageKey={articlePageKey}
           setPageKey={setArticlePageKey}
-          pageArticles={c.pageArticles}
+          pageArticles={(adminContent || content).pageArticles}
           save={save}
           setMsg={setMsg}
           contentDriver={contentDriver}
@@ -2290,6 +2290,17 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
           ) : null}
         </div>
       </div>
+
+      {localItems.length === 0 ? (
+        <p
+          className="text-[12px] leading-snug rounded-lg border border-mauve-light/40 px-3 py-2.5"
+          style={{ color: 'var(--text-mid)', background: 'rgba(240,210,221,0.18)' }}
+        >
+          Aucun article sur cette page pour l’instant. Cliquez sur <strong>+ Ajouter un article</strong>, renseignez
+          au minimum le titre et une photo, puis <strong>Enregistrer cette page</strong>. Sans cela, rien
+          n’apparaîtra sur le site.
+        </p>
+      ) : null}
 
       <div className="space-y-4">
         {localItems.map((it, idx) => (
