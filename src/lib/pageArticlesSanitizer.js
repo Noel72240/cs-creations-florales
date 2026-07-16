@@ -1,11 +1,10 @@
 import { PAGE_ARTICLE_CATALOG } from '../data/articleCatalog'
 import { isPublishableCatalogArticle, articleDisplayFingerprint } from './articleHubAggregation'
 import { normalizeArticlePrice } from './articlePrices'
-import { normalizeArticleProductOptions } from './articleProductOptions'
+import { normalizeArticleProductOptions, isGobeletPlastiqueArticle } from './articleProductOptions'
 
 const HUB_PAGE_KEYS = new Set(['evenementsFloraux', 'creationsSaisonnieres'])
 const HUB_ONLY_ID_PREFIXES = ['evt-', 'sai-']
-const GOBELET_ARTICLE_IDS = new Set(['bapteme-communion-002', 'personnalisation-009'])
 
 function buildDefaultArticleIndex() {
   const byId = new Map()
@@ -25,13 +24,6 @@ function isHubOnlyArticleId(id) {
 function shouldDropFromGrandesMeres(item) {
   const id = String(item?.id || '')
   return id.startsWith('fete-des-meres-')
-}
-
-function isGobeletPlastiqueArticle(item) {
-  const id = String(item?.id || '')
-  if (GOBELET_ARTICLE_IDS.has(id)) return true
-  const title = String(item?.title || '')
-  return /\bgobelet\b/i.test(title) && !/verre communion|gobelet.*communion colombes/i.test(title)
 }
 
 function repairProductOptions(item) {

@@ -78,6 +78,22 @@ export function getLockedOptionFieldIds(templateId) {
   return templateId && FORCE_FULL_OPTION_TEMPLATES.has(templateId) ? ['textColor'] : []
 }
 
+/** Tout article « gobelet » (plastique) — hors verre de communion. */
+export function isGobeletPlastiqueArticle(article) {
+  const id = String(article?.id || '')
+  if (
+    id === 'bapteme-communion-002' ||
+    id === 'personnalisation-009' ||
+    id === 'evt-bapteme-gobelet'
+  ) {
+    return true
+  }
+  const title = String(article?.title || '')
+  if (!/gobelet/i.test(title)) return false
+  if (/verre communion/i.test(title)) return false
+  return true
+}
+
 /** Assure les champs clés présents (ex. couleur du texte) même si l’admin avait une liste partielle. */
 function ensureTemplateFields(templateId, enabledFields, templateFields) {
   // Remapper avant filtre : sinon personalizationColor disparaît (plus dans le modèle).
@@ -124,7 +140,13 @@ export function normalizeArticleProductOptions(raw, title = '') {
       sectionTitle: '',
     }
   }
-  const templateId = String(raw.templateId || suggestTemplateIdFromTitle(title) || '').trim()
+  let templateId = String(raw.templateId || suggestTemplateIdFromTitle(title) || '').trim()
+
+  // Force gobelet plastique → modèle à l’unité (évite le barème 9,90 € des verres).
+  if (isGobeletPlastiqueArticle({ id: '', title, productOptions: raw }) && templateId !== 'gobelet-bapteme') {
+    templateId = 'gobelet-bapteme'
+  }
+
   const template = getProductOptionTemplate(templateId)
   const templateFields = template?.fields || []
 
@@ -139,7 +161,7 @@ export function normalizeArticleProductOptions(raw, title = '') {
       ? rawEnabled.filter((id) => templateFields.includes(id) && id !== 'eyeColor')
       : [...templateFields]
 
-  if (rawEnabled.length > 0 || FORCE_FULL_OPTION_TEMPLATES.has(templateId)) {
+  if (rawEnabled.length > 0 || FORCE_FULL_OPTION_TEMPLATES.has(templateId) || templateId === 'gobelet-bapteme') {
     enabledFields = ensureTemplateFields(templateId, enabledFields, templateFields)
   }
 
@@ -161,17 +183,8 @@ export function getArticleProductOptionsConfig(article) {
   const normalized = normalizeArticleProductOptions(article?.productOptions, article?.title)
   if (!normalized.active) return normalized
 
-  const title = String(article?.title || '')
-  const id = String(article?.id || '')
-  // Tout « gobelet » (plastique) = prix catalogue à l’unité — jamais le barème verres 9,90 €.
-  const isGobeletPlastique =
-    id === 'bapteme-communion-002' ||
-    id === 'personnalisation-009' ||
-    id === 'evt-bapteme-gobelet' ||
-    (/\bgobelet\b/i.test(title) && !/verre communion|gobelet.*communion colombes/i.test(title))
-
-  // Gobelet plastique : toujours le tarif à l’unité (pas le barème verres à 9,90 €).
-  if (isGobeletPlastique && normalized.templateId !== 'gobelet-bapteme') {
+  // Double filet : gobelet → modèle à l’unité même si l’admin a choisi « verres ».
+  if (isGobeletPlastiqueArticle(article) && normalized.templateId !== 'gobelet-bapteme') {
     return normalizeArticleProductOptions(
       {
         ...normalized,

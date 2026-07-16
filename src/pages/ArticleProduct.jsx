@@ -29,6 +29,7 @@ import {
 import {
   getArticleProductOptionsConfig,
   isProductOptionsActive,
+  isGobeletPlastiqueArticle,
   resolveProductOptionsSectionTitle,
 } from '../lib/articleProductOptions'
 import {
@@ -162,7 +163,9 @@ export default function ArticleProduct() {
   const optionTemplate = advancedOptionsActive
     ? getProductOptionTemplate(productOptionsConfig.templateId)
     : null
+  const forceGobeletUnit = article ? isGobeletPlastiqueArticle(article) : false
   const useCatalogBasePrice =
+    forceGobeletUnit ||
     optionTemplate?.pricingMode === 'unitQuantity' ||
     productOptionsConfig?.templateId === 'gobelet-bapteme'
   const displayPrice =
@@ -232,7 +235,7 @@ export default function ArticleProduct() {
     addItem({
       id: cartId,
       title: article.title,
-      price: useCatalogBasePrice ? basePrice : unitPrice,
+      price: useCatalogBasePrice || forceGobeletUnit ? basePrice : unitPrice,
       parcelTier: article.parcelTier,
       imageUrl: mainPhoto,
       path: productPath,
@@ -412,12 +415,14 @@ export default function ArticleProduct() {
                       Prix à l&apos;unité
                     </span>
                   ) : null}
-                  {advancedOptionsActive && productOptionsConfig.templateId === 'gobelet-bapteme' ? (
+                  {advancedOptionsActive &&
+                  (forceGobeletUnit || productOptionsConfig.templateId === 'gobelet-bapteme') ? (
                     <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
                       Prix à l&apos;unité
                     </span>
                   ) : null}
                   {advancedOptionsActive &&
+                  !forceGobeletUnit &&
                   productOptionsConfig.templateId !== 'gobelet-bapteme' &&
                   (productOptionsConfig.templateId === 'verres-personnalises' ||
                     productOptionsConfig.templateId === 'verre-communion') ? (
