@@ -88,8 +88,8 @@ export const PAGE_BANNER_FALLBACKS = {
     photoKey: 'bouquetSoft',
   },
   '/contact': {
-    title: 'Nous contacter',
-    subtitle: 'Parlons de votre projet',
+    title: '',
+    subtitle: '',
     photoKey: 'peonies',
   },
   '/paiement': {
