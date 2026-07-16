@@ -18,16 +18,14 @@ export function articleDisplayFingerprint(item) {
   return `id:${String(item?.id || '')}`
 }
 
-/** Article visible dans les grilles (photo uploadée, description, ou clé photo + prix). */
+/** Article visible dans les grilles (titre + au moins une photo ou une description). */
 export function isPublishableCatalogArticle(item) {
   const title = String(item?.title || '').trim()
   if (!title) return false
   const src = String(item?.src || '').trim()
   const desc = String(item?.description || '').trim()
-  if (src || desc) return true
   const photoKey = String(item?.photoKey || '').trim()
-  const price = Number(item?.price)
-  return Boolean(photoKey && Number.isFinite(price) && price > 0)
+  return Boolean(src || desc || photoKey)
 }
 
 /**

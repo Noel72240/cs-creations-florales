@@ -88,13 +88,12 @@ function dedupeItemsByFingerprint(items) {
 }
 
 /**
- * Nettoie les articles éditables / affichés :
- * - vide les aperçus hub (doublons evt-* / sai-*),
- * - retire les articles hub-only et les fantômes à 0 €,
- * - déduplique par photo (src),
- * - corrige les prix et modèles connus depuis le catalogue par défaut.
+ * Nettoie les articles éditables / affichés.
+ * @param {object} pageArticles
+ * @param {{ forDisplay?: boolean }} [options] — forDisplay=false conserve les brouillons admin à l’enregistrement.
  */
-export function sanitizePageArticles(pageArticles) {
+export function sanitizePageArticles(pageArticles, options = {}) {
+  const forDisplay = options.forDisplay !== false
   if (!pageArticles || typeof pageArticles !== 'object') return pageArticles
 
   const defaults = buildDefaultArticleIndex()
@@ -116,14 +115,18 @@ export function sanitizePageArticles(pageArticles) {
         .filter((item) => {
           if (!item?.id || isHubOnlyArticleId(item.id)) return false
           if (pageKey === 'feteDesGrandesMeres' && shouldDropFromGrandesMeres(item)) return false
-          if (!isPublishableCatalogArticle(item)) return false
 
-          const storedPrice = normalizeArticlePrice(item.price)
-          const hasDefault = defaults.has(String(item.id))
-          const hasPhoto =
-            Boolean(String(item.src || '').trim()) || Boolean(String(item.photoKey || '').trim())
-          // Ne pas masquer les créations à 0 € si une photo (fichier ou clé) est présente.
-          if (storedPrice === 0 && !hasDefault && !hasPhoto) return false
+          if (forDisplay) {
+            if (!isPublishableCatalogArticle(item)) return false
+
+            const storedPrice = normalizeArticlePrice(item.price)
+            const hasDefault = defaults.has(String(item.id))
+            const hasPhoto =
+              Boolean(String(item.src || '').trim()) || Boolean(String(item.photoKey || '').trim())
+            if (storedPrice === 0 && !hasDefault && !hasPhoto) return false
+          } else if (!String(item?.title || '').trim()) {
+            return false
+          }
 
           return true
         })

@@ -57,7 +57,7 @@ function stripMotoAdminHints(moto) {
   }
 }
 
-export function getMergedContent(overrides) {
+export function getMergedContent(overrides, { forPersist = false } = {}) {
   const raw = JSON.parse(JSON.stringify(SITE_CONTENT_DEFAULTS))
   const merged = deepMerge(raw, overrides || {})
   const titleLine2 = merged.home?.hero?.titleLine2
@@ -75,9 +75,10 @@ export function getMergedContent(overrides) {
     merged.home.moto = stripMotoAdminHints(merged.home.moto)
   }
   if (merged.pageArticles) {
-    merged.pageArticles = enrichPageArticlesProductOptions(
-      normalizeAllPageArticleIds(sanitizePageArticles(merged.pageArticles)),
+    const normalized = normalizeAllPageArticleIds(
+      sanitizePageArticles(merged.pageArticles, { forDisplay: !forPersist }),
     )
+    merged.pageArticles = forPersist ? normalized : enrichPageArticlesProductOptions(normalized)
   }
   return merged
 }
@@ -138,7 +139,7 @@ export function SiteContentProvider({ children }) {
         overridesRef.current = next
         setOverrides(next)
       }
-      const r = await upsertSiteContentPayload(getMergedContent(next))
+      const r = await upsertSiteContentPayload(getMergedContent(next, { forPersist: true }))
       if (!r.ok && import.meta.env.DEV) {
         console.warn('[SiteContent] sync Supabase:', r.error)
       }
