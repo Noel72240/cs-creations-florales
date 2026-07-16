@@ -1698,6 +1698,13 @@ h1, h2, h3, h4 {
   padding: 1.25rem 1.5rem;
 }
 
+.img-overlay .overlay.overlay--bottom-center {
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
 /* Intro split (ex. Personnalisation) — même densité que « Qui suis-je » */
 .page-intro-section--split .page-intro-copy--split {
   display: flex;

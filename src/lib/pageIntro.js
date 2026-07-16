@@ -13,7 +13,7 @@ export const PAGE_INTRO_DEFAULTS = {
       src: '/images/personnalisation/trousse-personnalisee.png',
       photoKey: '',
       overlayTitle: 'Création sur mesure',
-      overlayPosition: 'bottom-right',
+      overlayPosition: 'bottom-center',
       alt: 'Trousse personnalisée — exemple de création sur mesure',
     },
     cta: { enabled: true, label: 'Demander une personnalisation', path: '/contact' },
@@ -147,8 +147,10 @@ export const PAGE_INTRO_DEFAULTS = {
 }
 
 function normalizeOverlayPosition(raw, fallback = 'centered') {
-  if (raw === 'bottom-left' || raw === 'bottom-right' || raw === 'centered') return raw
-  if (fallback === 'bottom-left' || fallback === 'bottom-right' || fallback === 'centered') return fallback
+  if (raw === 'bottom-left' || raw === 'bottom-right' || raw === 'bottom-center' || raw === 'centered') return raw
+  if (fallback === 'bottom-left' || fallback === 'bottom-right' || fallback === 'bottom-center' || fallback === 'centered') {
+    return fallback
+  }
   return 'centered'
 }
 
@@ -191,9 +193,9 @@ export function normalizePageIntro(raw, pageKey, options = {}) {
       imageRaw.overlayPosition,
       base.image?.overlayPosition || 'centered',
     )
-    // Ancien défaut personnalisation : bas gauche → bas droite.
-    if (pageKey === 'personnalisation' && overlayPosition === 'bottom-left') {
-      overlayPosition = 'bottom-right'
+    // Personnalisation : texte sur la photo en bas au centre.
+    if (pageKey === 'personnalisation') {
+      overlayPosition = 'bottom-center'
     }
     image = {
       src: String(imageRaw.src ?? base.image?.src ?? '').trim(),

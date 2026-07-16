@@ -15,6 +15,7 @@ function resolveIntroImage(intro) {
 function overlayClass(position) {
   if (position === 'bottom-left') return 'overlay overlay--bottom-left'
   if (position === 'bottom-right') return 'overlay overlay--bottom-right'
+  if (position === 'bottom-center') return 'overlay overlay--bottom-center'
   return 'overlay overlay--centered'
 }
 
