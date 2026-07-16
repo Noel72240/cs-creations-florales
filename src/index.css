@@ -1140,6 +1140,25 @@ main.site-main .article-catalog-section {
   justify-content: center;
 }
 
+/* Affiche déjà écrite (ex. Contact) : image entière, sans recadrage cover. */
+.page-header--image-only {
+  min-height: 0;
+  padding: 0 !important;
+  display: block;
+  background: #f7eef2;
+}
+
+.page-header__full-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 /* Sous-titre bandeau — sous le titre, plus discret */
 .page-header__subtitle {
   font-family: var(--font-body);
@@ -2794,7 +2813,7 @@ button.nav-link.nav-link-header {
 
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
-  .page-header--responsive.page-header--image {
+  .page-header--responsive.page-header--image:not(.page-header--image-only) {
     min-height: clamp(16rem, 62vw, 20rem);
   }
 
