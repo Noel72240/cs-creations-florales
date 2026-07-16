@@ -31,7 +31,7 @@ function isGobeletPlastiqueArticle(item) {
   const id = String(item?.id || '')
   if (GOBELET_ARTICLE_IDS.has(id)) return true
   const title = String(item?.title || '')
-  return /gobelet.*(plastique|bapt)/i.test(title) && !/communion colombes|verre communion/i.test(title)
+  return /\bgobelet\b/i.test(title) && !/verre communion|gobelet.*communion colombes/i.test(title)
 }
 
 function repairProductOptions(item) {

@@ -163,11 +163,12 @@ export function getArticleProductOptionsConfig(article) {
 
   const title = String(article?.title || '')
   const id = String(article?.id || '')
+  // Tout « gobelet » (plastique) = prix catalogue à l’unité — jamais le barème verres 9,90 €.
   const isGobeletPlastique =
     id === 'bapteme-communion-002' ||
     id === 'personnalisation-009' ||
     id === 'evt-bapteme-gobelet' ||
-    (/gobelet.*(plastique|bapt|doré)/i.test(title) && !/communion colombes|verre communion/i.test(title))
+    (/\bgobelet\b/i.test(title) && !/verre communion|gobelet.*communion colombes/i.test(title))
 
   // Gobelet plastique : toujours le tarif à l’unité (pas le barème verres à 9,90 €).
   if (isGobeletPlastique && normalized.templateId !== 'gobelet-bapteme') {

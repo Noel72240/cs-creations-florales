@@ -418,6 +418,7 @@ export default function ArticleProduct() {
                     </span>
                   ) : null}
                   {advancedOptionsActive &&
+                  productOptionsConfig.templateId !== 'gobelet-bapteme' &&
                   (productOptionsConfig.templateId === 'verres-personnalises' ||
                     productOptionsConfig.templateId === 'verre-communion') ? (
                     <span className="block text-xs font-body font-normal mt-0.5" style={{ color: 'var(--text-mid)' }}>
