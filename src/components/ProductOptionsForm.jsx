@@ -93,7 +93,9 @@ export default function ProductOptionsForm({
           <div key={field.id} className="product-options-form__field">
             <label htmlFor={field.type === 'color' || field.type === 'colorMulti' ? undefined : fieldId} className="block">
               <span className="text-sm font-medium mb-0.5 block" style={{ color: 'var(--violet)' }}>
-                {field.label}
+                {templateId === 'box-florale' && field.id === 'bagColorExtended'
+                  ? 'Couleur du support'
+                  : field.label}
                 {field.required ? ' *' : ''}
               </span>
 

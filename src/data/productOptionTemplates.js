@@ -114,11 +114,11 @@ export const PRODUCT_OPTION_TEMPLATES = {
     label: 'Box / boîte florale',
     fields: [
       'bagColorExtended',
-      'smallRoseColor',
-      'largeRoseColorMax3',
       'personalizationYesNo',
       'personalizationTextIfYes',
       'textColor',
+      'smallRoseColor',
+      'largeRoseColorMax3',
       'largeFlowerColor',
       'flowerSelectMax2',
       'pearlYesNo',
@@ -204,32 +204,32 @@ export const PRODUCT_OPTION_TEMPLATES = {
   'tracteur-floral': {
     id: 'tracteur-floral',
     label: 'Tracteur floral',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'specialRequests'],
   },
   'ourson-sur-plaque': {
     id: 'ourson-sur-plaque',
     label: 'Ourson sur plaque florale',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'specialRequests'],
   },
   'coeur-sur-plaque': {
     id: 'coeur-sur-plaque',
     label: 'Cœur sur plaque florale',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'specialRequests'],
   },
   'couronne-deuil': {
     id: 'couronne-deuil',
     label: 'Couronne florale de deuil',
-    fields: ['roseColorMax3', 'candleMessageYesNo', 'candleMessageText', 'personalizationColor', 'specialRequests'],
+    fields: ['roseColorMax3', 'candleMessageYesNo', 'candleMessageText', 'textColor', 'specialRequests'],
   },
   'jardin-souvenir': {
     id: 'jardin-souvenir',
     label: 'Jardin du Souvenir',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'gateMaterial', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'gateMaterial', 'specialRequests'],
   },
   'lapin-paques': {
     id: 'lapin-paques',
     label: 'Lapin de Pâques floral',
-    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'personalizationColor', 'paquesDecorationsText', 'specialRequests'],
+    fields: ['roseColorMax3', 'plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor', 'paquesDecorationsText', 'specialRequests'],
   },
 }
 

@@ -1818,7 +1818,11 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       localItems.slice(0, MAX_PAGE_ARTICLES).map((it) => ({
       id: String(it.id || '').trim() || `id-${Date.now()}`,
       title: String(it.title || '').trim(),
-      description: String(it.description || '').trim(),
+      description: String(it.description || '')
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+$/gm, '')
+        .replace(/^\n+/, '')
+        .replace(/\n+$/, ''),
       price: normalizeArticlePrice(it.price),
       photoKey: String(it.photoKey || 'weddingBouquet').trim() || 'weddingBouquet',
       src: String(it.src || '').trim(),
@@ -2325,9 +2329,9 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
               <label className="block sm:col-span-2">
                 Description
                 <span className="block text-[11px] font-normal mt-0.5 opacity-80">
-                  Mettez un mot en gras avec <code className="text-[10px] bg-white/70 px-1 rounded">**comme ceci**</code>
+                  Les espaces et lignes vides sont conservés. Gras : <code className="text-[10px] bg-white/70 px-1 rounded">**comme ceci**</code>
                 </span>
-                <textarea className="form-field mt-1" rows={3} value={it.description || ''} onChange={(e) => setField(idx, 'description', e.target.value)} />
+                <textarea className="form-field mt-1" rows={5} value={it.description || ''} onChange={(e) => setField(idx, 'description', e.target.value)} />
               </label>
               <label className="block">
                 Prix (€)

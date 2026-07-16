@@ -133,7 +133,7 @@ export default function PageIntroSection({ pageKey }) {
           <>
             {headerBlock}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div className="img-overlay rounded-2xl page-intro-photo order-2 md:order-1" style={{ minHeight: '300px' }}>
+              <div className="img-overlay rounded-2xl page-intro-photo order-2 md:order-1">
                 <img
                   src={imageUrl}
                   alt={intro.image?.alt || intro.title || 'Illustration'}

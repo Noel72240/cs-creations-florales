@@ -48,7 +48,16 @@ export function resolveProductOptionsSectionTitle(config, title = '') {
 /** Assure les champs clés présents (ex. couleur du texte) même si l’admin avait une liste partielle. */
 function ensureTemplateFields(templateId, enabledFields, templateFields) {
   let ids = enabledFields.map((id) =>
-    templateId === 'croix-florale' && id === 'personalizationColor' ? 'textColor' : id,
+    (templateId === 'croix-florale' ||
+      templateId === 'coeur-sur-plaque' ||
+      templateId === 'tracteur-floral' ||
+      templateId === 'ourson-sur-plaque' ||
+      templateId === 'couronne-deuil' ||
+      templateId === 'jardin-souvenir' ||
+      templateId === 'lapin-paques') &&
+    id === 'personalizationColor'
+      ? 'textColor'
+      : id,
   )
 
   const ensure = (fieldId) => {
@@ -57,9 +66,14 @@ function ensureTemplateFields(templateId, enabledFields, templateFields) {
 
   if (templateId === 'box-florale' || templateId === 'boite-mouchoirs' || templateId === 'ecrin-floral') {
     ensure('textColor')
+    ensure('personalizationYesNo')
+    ensure('personalizationTextIfYes')
   }
   if (
     templateId === 'croix-florale' ||
+    templateId === 'coeur-sur-plaque' ||
+    templateId === 'coeur-plaque-acrylique' ||
+    templateId === 'coeur-plaque-bois' ||
     templateId === 'verre-communion' ||
     templateId === 'gobelet-bapteme' ||
     templateId === 'verres-personnalises'

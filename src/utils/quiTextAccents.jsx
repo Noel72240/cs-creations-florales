@@ -29,10 +29,16 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
       {content}
     </span>
   )
+  const wrapPlace = (content, k) => (
+    <span key={k} className="qui-inline-place">
+      {content}
+    </span>
+  )
 
   const highlightTerms = [fn, ...brands, ...places].filter(Boolean).sort((a, b) => b.length - a.length)
   if (!highlightTerms.length) return str
 
+  const placeSet = new Set(places.map((p) => p.toLowerCase()))
   const re = new RegExp(`(${highlightTerms.map(escapeRegExp).join('|')})`, 'gi')
   const nodes = []
   let key = 0
@@ -43,7 +49,12 @@ export function renderQuiParagraphAccents(text, firstName, extraBrandPhrases = [
     if (match.index > last) {
       nodes.push(str.slice(last, match.index))
     }
-    nodes.push(wrapBrand(match[0], key++))
+    const hit = match[0]
+    if (placeSet.has(hit.toLowerCase())) {
+      nodes.push(wrapPlace(hit, key++))
+    } else {
+      nodes.push(wrapBrand(hit, key++))
+    }
     last = match.index + match[0].length
   }
   if (last < str.length) nodes.push(str.slice(last))
