@@ -4,20 +4,30 @@ import {
   getProductOptionTemplate,
   suggestTemplateIdFromTitle,
 } from '../../data/productOptionTemplates'
-import { normalizeArticleProductOptions, getDefaultProductOptionsSectionTitle } from '../../lib/articleProductOptions'
+import {
+  normalizeArticleProductOptions,
+  getDefaultProductOptionsSectionTitle,
+  getLockedOptionFieldIds,
+} from '../../lib/articleProductOptions'
 
 export default function ArticleProductOptionsEditor({ config, title, onChange }) {
   const normalized = normalizeArticleProductOptions(config, title)
   const template = getProductOptionTemplate(normalized.templateId)
   const templateFields = template?.fields || []
   const enabledSet = new Set(normalized.enabledFields)
+  const lockedFields = new Set(getLockedOptionFieldIds(normalized.templateId))
 
   const setPartial = (patch) => onChange({ ...normalized, ...patch })
 
   const toggleField = (fieldId) => {
+    if (lockedFields.has(fieldId)) return
     const set = new Set(enabledSet)
     if (set.has(fieldId)) set.delete(fieldId)
     else set.add(fieldId)
+    // Toujours conserver les champs verrouillés.
+    for (const id of lockedFields) {
+      if (templateFields.includes(id)) set.add(id)
+    }
     setPartial({ enabledFields: [...set] })
   }
 
@@ -128,10 +138,18 @@ export default function ArticleProductOptionsEditor({ config, title, onChange })
                       className="rounded-lg border border-mauve-light/25 px-3 py-2 space-y-2"
                       style={{ background: 'rgba(255,255,255,0.55)' }}
                     >
-                      <label className="flex items-center gap-2 text-xs cursor-pointer">
-                        <input type="checkbox" checked={checked} onChange={() => toggleField(fieldId)} />
+                      <label
+                        className={`flex items-center gap-2 text-xs ${lockedFields.has(fieldId) ? 'cursor-default' : 'cursor-pointer'}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked || lockedFields.has(fieldId)}
+                          disabled={lockedFields.has(fieldId)}
+                          onChange={() => toggleField(fieldId)}
+                        />
                         <span className="font-medium" style={{ color: 'var(--violet)' }}>
                           {def.label}
+                          {lockedFields.has(fieldId) ? ' (obligatoire)' : ''}
                         </span>
                       </label>
                       {checked && isColor ? (

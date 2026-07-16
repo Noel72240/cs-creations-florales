@@ -95,9 +95,21 @@ export default function ProductOptionsForm({
               <span className="text-sm font-medium mb-0.5 block" style={{ color: 'var(--violet)' }}>
                 {templateId === 'box-florale' && field.id === 'bagColorExtended'
                   ? 'Couleur du support'
-                  : (templateId === 'croix-florale' || templateId === 'coeur-sur-plaque') && field.id === 'textColor'
-                    ? 'Couleur du texte (plaque)'
-                    : field.label}
+                  : field.id === 'textColor' &&
+                      (templateId === 'croix-florale' ||
+                        templateId === 'coeur-sur-plaque' ||
+                        templateId === 'ourson-sur-plaque' ||
+                        templateId === 'tracteur-floral' ||
+                        templateId === 'jardin-souvenir' ||
+                        templateId === 'lapin-paques' ||
+                        templateId === 'camion-floral' ||
+                        templateId === 'moto-florale' ||
+                        templateId === 'papillon-floral' ||
+                        templateId === 'couronne-deuil')
+                    ? 'Couleur de la personnalisation'
+                    : field.id === 'textColor' && (templateId === 'box-florale' || templateId === 'boite-mouchoirs')
+                      ? 'Couleur du texte'
+                      : field.label}
                 {field.required ? ' *' : ''}
               </span>
 

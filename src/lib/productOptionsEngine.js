@@ -148,12 +148,67 @@ function sortOptionFieldIds(ids, templateFields = []) {
   })
 }
 
+/** Modèles où le formulaire client doit coller au cahier des charges (ignorer les listes admin incomplètes). */
+const FORCE_FULL_TEMPLATE_FIELDS = new Set([
+  'box-florale',
+  'boite-mouchoirs',
+  'ecrin-floral',
+  'croix-florale',
+  'coeur-sur-plaque',
+  'ourson-sur-plaque',
+  'tracteur-floral',
+  'jardin-souvenir',
+  'lapin-paques',
+  'couronne-deuil',
+])
+
+/** Couleur du texte uniquement si personnalisation / plaque = Oui (comme le cahier des charges). */
+function textColorShowWhenForTemplate(templateId) {
+  if (templateId === 'box-florale') {
+    return { field: 'personalizationYesNo', equals: 'oui' }
+  }
+  if (
+    templateId === 'croix-florale' ||
+    templateId === 'coeur-sur-plaque' ||
+    templateId === 'ourson-sur-plaque' ||
+    templateId === 'tracteur-floral' ||
+    templateId === 'jardin-souvenir' ||
+    templateId === 'lapin-paques' ||
+    templateId === 'camion-floral' ||
+    templateId === 'moto-florale' ||
+    templateId === 'papillon-floral'
+  ) {
+    return { field: 'plaqueAcryliqueYesNo', equals: 'oui' }
+  }
+  if (templateId === 'ecrin-floral') {
+    return { field: 'messagePersonalizationYesNo', equals: 'oui' }
+  }
+  if (templateId === 'couronne-deuil') {
+    return { field: 'candleMessageYesNo', equals: 'oui' }
+  }
+  return null
+}
+
+function remapLegacyPersonalizationColor(ids, templateFields) {
+  if (!templateFields.includes('textColor')) return ids
+  return ids.map((id) => (id === 'personalizationColor' ? 'textColor' : id))
+}
+
 export function resolveProductOptionFields(templateId, enabledFieldIds, fieldSettings = {}) {
   const template = getProductOptionTemplate(templateId)
   if (!template) return []
-  let ids = Array.isArray(enabledFieldIds) && enabledFieldIds.length
-    ? enabledFieldIds.filter((id) => template.fields.includes(id) && id !== 'eyeColor')
-    : [...template.fields]
+
+  // Ancien champ admin « personalizationColor » → textColor avant tout filtre.
+  const rawIds = remapLegacyPersonalizationColor(
+    Array.isArray(enabledFieldIds) ? enabledFieldIds : [],
+    template.fields,
+  )
+
+  let ids = FORCE_FULL_TEMPLATE_FIELDS.has(templateId)
+    ? [...template.fields]
+    : rawIds.length
+      ? rawIds.filter((id) => template.fields.includes(id) && id !== 'eyeColor')
+      : [...template.fields]
 
   // Champs indispensables toujours affichés (même si décochés dans une ancienne config admin).
   const forceOn = []
@@ -172,16 +227,23 @@ export function resolveProductOptionFields(templateId, enabledFieldIds, fieldSet
   for (const id of forceOn) {
     if (template.fields.includes(id) && !ids.includes(id)) ids.push(id)
   }
-  // Ancien champ « couleur personnalisation » → couleur du texte
-  ids = ids.map((id) => (id === 'personalizationColor' && template.fields.includes('textColor') ? 'textColor' : id))
-  ids = [...new Set(ids)]
+  ids = [...new Set(ids.filter((id) => id !== 'eyeColor'))]
 
   if (template.fields.includes('specialRequests') && !ids.includes('specialRequests')) {
     ids = [...ids, 'specialRequests']
   }
   ids = sortOptionFieldIds(ids, template.fields)
+
+  const textColorShowWhen = textColorShowWhenForTemplate(templateId)
   return ids
-    .map((id) => applyFieldSettings(getOptionFieldDef(id), fieldSettings[id]))
+    .map((id) => {
+      let def = applyFieldSettings(getOptionFieldDef(id), fieldSettings[id])
+      if (!def) return null
+      if (id === 'textColor' && textColorShowWhen) {
+        def = { ...def, showWhen: textColorShowWhen }
+      }
+      return def
+    })
     .filter(Boolean)
 }
 
