@@ -1,6 +1,6 @@
 /**
  * Mise en forme légère des descriptions article : **mot** → gras.
- * Le texte sans ** reste affiché tel quel.
+ * Lignes consécutives = bloc serré ; ligne(s) vide(s) = espace entre sections.
  */
 
 export function stripArticleDescriptionMarkup(text) {
@@ -31,4 +31,39 @@ export function ArticleDescriptionBlock({ text }) {
   if (!nodes.length) return <span>{raw}</span>
 
   return <>{nodes}</>
+}
+
+/**
+ * Découpe la description admin en blocs :
+ * - lignes non vides consécutives → un paragraphe serré (lignes séparées par <br>)
+ * - ligne(s) vide(s) → séparateur entre blocs
+ */
+export function splitArticleDescriptionSections(raw) {
+  const lines = String(raw || '')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map((line) => line.replace(/\s+$/g, ''))
+
+  const sections = []
+  let current = []
+
+  const flush = () => {
+    if (!current.length) return
+    sections.push({ type: 'block', lines: current })
+    current = []
+  }
+
+  for (const line of lines) {
+    if (line.trim() === '') {
+      flush()
+      if (sections.length && sections[sections.length - 1].type !== 'gap') {
+        sections.push({ type: 'gap' })
+      }
+    } else {
+      current.push(line)
+    }
+  }
+  flush()
+
+  return sections
 }

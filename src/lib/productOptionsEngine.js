@@ -154,6 +154,28 @@ export function resolveProductOptionFields(templateId, enabledFieldIds, fieldSet
   let ids = Array.isArray(enabledFieldIds) && enabledFieldIds.length
     ? enabledFieldIds.filter((id) => template.fields.includes(id) && id !== 'eyeColor')
     : [...template.fields]
+
+  // Champs indispensables toujours affichés (même si décochés dans une ancienne config admin).
+  const forceOn = []
+  if (template.fields.includes('textColor')) forceOn.push('textColor')
+  if (templateId === 'box-florale') {
+    forceOn.push('personalizationYesNo', 'personalizationTextIfYes', 'textColor')
+  }
+  if (
+    templateId === 'croix-florale' ||
+    templateId === 'coeur-sur-plaque' ||
+    templateId === 'tracteur-floral' ||
+    templateId === 'ourson-sur-plaque'
+  ) {
+    forceOn.push('plaqueAcryliqueYesNo', 'plaqueAcryliqueTextIfYes', 'textColor')
+  }
+  for (const id of forceOn) {
+    if (template.fields.includes(id) && !ids.includes(id)) ids.push(id)
+  }
+  // Ancien champ « couleur personnalisation » → couleur du texte
+  ids = ids.map((id) => (id === 'personalizationColor' && template.fields.includes('textColor') ? 'textColor' : id))
+  ids = [...new Set(ids)]
+
   if (template.fields.includes('specialRequests') && !ids.includes('specialRequests')) {
     ids = [...ids, 'specialRequests']
   }

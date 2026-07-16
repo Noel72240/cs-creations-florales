@@ -2329,7 +2329,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
               <label className="block sm:col-span-2">
                 Description
                 <span className="block text-[11px] font-normal mt-0.5 opacity-80">
-                  Les espaces et lignes vides sont conservés. Gras : <code className="text-[10px] bg-white/70 px-1 rounded">**comme ceci**</code>
+                  Une ligne = une ligne serrée. Une ligne vide = espace entre deux blocs (ex. caractéristiques /
+                  entretien / livraison). Gras : <code className="text-[10px] bg-white/70 px-1 rounded">**comme ceci**</code>
                 </span>
                 <textarea className="form-field mt-1" rows={5} value={it.description || ''} onChange={(e) => setField(idx, 'description', e.target.value)} />
               </label>

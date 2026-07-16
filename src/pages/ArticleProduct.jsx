@@ -14,7 +14,11 @@ import {
 import { resolveCatalogPageKey } from '../lib/articleHubAggregation'
 import { getArticlePhotoUrls } from '../lib/articlePhotos'
 import { resolveArticlePrice } from '../lib/articlePrices'
-import { ArticleDescriptionBlock, stripArticleDescriptionMarkup } from '../lib/articleDescription'
+import {
+  ArticleDescriptionBlock,
+  splitArticleDescriptionSections,
+  stripArticleDescriptionMarkup,
+} from '../lib/articleDescription'
 import { formatEuro } from '../utils/formatEuro'
 import ArticleColorSwatches, { normalizeHexColor } from '../components/ArticleColorSwatches'
 import { useSwipeIndex } from '../hooks/useSwipeIndex'
@@ -241,12 +245,9 @@ export default function ArticleProduct() {
     window.setTimeout(() => setAdded(false), 2200)
   }
 
-  // Conserve les lignes vides saisies dans l’admin (sauts de paragraphe).
-  const descriptionBlocks = String(article.description || '')
-    .replace(/\r\n/g, '\n')
-    .split('\n')
-    .map((line) => line.replace(/\s+$/g, ''))
-  const hasDescription = descriptionBlocks.some((line) => line.trim().length > 0)
+  // Blocs serrés (lignes collées) séparés par les lignes vides de l’admin.
+  const descriptionSections = splitArticleDescriptionSections(article.description)
+  const hasDescription = descriptionSections.some((s) => s.type === 'block')
 
   const lineTotal = unitPrice * (hideQtyStepper ? cartQuantity : quantity)
 
@@ -429,14 +430,17 @@ export default function ArticleProduct() {
               <div className="article-product-layout__desc order-3 lg:order-4">
                 {hasDescription ? (
                   <div className="article-product-description">
-                    {descriptionBlocks.map((block, i) =>
-                      block.trim() ? (
-                        <p key={i}>
-                          <ArticleDescriptionBlock text={block} />
-                        </p>
+                    {descriptionSections.map((section, i) =>
+                      section.type === 'gap' ? (
+                        <div key={`gap-${i}`} className="article-product-description__gap" aria-hidden="true" />
                       ) : (
-                        <p key={i} className="is-blank" aria-hidden="true">
-                          &nbsp;
+                        <p key={`block-${i}`} className="article-product-description__block">
+                          {section.lines.map((line, li) => (
+                            <span key={li}>
+                              {li > 0 ? <br /> : null}
+                              <ArticleDescriptionBlock text={line} />
+                            </span>
+                          ))}
                         </p>
                       ),
                     )}

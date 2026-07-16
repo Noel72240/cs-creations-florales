@@ -95,7 +95,9 @@ export default function ProductOptionsForm({
               <span className="text-sm font-medium mb-0.5 block" style={{ color: 'var(--violet)' }}>
                 {templateId === 'box-florale' && field.id === 'bagColorExtended'
                   ? 'Couleur du support'
-                  : field.label}
+                  : (templateId === 'croix-florale' || templateId === 'coeur-sur-plaque') && field.id === 'textColor'
+                    ? 'Couleur du texte (plaque)'
+                    : field.label}
                 {field.required ? ' *' : ''}
               </span>
 

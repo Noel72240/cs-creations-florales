@@ -245,7 +245,7 @@ export const TITLE_TO_OPTION_TEMPLATE = [
   { match: /boîte.*mouchoir|boite.*mouchoir/i, templateId: 'boite-mouchoirs' },
   { match: /plaque bienvenue|plaque « bienvenue/i, templateId: 'panneau-bienvenue' },
   { match: /sac noir|grand sac/i, templateId: 'grand-sac-floral' },
-  { match: /box florale|boîte florale|boite florale/i, templateId: 'box-florale' },
+  { match: /box florale|boîte florale|boite florale|\bbox\b/i, templateId: 'box-florale' },
   { match: /sac matelassé|sac blanc|sac bleu|petit sac|écrin blanc roses/i, templateId: 'petit-sac-floral' },
   { match: /lapin.*pâques|lapin pâques/i, templateId: 'lapin-paques' },
   { match: /plaque.*bois|suspension bois|cœur bois message|bonne fête maman|bonne fête mamie|bonne fête papa/i, templateId: 'coeur-plaque-bois' },

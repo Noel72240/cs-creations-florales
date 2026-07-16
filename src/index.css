@@ -2429,10 +2429,9 @@ button.nav-link.nav-link-header {
   text-align: center;
   font-family: var(--font-body);
   font-size: 0.875rem;
-  line-height: 1.65;
+  line-height: 1.45;
   letter-spacing: 0.02em;
   color: var(--text-elegant);
-  white-space: pre-wrap;
 }
 
 .article-product-description strong {
@@ -2446,17 +2445,14 @@ button.nav-link.nav-link-header {
   }
 }
 
-.article-product-description p {
-  margin: 0 0 0.65rem;
+/* Lignes d’un même bloc = serrées ; espace = ligne vide dans l’admin */
+.article-product-description__block {
+  margin: 0;
+  line-height: 1.4;
 }
 
-.article-product-description p:last-child {
-  margin-bottom: 0;
-}
-
-.article-product-description p.is-blank {
-  margin: 0 0 0.35rem;
-  min-height: 1rem;
+.article-product-description__gap {
+  height: 1.1rem;
 }
 
 @media (min-width: 1024px) {

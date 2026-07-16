@@ -10,7 +10,7 @@ export const PRODUCT_OPTION_FIELD_CATALOG = {
   personalizationText: { id: 'personalizationText', type: 'textarea', label: 'Personnalisation', placeholder: 'Prénom, date ou message…', required: true },
   personalizationYesNo: { id: 'personalizationYesNo', type: 'yesNo', label: 'Personnalisation', required: true },
   personalizationTextIfYes: { id: 'personalizationTextIfYes', type: 'textarea', label: 'Votre message', placeholder: 'Prénom, date ou message…', showWhen: { field: 'personalizationYesNo', equals: 'oui' }, required: true },
-  personalizationColor: { id: 'personalizationColor', type: 'color', label: 'Couleur de la personnalisation', palette: 'text', required: true },
+  personalizationColor: { id: 'personalizationColor', type: 'color', label: 'Couleur du texte', palette: 'text', required: true },
   specialRequests: { id: 'specialRequests', type: 'textarea', label: 'Vos souhaits / Demandes particulières', placeholder: 'Thème, décorations, fleurs…', required: false },
   glassQuantity: { id: 'glassQuantity', type: 'number', label: 'Quantité', min: 1, max: 999, required: true, pricing: 'glassTier' },
   chiffreNumber: { id: 'chiffreNumber', type: 'text', label: 'Nombre à réaliser', placeholder: 'Ex. : 18, 2026…', required: true, pricing: 'chiffreDigits' },
