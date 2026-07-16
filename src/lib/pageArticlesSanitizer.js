@@ -50,10 +50,9 @@ function repairKnownArticle(item, defaults) {
     }
   }
 
-  // Gobelet plastique : toujours le prix catalogue (2,90), jamais le barème verres 9,90.
+  // Gobelet plastique : toujours 2,90 € (jamais le barème verres 9,90 ni un mauvais prix admin).
   if (isGobeletPlastiqueArticle(next)) {
-    const gobeletPrice = normalizeArticlePrice(def?.price)
-    next.price = gobeletPrice > 0 ? gobeletPrice : 2.9
+    next.price = 2.9
   }
 
   next.productOptions = repairProductOptions(next)
