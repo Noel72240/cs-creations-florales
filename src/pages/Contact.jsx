@@ -25,9 +25,19 @@ export default function Contact() {
     [contactInfo.addressLine, contactInfo.availability, site.email, site.phoneDisplay, site.phoneHref],
   )
 
-  const [form, setForm] = useState({ nom: '', prenom: '', email: '', telephone: '', sujet: '', message: '', rgpd: false })
+  const [form, setForm] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    sujet: '',
+    message: '',
+    rgpd: false,
+    website: '',
+  })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const prefillMessage = location.state?.prefillMessage
   const prefillSujet = location.state?.prefillSujet
@@ -44,18 +54,39 @@ export default function Contact() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.rgpd) return
+    if (!form.rgpd || loading) return
     setLoading(true)
-    // Simulation d'envoi (à connecter à votre backend / Formspree / EmailJS)
-    setTimeout(() => {
-      setLoading(false)
+    setError('')
+    try {
+      const res = await fetch('/api/send-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prenom: form.prenom,
+          nom: form.nom,
+          email: form.email,
+          telephone: form.telephone,
+          sujet: form.sujet,
+          message: form.message,
+          rgpd: form.rgpd,
+          website: form.website,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Envoi impossible')
+      }
       setSubmitted(true)
-    }, 1200)
+    } catch (err) {
+      setError(err?.message || 'Envoi impossible. Réessayez ou appelez-nous.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -136,6 +167,20 @@ export default function Contact() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Honeypot anti-spam — ne pas remplir */}
+                  <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                    <label>
+                      Site web
+                      <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={form.website}
+                        onChange={handleChange}
+                      />
+                    </label>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="block font-refined text-base font-semibold tracking-wide mb-2" style={{ color: 'var(--mauve)' }}>Prénom *</label>
@@ -188,6 +233,12 @@ export default function Contact() {
                       </span>
                     </label>
                   </div>
+
+                  {error ? (
+                    <p className="font-body text-sm text-center" style={{ color: '#b42318' }} role="alert">
+                      {error}
+                    </p>
+                  ) : null}
 
                   <button type="submit" disabled={!form.rgpd || loading} className="btn-primary btn-contact-submit w-full py-3.5">
                     {loading ? 'Envoi en cours…' : 'Envoyer mon message ✿'}
