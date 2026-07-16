@@ -11,6 +11,7 @@ export default function FeteDesGrandesMeres() {
       intro="Les grands-mères ont une place unique dans nos cœurs. Pour la Fête des Grandes-Mères, je crée des compositions florales tendres et chaleureuses — cœurs gravés, bouquets délicats et créations durables — pour leur dire merci avec poésie et affection."
       articlePageKey="feteDesGrandesMeres"
       pagePath="/creations-saisonnieres/fete-des-grandes-meres"
+      headerClassName="page-header--subtitle-lower"
     />
   )
 }

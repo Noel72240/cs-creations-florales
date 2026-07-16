@@ -66,9 +66,9 @@ export const SITE_CONTENT_DEFAULTS = {
 
   /** Bandeaux Panier, Contact, Paiement (admin → onglet Contact). */
   pageBanners: {
-    '/panier': { title: '', subtitle: '', src: '', photoKey: '' },
-    '/contact': { title: '', subtitle: '', src: '', photoKey: '' },
-    '/paiement': { title: '', subtitle: '', src: '', photoKey: '' },
+    '/panier': { title: '', subtitle: '', src: '', photoKey: '', hideText: false },
+    '/contact': { title: '', subtitle: '', src: '', photoKey: '', hideText: true },
+    '/paiement': { title: '', subtitle: '', src: '', photoKey: '', hideText: false },
   },
 
   googleReviews: {

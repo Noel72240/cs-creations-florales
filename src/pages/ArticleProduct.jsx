@@ -212,7 +212,7 @@ export default function ArticleProduct() {
   const cannotAddToCart =
     missingColor ||
     missingPersonalizationMessage ||
-    (advancedOptionsActive && (!optionsValidation.valid || unitPrice <= 0))
+    (advancedOptionsActive && (!optionsValidation.valid || displayPrice <= 0))
 
   const handleAdd = () => {
     if (advancedOptionsActive && !optionsValidation.valid) {
@@ -232,7 +232,7 @@ export default function ArticleProduct() {
     addItem({
       id: cartId,
       title: article.title,
-      price: unitPrice,
+      price: useCatalogBasePrice ? basePrice : unitPrice,
       parcelTier: article.parcelTier,
       imageUrl: mainPhoto,
       path: productPath,

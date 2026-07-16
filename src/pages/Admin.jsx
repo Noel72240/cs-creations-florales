@@ -1595,6 +1595,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
     subtitle: current.banner?.subtitle || '',
     src: current.banner?.src || '',
     photoKey: current.banner?.photoKey || defaultBanner.photoKey || '',
+    hideText: Boolean(current.banner?.hideText),
   }))
   const [localItems, setLocalItems] = useState(() =>
     (current.items || [])
@@ -1648,6 +1649,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
       subtitle: next.banner?.subtitle || '',
       src: next.banner?.src || '',
       photoKey: next.banner?.photoKey || fallback.photoKey || '',
+      hideText: Boolean(next.banner?.hideText),
     })
     setLocalItems(
       (next.items || [])
@@ -1851,6 +1853,7 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
         subtitle: localBanner.subtitle.trim(),
         src: localBanner.src.trim(),
         photoKey: localBanner.photoKey.trim(),
+        hideText: Boolean(localBanner.hideText),
       },
       items,
       pageIntro: normalizePageIntro(localPageIntro, pageKey),
@@ -1967,28 +1970,39 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
             Bandeau (haut de page)
           </legend>
           <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-            Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez le titre vide pour garder le texte par défaut.
+            Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Les titres s’affichent en bas sur un bandeau pour
+            ne pas masquer vos créations. Cochez « Masquer les écritures » si votre photo contient déjà le texte.
           </p>
-          <div className="grid sm:grid-cols-2 gap-2">
-            <label className="block">
-              Titre
-              <input
-                className="form-field mt-1"
-                value={localBanner.title}
-                onChange={(e) => setLocalBanner((b) => ({ ...b, title: e.target.value }))}
-                placeholder={defaultBanner.title || 'ex. Anniversaire'}
-              />
-            </label>
-            <label className="block">
-              Sous-titre
-              <input
-                className="form-field mt-1"
-                value={localBanner.subtitle}
-                onChange={(e) => setLocalBanner((b) => ({ ...b, subtitle: e.target.value }))}
-                placeholder={defaultBanner.subtitle || 'ex. Événements floraux'}
-              />
-            </label>
-          </div>
+          <label className="flex items-center gap-2 text-xs cursor-pointer">
+            <input
+              type="checkbox"
+              checked={Boolean(localBanner.hideText)}
+              onChange={(e) => setLocalBanner((b) => ({ ...b, hideText: e.target.checked }))}
+            />
+            <span>Masquer titre et sous-titre (affiche déjà écrite)</span>
+          </label>
+          {!localBanner.hideText ? (
+            <div className="grid sm:grid-cols-2 gap-2">
+              <label className="block">
+                Titre
+                <input
+                  className="form-field mt-1"
+                  value={localBanner.title}
+                  onChange={(e) => setLocalBanner((b) => ({ ...b, title: e.target.value }))}
+                  placeholder={defaultBanner.title || 'ex. Anniversaire'}
+                />
+              </label>
+              <label className="block">
+                Sous-titre
+                <input
+                  className="form-field mt-1"
+                  value={localBanner.subtitle}
+                  onChange={(e) => setLocalBanner((b) => ({ ...b, subtitle: e.target.value }))}
+                  placeholder={defaultBanner.subtitle || 'ex. Événements floraux'}
+                />
+              </label>
+            </div>
+          ) : null}
           <div className="flex flex-wrap items-center gap-2">
             <label className="btn-primary text-xs py-2 px-4 cursor-pointer">
               Choisir une photo
@@ -2642,11 +2656,13 @@ function normalizeUtilityPageBanners(initial = {}) {
   const out = {}
   for (const { path } of UTILITY_PAGE_BANNERS) {
     const row = initial?.[path] || {}
+    const hideTextDefault = path === '/contact'
     out[path] = {
       title: String(row.title || '').trim(),
       subtitle: String(row.subtitle || '').trim(),
       src: String(row.src || '').trim(),
       photoKey: String(row.photoKey || '').trim(),
+      hideText: row.hideText == null ? hideTextDefault : Boolean(row.hideText),
     }
   }
   return out
@@ -2688,8 +2704,8 @@ function UtilityPageBannersEditor({ initial, onDraftChange, setMsg }) {
         Bandeaux (Panier, Contact, Paiement)
       </legend>
       <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-        Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez titre et sous-titre vides pour garder le texte par défaut
-        (sur le panier, le sous-titre affiche le nombre d’articles si vous ne le remplissez pas).
+        Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Sur Contact, les écritures sont masquées par défaut
+        pour laisser place à votre affiche. Cochez « Afficher titre / sous-titre » si besoin.
       </p>
       {UTILITY_PAGE_BANNERS.map(({ path, label }) => {
         const row = banners[path] || {}
@@ -2707,26 +2723,40 @@ function UtilityPageBannersEditor({ initial, onDraftChange, setMsg }) {
             <h3 className="text-sm font-medium" style={{ color: 'var(--violet)' }}>
               {label}
             </h3>
-            <div className="grid sm:grid-cols-2 gap-2">
-              <label className="block text-xs">
-                Titre
-                <input
-                  className="form-field mt-1"
-                  value={row.title}
-                  onChange={(e) => updateBanner(path, { title: e.target.value })}
-                  placeholder={defaultBanner.title || label}
-                />
-              </label>
-              <label className="block text-xs">
-                Sous-titre
-                <input
-                  className="form-field mt-1"
-                  value={row.subtitle}
-                  onChange={(e) => updateBanner(path, { subtitle: e.target.value })}
-                  placeholder={defaultBanner.subtitle || ''}
-                />
-              </label>
-            </div>
+            <label className="flex items-center gap-2 text-xs cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!row.hideText}
+                onChange={(e) => updateBanner(path, { hideText: !e.target.checked })}
+              />
+              <span>Afficher titre et sous-titre sur le bandeau</span>
+            </label>
+            {!row.hideText ? (
+              <div className="grid sm:grid-cols-2 gap-2">
+                <label className="block text-xs">
+                  Titre
+                  <input
+                    className="form-field mt-1"
+                    value={row.title}
+                    onChange={(e) => updateBanner(path, { title: e.target.value })}
+                    placeholder={defaultBanner.title || label}
+                  />
+                </label>
+                <label className="block text-xs">
+                  Sous-titre
+                  <input
+                    className="form-field mt-1"
+                    value={row.subtitle}
+                    onChange={(e) => updateBanner(path, { subtitle: e.target.value })}
+                    placeholder={defaultBanner.subtitle || ''}
+                  />
+                </label>
+              </div>
+            ) : (
+              <p className="text-[11px]" style={{ color: 'var(--text-mid)' }}>
+                Titres masqués — idéal si votre photo contient déjà le texte.
+              </p>
+            )}
             <label className="block text-xs">
               Photo par défaut (catalogue)
               <select

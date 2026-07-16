@@ -161,6 +161,26 @@ export function getArticleProductOptionsConfig(article) {
   const normalized = normalizeArticleProductOptions(article?.productOptions, article?.title)
   if (!normalized.active) return normalized
 
+  const title = String(article?.title || '')
+  const id = String(article?.id || '')
+  const isGobeletPlastique =
+    id === 'bapteme-communion-002' ||
+    id === 'personnalisation-009' ||
+    id === 'evt-bapteme-gobelet' ||
+    (/gobelet.*(plastique|bapt|doré)/i.test(title) && !/communion colombes|verre communion/i.test(title))
+
+  // Gobelet plastique : toujours le tarif à l’unité (pas le barème verres à 9,90 €).
+  if (isGobeletPlastique && normalized.templateId !== 'gobelet-bapteme') {
+    return normalizeArticleProductOptions(
+      {
+        ...normalized,
+        templateId: 'gobelet-bapteme',
+        enabledFields: [],
+      },
+      article?.title,
+    )
+  }
+
   // Si le titre indique box/croix/… mais qu’un mauvais modèle sans couleur texte est enregistré, corriger.
   const suggested = suggestTemplateIdFromTitle(article?.title)
   if (suggested && FORCE_FULL_OPTION_TEMPLATES.has(suggested) && normalized.templateId !== suggested) {
