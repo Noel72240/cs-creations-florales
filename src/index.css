@@ -1133,6 +1133,11 @@ main.site-main .article-catalog-section {
 
 .page-header--image {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
+  /* Bandeau plus haut : on voit la photo (plus un mince liseré coupé). */
+  min-height: clamp(18rem, 42vw, 26rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
@@ -2790,7 +2795,7 @@ button.nav-link.nav-link-header {
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
   .page-header--responsive.page-header--image {
-    min-height: 10.5rem;
+    min-height: clamp(16rem, 62vw, 20rem);
   }
 
   .page-header--responsive.page-header--image .section-subtitle {
