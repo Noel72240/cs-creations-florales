@@ -1133,51 +1133,25 @@ main.site-main .article-catalog-section {
 
 .page-header--image {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
-  min-height: 12.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-.page-header--image-only {
-  min-height: 14rem;
-}
-
-.page-header__caption--on-image {
-  width: 100%;
-  padding: 0.85rem 0 1rem;
-  background: linear-gradient(
-    to top,
-    rgba(32, 16, 30, 0.72) 0%,
-    rgba(32, 16, 30, 0.42) 70%,
-    transparent 100%
-  );
-}
-
-.page-header__caption--plain {
-  padding: 1rem 0 1.75rem;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
 .page-header__subtitle {
   font-family: var(--font-body);
-  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-size: clamp(0.95rem, 2.1vw, 1.2rem);
   font-weight: 400;
   letter-spacing: 0.02em;
-  line-height: 1.4;
+  line-height: 1.45;
   color: rgba(255, 255, 255, 0.92);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
 
-/* Sous-titre encore plus bas (ex. Saint-Valentin) */
-.page-header--subtitle-lower .page-header__caption--on-image {
-  padding-top: 1.5rem;
-  padding-bottom: 1.35rem;
-}
+/* Sous-titre descendu pour laisser la place à la phrase sur la photo (ex. Saint-Valentin) */
 .page-header--subtitle-lower .page-header__subtitle {
-  margin-top: 0.85rem;
+  margin-top: 1.65rem;
+}
+.page-header--subtitle-lower.page-header--responsive {
+  padding-top: 1.65rem;
 }
 
 .page-header--plain .page-header__subtitle {
@@ -2816,19 +2790,16 @@ button.nav-link.nav-link-header {
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
   .page-header--responsive.page-header--image {
-    min-height: 12rem;
+    min-height: 10.5rem;
   }
 
-  .page-header--responsive.page-header--image-only {
-    min-height: 13.5rem;
-  }
-
-  .page-header--responsive.page-header--image .page-header__subtitle {
-    font-size: clamp(0.88rem, 3.8vw, 1.05rem);
+  .page-header--responsive.page-header--image .section-subtitle {
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
+    margin-bottom: 0.5rem;
   }
 
   .page-header--responsive.page-header--image h1.font-heading {
-    font-size: clamp(1.45rem, 6vw, 1.95rem) !important;
+    font-size: clamp(1.85rem, 7.5vw, 2.35rem) !important;
     line-height: 1.15;
   }
 
