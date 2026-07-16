@@ -1757,11 +1757,11 @@ h1, h2, h3, h4 {
 
 .page-intro-section--split .page-intro-photo {
   aspect-ratio: 3 / 4;
-  max-height: min(22rem, 52vh);
+  max-height: min(26rem, 58vh);
   min-height: 0 !important;
   margin-inline: auto;
   width: 100%;
-  max-width: 18rem;
+  max-width: 21rem;
 }
 
 @media (min-width: 768px) {
@@ -1771,8 +1771,8 @@ h1, h2, h3, h4 {
   }
 
   .page-intro-section--split .page-intro-photo {
-    max-height: 20rem;
-    max-width: 16.5rem;
+    max-height: 24rem;
+    max-width: 20rem;
     justify-self: center;
   }
 }

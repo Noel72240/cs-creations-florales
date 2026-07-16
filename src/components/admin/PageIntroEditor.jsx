@@ -119,6 +119,9 @@ export default function PageIntroEditor({ pageKey, value, onChange, fileToSrc })
               <p className="text-xs font-medium" style={{ color: 'var(--violet)' }}>
                 Photo à droite (cadre gris)
               </p>
+              <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
+                Vous pouvez changer cette photo quand vous voulez : Parcourir… puis Enregistrer cette page.
+              </p>
               <label className="btn-outline text-xs py-2 px-4 cursor-pointer inline-block">
                 Parcourir…
                 <input
