@@ -1967,7 +1967,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
             Bandeau (haut de page)
           </legend>
           <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-            Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez le titre vide pour garder le texte par défaut.
+            Photo conseillée : <strong>1920 × 600 px</strong> (paysage, ratio 3,2:1). Fichier sans bande blanche/grise
+            autour — la photo doit aller jusqu’aux bords. Laissez le titre vide pour garder le texte par défaut.
           </p>
           <div className="grid sm:grid-cols-2 gap-2">
             <label className="block">
