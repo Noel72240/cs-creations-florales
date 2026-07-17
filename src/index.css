@@ -1140,10 +1140,25 @@ main.site-main .article-catalog-section {
   justify-content: center;
 }
 
-/* Affiche déjà écrite (Contact) : même largeur, hauteur adaptée au format de l’affiche. */
+/* Affiche déjà écrite (Contact) : image entière, pleine largeur, sans coupe. */
 .page-header--image-only {
+  min-height: 0 !important;
   padding: 0 !important;
-  background-color: #f4ebe8;
+  display: block;
+  background: transparent;
+  box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
+}
+
+.page-header__full-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: top;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .contact-banner-wrap {
@@ -1151,26 +1166,15 @@ main.site-main .article-catalog-section {
   margin: 0;
   padding: 0;
   line-height: 0;
+  overflow: hidden;
 }
 
-/* Contact : remplit bord à bord sans marges blanches (image déjà recadrée). */
 .page-header--contact.page-header--image-only {
-  min-height: 0;
   width: 100%;
-  aspect-ratio: 4.2 / 1;
-  max-height: min(28rem, 42vw);
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
-}
-
-@media (max-width: 639px) {
-  .page-header--contact.page-header--image-only {
-    aspect-ratio: 3.6 / 1;
-    max-height: none;
-    min-height: 9.5rem;
-  }
+  aspect-ratio: auto;
+  max-height: none;
+  min-height: 0 !important;
+  background-image: none !important;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
