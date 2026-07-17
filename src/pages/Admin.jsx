@@ -1967,8 +1967,8 @@ function PageArticlesEditor({ pageKey, setPageKey, pageArticles, save, setMsg, c
             Bandeau (haut de page)
           </legend>
           <p className="text-[11px] leading-snug" style={{ color: 'var(--text-mid)' }}>
-            Photo conseillée : <strong>1920 × 600 px</strong> (paysage, ratio 3,2:1). Fichier sans bande blanche/grise
-            autour — la photo doit aller jusqu’aux bords. Laissez le titre vide pour garder le texte par défaut.
+            Photo conseillée : paysage large (ex. <strong>1920 × 700–900 px</strong>). Affichée en entier sans
+            recadrage — évitez les bandes blanches/grises autour. Laissez le titre vide pour garder le texte par défaut.
           </p>
           <div className="grid sm:grid-cols-2 gap-2">
             <label className="block">
@@ -2689,7 +2689,7 @@ function UtilityPageBannersEditor({ initial, onDraftChange, setMsg }) {
         Bandeaux (Panier, Contact, Paiement)
       </legend>
       <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-        Photo conseillée : <strong>1920 × 600 px</strong> (paysage). Laissez titre et sous-titre vides pour garder le texte par défaut
+        Photo conseillée : paysage large (ex. <strong>1920 × 700–900 px</strong>), affichée en entier. Laissez titre et sous-titre vides pour garder le texte par défaut
         (sur le panier, le sous-titre affiche le nombre d’articles si vous ne le remplissez pas).
       </p>
       {UTILITY_PAGE_BANNERS.map(({ path, label }) => {

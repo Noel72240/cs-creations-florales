@@ -1,25 +1,36 @@
 export default function PageHeader({ title, subtitle, image, legal, className = '' }) {
   const hasText = Boolean(String(title || '').trim() || String(subtitle || '').trim())
+  const imageOnly = Boolean(image) && !hasText
 
   return (
     <div
-      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${!hasText && image ? ' page-header--image-only' : ' pt-6 pb-10 sm:pt-8 sm:pb-16'}${className ? ` ${className}` : ''}`}
-      style={
-        image
-          ? {
-              backgroundImage: hasText
-                ? `linear-gradient(to bottom, rgba(139,75,106,0.55), rgba(192,122,151,0.3)), url(${image})`
-                : `url(${image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }
-          : undefined
-      }
+      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${imageOnly ? ' page-header--image-only' : ''}${!image ? ' pt-6 pb-10 sm:pt-8 sm:pb-16' : ''}${className ? ` ${className}` : ''}`}
     >
+      {image ? (
+        <>
+          <img
+            src={image}
+            alt=""
+            className="page-header__full-image"
+            decoding="async"
+            draggable={false}
+          />
+          {hasText ? (
+            <div
+              className="page-header__image-veil"
+              aria-hidden="true"
+              style={{
+                background:
+                  'linear-gradient(to bottom, rgba(139,75,106,0.45), rgba(192,122,151,0.22))',
+              }}
+            />
+          ) : null}
+        </>
+      ) : null}
       {image && hasText ? <div className="page-header-shimmer" aria-hidden="true" /> : null}
       {hasText ? <div className="page-header-vignette" aria-hidden="true" /> : null}
       {hasText ? (
-        <div className="relative z-10 max-w-3xl mx-auto text-center px-4">
+        <div className="page-header__copy relative z-10 max-w-3xl mx-auto text-center px-4">
           {title ? (
             <h1
               className={`text-white drop-shadow-lg ${legal ? 'page-legal-header__title' : 'font-heading page-header__title'}`}
