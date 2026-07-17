@@ -1,7 +1,7 @@
 export default function PageHeader({ title, subtitle, image, legal, className = '' }) {
   return (
     <div
-      className={`page-header page-header--fx page-header--responsive pt-4 pb-7 sm:pt-5 sm:pb-10 relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${className ? ` ${className}` : ''}`}
+      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain pt-4 pb-7 sm:pt-5 sm:pb-10'}${className ? ` ${className}` : ''}`}
       style={
         image
           ? {
