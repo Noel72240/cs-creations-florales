@@ -1140,7 +1140,7 @@ main.site-main .article-catalog-section {
   justify-content: center;
 }
 
-/* Affiche déjà écrite (Contact) : même taille que les autres, sans voile / titre. */
+/* Affiche déjà écrite (Contact) : même largeur, hauteur adaptée au format de l’affiche. */
 .page-header--image-only {
   padding: 0 !important;
   background-color: #f4ebe8;
@@ -1151,6 +1151,26 @@ main.site-main .article-catalog-section {
   margin: 0;
   padding: 0;
   line-height: 0;
+}
+
+/* Contact : remplit bord à bord sans marges blanches (image déjà recadrée). */
+.page-header--contact.page-header--image-only {
+  min-height: 0;
+  width: 100%;
+  aspect-ratio: 4.2 / 1;
+  max-height: min(28rem, 42vw);
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
+}
+
+@media (max-width: 639px) {
+  .page-header--contact.page-header--image-only {
+    aspect-ratio: 3.6 / 1;
+    max-height: none;
+    min-height: 9.5rem;
+  }
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
