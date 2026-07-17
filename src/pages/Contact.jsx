@@ -91,9 +91,10 @@ export default function Contact() {
 
   return (
     <>
-      <div>
+      <div className="contact-banner-wrap">
         <ConfigurablePageHeader
           pagePath="/contact"
+          className="page-header--contact"
           fallback={{
             title: '',
             subtitle: '',
@@ -103,7 +104,7 @@ export default function Contact() {
         />
       </div>
 
-      <section className="contact-page py-10 px-4" style={{ background: 'var(--blanc)' }}>
+      <section className="contact-page pt-5 pb-10 px-4" style={{ background: 'var(--blanc)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Coordonnées */}

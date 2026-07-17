@@ -1145,7 +1145,7 @@ main.site-main .article-catalog-section {
   min-height: 0;
   padding: 0 !important;
   display: block;
-  background: #f7eef2;
+  background: transparent;
 }
 
 .page-header__full-image {
@@ -1157,6 +1157,37 @@ main.site-main .article-catalog-section {
   margin: 0 auto;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+/* Contact : moins de blanc autour / dans l’affiche (marges crème de l’image). */
+.contact-banner-wrap {
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+  background: #f4ebe8;
+}
+
+.page-header--contact.page-header--image-only {
+  overflow: hidden;
+  background: #f4ebe8;
+}
+
+.page-header--contact .page-header__full-image {
+  display: block;
+  width: 112%;
+  max-width: none;
+  height: auto;
+  /* Rogne légèrement les marges crème haut / bas / côtés. */
+  margin: -2.8% -6% -2.8% -6%;
+  transform: none;
+}
+
+@media (max-width: 639px) {
+  .page-header--contact .page-header__full-image {
+    width: 110%;
+    margin: -2% -5% -2% -5%;
+  }
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
