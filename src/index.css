@@ -1133,62 +1133,24 @@ main.site-main .article-catalog-section {
 
 .page-header--image {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
-  /* Bandeau plus haut : on voit la photo (plus un mince liseré coupé). */
+  /* Même hauteur pour tous les bandeaux photo (camion, contact, etc.). */
   min-height: clamp(18rem, 42vw, 26rem);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Affiche déjà écrite (ex. Contact) : image pleine largeur, sans marges. */
+/* Affiche déjà écrite (Contact) : même taille que les autres, sans voile / titre. */
 .page-header--image-only {
-  min-height: 0;
   padding: 0 !important;
-  display: block;
-  background: transparent;
+  background-color: #f4ebe8;
 }
 
-.page-header__full-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  object-position: center;
-  margin: 0;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* Contact : bandeau bord à bord, sans marge blanche. */
 .contact-banner-wrap {
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  width: 100%;
+  margin: 0;
   padding: 0;
   line-height: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.page-header--contact.page-header--image-only {
-  width: 100%;
-  margin: 0;
-  padding: 0 !important;
-  overflow: hidden;
-  background: transparent;
-  box-shadow: none;
-}
-
-.page-header--contact .page-header__full-image {
-  display: block;
-  width: 100%;
-  max-width: none;
-  height: auto;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: top;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
@@ -2845,7 +2807,7 @@ button.nav-link.nav-link-header {
 
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
-  .page-header--responsive.page-header--image:not(.page-header--image-only) {
+  .page-header--responsive.page-header--image {
     min-height: clamp(16rem, 62vw, 20rem);
   }
 

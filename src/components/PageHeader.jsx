@@ -1,29 +1,21 @@
 export default function PageHeader({ title, subtitle, image, legal, className = '' }) {
   const hasText = Boolean(String(title || '').trim() || String(subtitle || '').trim())
-  const imageOnly = Boolean(image) && !hasText
 
   return (
     <div
-      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${imageOnly ? ' page-header--image-only' : ' pt-4 pb-7 sm:pt-5 sm:pb-10'}${className ? ` ${className}` : ''}`}
+      className={`page-header page-header--fx page-header--responsive pt-4 pb-7 sm:pt-5 sm:pb-10 relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${!hasText && image ? ' page-header--image-only' : ''}${className ? ` ${className}` : ''}`}
       style={
-        image && hasText
+        image
           ? {
-              backgroundImage: `linear-gradient(to bottom, rgba(139,75,106,0.4), rgba(192,122,151,0.2)), url(${image})`,
+              backgroundImage: hasText
+                ? `linear-gradient(to bottom, rgba(139,75,106,0.4), rgba(192,122,151,0.2)), url(${image})`
+                : `url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }
           : undefined
       }
     >
-      {imageOnly ? (
-        <img
-          src={image}
-          alt=""
-          className="page-header__full-image"
-          decoding="async"
-          draggable={false}
-        />
-      ) : null}
       {image && hasText ? <div className="page-header-shimmer" aria-hidden="true" /> : null}
       {hasText ? <div className="page-header-vignette" aria-hidden="true" /> : null}
       {hasText ? (
