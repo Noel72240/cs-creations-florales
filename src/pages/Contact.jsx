@@ -95,8 +95,8 @@ export default function Contact() {
         <ConfigurablePageHeader
           pagePath="/contact"
           fallback={{
-            title: '',
-            subtitle: '',
+            title: 'Nous contacter',
+            subtitle: 'Parlons de votre projet',
             photoKey: 'peonies',
             image: w1200(P.peonies),
           }}

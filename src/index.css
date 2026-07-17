@@ -913,14 +913,9 @@ main.site-main .mt-10 {
 main.site-main .gap-12 {
   gap: 1.75rem;
 }
-/* Bandeaux : padding d’origine (13 juil.), pas le rythme resserré. */
 main.site-main .page-header--responsive {
-  padding-top: 1.5rem;
-  padding-bottom: 2.5rem;
-}
-main.site-main .page-header--responsive.page-header--image-only {
-  padding-top: 0;
-  padding-bottom: 0;
+  padding-top: 1rem;
+  padding-bottom: 1.75rem;
 }
 main.site-main .qui-suis-je-section {
   padding-top: 1.75rem;
@@ -944,12 +939,8 @@ main.site-main .article-catalog-section {
     padding-bottom: 1.85rem;
   }
   main.site-main .page-header--responsive {
-    padding-top: 2rem;
-    padding-bottom: 4rem;
-  }
-  main.site-main .page-header--responsive.page-header--image-only {
-    padding-top: 0;
-    padding-bottom: 0;
+    padding-top: 1.15rem;
+    padding-bottom: 2rem;
   }
   main.site-main .article-catalog-section {
     padding-top: 1.75rem;
@@ -1142,41 +1133,6 @@ main.site-main .article-catalog-section {
 
 .page-header--image {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
-  padding: 0 !important;
-  line-height: 0;
-}
-
-.page-header--image-only {
-  min-height: 0;
-  background: transparent;
-}
-
-/* Image entière, sans recadrage cover — la hauteur suit la photo. */
-.page-header__full-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 0;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.page-header__image-veil {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.page-header--image .page-header__copy {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  line-height: normal;
-  pointer-events: none;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
@@ -2834,11 +2790,7 @@ button.nav-link.nav-link-header {
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
   .page-header--responsive.page-header--image {
-    min-height: 0;
-  }
-
-  .page-header--responsive.page-header--image-only {
-    min-height: 0;
+    min-height: 10.5rem;
   }
 
   .page-header--responsive.page-header--image .section-subtitle {
