@@ -1140,7 +1140,7 @@ main.site-main .article-catalog-section {
   justify-content: center;
 }
 
-/* Affiche déjà écrite (ex. Contact) : image entière, sans recadrage cover. */
+/* Affiche déjà écrite (ex. Contact) : image pleine largeur, sans marges. */
 .page-header--image-only {
   min-height: 0;
   padding: 0 !important;
@@ -1154,40 +1154,41 @@ main.site-main .article-catalog-section {
   height: auto;
   object-fit: contain;
   object-position: center;
-  margin: 0 auto;
+  margin: 0;
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* Contact : moins de blanc autour / dans l’affiche (marges crème de l’image). */
+/* Contact : bandeau bord à bord, sans marge blanche. */
 .contact-banner-wrap {
-  margin: 0;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   padding: 0;
   line-height: 0;
   overflow: hidden;
-  background: #f4ebe8;
+  background: transparent;
 }
 
 .page-header--contact.page-header--image-only {
+  width: 100%;
+  margin: 0;
+  padding: 0 !important;
   overflow: hidden;
-  background: #f4ebe8;
+  background: transparent;
+  box-shadow: none;
 }
 
 .page-header--contact .page-header__full-image {
   display: block;
-  width: 112%;
+  width: 100%;
   max-width: none;
   height: auto;
-  /* Rogne légèrement les marges crème haut / bas / côtés. */
-  margin: -2.8% -6% -2.8% -6%;
-  transform: none;
-}
-
-@media (max-width: 639px) {
-  .page-header--contact .page-header__full-image {
-    width: 110%;
-    margin: -2% -5% -2% -5%;
-  }
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: top;
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
