@@ -5,9 +5,10 @@ export default function PageHeader({ title, subtitle, image, legal, className = 
       style={
         image
           ? {
-              backgroundImage: `linear-gradient(to bottom, rgba(139,75,106,0.55), rgba(192,122,151,0.3)), url(${image})`,
+              backgroundImage: `linear-gradient(to bottom, rgba(139,75,106,0.38), rgba(192,122,151,0.18)), url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
             }
           : {}
       }
