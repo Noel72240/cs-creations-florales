@@ -1146,10 +1146,20 @@ main.site-main .page-header--responsive.page-header--image {
   padding-bottom: 2.25rem;
 }
 
+main.site-main .page-header--responsive.page-header--image-only {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 @media (min-width: 640px) {
   main.site-main .page-header--responsive.page-header--image {
     padding-top: 2.5rem;
     padding-bottom: 2.75rem;
+  }
+
+  main.site-main .page-header--responsive.page-header--image-only {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 }
 
