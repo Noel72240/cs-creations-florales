@@ -913,9 +913,14 @@ main.site-main .mt-10 {
 main.site-main .gap-12 {
   gap: 1.75rem;
 }
+/* Bandeaux : padding d’origine (13 juil.), pas le rythme resserré. */
 main.site-main .page-header--responsive {
-  padding-top: 1rem;
-  padding-bottom: 1.75rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+main.site-main .page-header--responsive.page-header--image-only {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 main.site-main .qui-suis-je-section {
   padding-top: 1.75rem;
@@ -939,8 +944,12 @@ main.site-main .article-catalog-section {
     padding-bottom: 1.85rem;
   }
   main.site-main .page-header--responsive {
-    padding-top: 1.15rem;
-    padding-bottom: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+  }
+  main.site-main .page-header--responsive.page-header--image-only {
+    padding-top: 0;
+    padding-bottom: 0;
   }
   main.site-main .article-catalog-section {
     padding-top: 1.75rem;
@@ -1133,34 +1142,10 @@ main.site-main .article-catalog-section {
 
 .page-header--image {
   box-shadow: 0 12px 40px rgba(80, 45, 70, 0.12);
-  /* Hauteur suffisante pour voir la photo (camion, fleurs…), pas un mince liseré. */
-  min-height: clamp(16rem, 38vw, 24rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
 }
 
-main.site-main .page-header--responsive.page-header--image {
-  padding-top: 2rem;
-  padding-bottom: 2.25rem;
-}
-
-main.site-main .page-header--responsive.page-header--image-only {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-@media (min-width: 640px) {
-  main.site-main .page-header--responsive.page-header--image {
-    padding-top: 2.5rem;
-    padding-bottom: 2.75rem;
-  }
-
-  main.site-main .page-header--responsive.page-header--image-only {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
+.page-header--image-only {
+  min-height: clamp(12rem, 32vw, 20rem);
 }
 
 /* Sous-titre bandeau — sous le titre, plus discret */
@@ -2818,7 +2803,11 @@ button.nav-link.nav-link-header {
 /* ─── Mobile : catalogue & fiche produit ─── */
 @media (max-width: 639px) {
   .page-header--responsive.page-header--image {
-    min-height: clamp(14rem, 55vw, 18rem);
+    min-height: 10.5rem;
+  }
+
+  .page-header--responsive.page-header--image-only {
+    min-height: 11rem;
   }
 
   .page-header--responsive.page-header--image .section-subtitle {

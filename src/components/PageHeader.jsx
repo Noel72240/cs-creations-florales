@@ -3,17 +3,15 @@ export default function PageHeader({ title, subtitle, image, legal, className = 
 
   return (
     <div
-      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${!hasText && image ? ' page-header--image-only' : ' pt-4 pb-7 sm:pt-5 sm:pb-10'}${className ? ` ${className}` : ''}`}
+      className={`page-header page-header--fx page-header--responsive relative overflow-hidden ${image ? 'page-header--image' : 'page-header--plain'}${!hasText && image ? ' page-header--image-only' : ' pt-6 pb-10 sm:pt-8 sm:pb-16'}${className ? ` ${className}` : ''}`}
       style={
         image
           ? {
-              // Affiche déjà écrite : pas de voile, pour laisser le graphisme visible.
               backgroundImage: hasText
-                ? `linear-gradient(to bottom, rgba(139,75,106,0.38), rgba(192,122,151,0.18)), url(${image})`
+                ? `linear-gradient(to bottom, rgba(139,75,106,0.55), rgba(192,122,151,0.3)), url(${image})`
                 : `url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
             }
           : undefined
       }
