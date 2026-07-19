@@ -18,7 +18,6 @@ export const FLORAL_COLOR_PALETTE = {
   violet: { label: 'Violet', hex: '#9b68b8' },
   fuchsia: { label: 'Fuchsia', hex: '#e83898' },
   rouge: { label: 'Rouge', hex: '#c41e3a' },
-  vertFonce: { label: 'Vert foncé', hex: '#2d5016' },
   bleuClair: { label: 'Bleu clair', hex: '#87ceeb' },
   marron: { label: 'Marron', hex: '#6b4423' },
 
@@ -57,7 +56,6 @@ export const ROSE_FOAM_COLOR_KEYS = [
   'noir',
   'rosePale',
   'vertAnis',
-  'vertFonce',
   'jaune',
   'gris',
   'peche',
@@ -89,7 +87,7 @@ export const PALETTE_SETS = {
     'blanc', 'creme', 'jaune', 'orange', 'rouge', 'bordeaux',
     'rosePale', 'rose', 'roseRose', 'fuchsia', 'violet',
     'bleuCiel', 'bleuRoi', 'bleuClair', 'bleuFonce',
-    'vertAnis', 'vertClair', 'vertFonce',
+    'vertAnis', 'vertClair',
     'camel', 'beige', 'marron', 'marronClair', 'marronFonce', 'gris', 'noir', 'dore', 'argente',
   ],
 }
